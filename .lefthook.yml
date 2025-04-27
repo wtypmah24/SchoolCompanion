@@ -1,0 +1,6 @@
+pre-commit:
+  enabled: true
+  commands:
+    format-java:
+      name: "Format Java code"
+      run: "mvn com.coveo:format-maven-plugin:format"

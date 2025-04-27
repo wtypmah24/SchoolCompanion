@@ -1,0 +1,40 @@
+package org.back.beobachtungapp.entity.companion;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.ToString;
+import org.back.beobachtungapp.entity.child.Child;
+import org.back.beobachtungapp.entity.note.Note;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+import java.util.Set;
+
+//TODO: add roles
+@Entity
+@Table(name = "companion")
+@Data
+@EntityListeners(AuditingEntityListener.class)
+public class Companion {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+    @Column(nullable = false)
+    private String name;
+    @Column(nullable = false)
+    private String surname;
+    @Column(unique = true, nullable = false)
+    private String email;
+    @Column(nullable = false)
+    private String password;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private Set<Child> children;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private Set<Note> notes;
+    @CreatedDate()
+    @Column(name = "created_at", updatable = false)
+    LocalDateTime createdAt;
+}
