@@ -1,5 +1,6 @@
 package org.back.beobachtungapp.entity.child;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.back.beobachtungapp.entity.companion.Companion;
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+@SuppressFBWarnings
 @Entity
 @Table()
 @Data

@@ -1,5 +1,6 @@
 package org.back.beobachtungapp.config;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.back.beobachtungapp.service.CompanionJwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +23,7 @@ import java.util.List;
 
 @Configuration
 public class SecurityConfig {
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "CompanionJwtFilter is immutable and safe to inject")
     private final CompanionJwtFilter companionJwtFilter;
 
     @Autowired

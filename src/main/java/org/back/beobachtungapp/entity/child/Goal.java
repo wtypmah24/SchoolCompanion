@@ -1,11 +1,13 @@
 package org.back.beobachtungapp.entity.child;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDate;
 
+@SuppressFBWarnings
 @Entity
 @Table()
 @Data

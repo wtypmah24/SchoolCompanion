@@ -1,5 +1,6 @@
 package org.back.beobachtungapp.entity.companion;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 //TODO: add roles
+@SuppressFBWarnings
 @Entity
 @Table(name = "companion")
 @Data

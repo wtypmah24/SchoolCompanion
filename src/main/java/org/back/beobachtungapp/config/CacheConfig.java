@@ -16,7 +16,7 @@ public class CacheConfig {
     private final ObjectMapper objectMapper;
 
     public CacheConfig(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+        this.objectMapper = objectMapper.copy();
     }
 
     @Bean

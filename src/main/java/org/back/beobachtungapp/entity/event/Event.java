@@ -1,11 +1,13 @@
 package org.back.beobachtungapp.entity.event;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.back.beobachtungapp.entity.companion.Companion;
 
 import java.time.LocalDate;
 
+@SuppressFBWarnings
 @Entity
 @Table()
 @Data

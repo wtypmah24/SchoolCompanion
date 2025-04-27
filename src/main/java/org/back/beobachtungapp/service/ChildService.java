@@ -3,6 +3,7 @@ package org.back.beobachtungapp.service;
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.dto.request.child.ChildRequestDto;
 import org.back.beobachtungapp.dto.response.child.ChildResponseDto;
+import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.mapper.ChildMapper;
@@ -35,8 +36,8 @@ public class ChildService {
     }
 
     @Cacheable(value = "children", key = "#companion.id", unless = "#result == null or #result.isEmpty()")
-    public List<Child> findAllByCompanion(Companion companion) {
+    public List<Child> findAllByCompanion(CompanionDto companion) {
         log.info("findAllByCompanion{}", companion);
-        return childRepository.findAllBySchoolCompanion(companion);
+        return childRepository.findAllBySchoolCompanionId(companion.id());
     }
 }

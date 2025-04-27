@@ -1,5 +1,6 @@
 package org.back.beobachtungapp.service;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.config.JwtProperties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.time.temporal.ChronoUnit;
 @Service
 public class TokenService {
     private final JwtEncoder encoder;
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     private final JwtProperties jwtProperties;
 
     @Autowired

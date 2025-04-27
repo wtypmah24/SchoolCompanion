@@ -1,11 +1,13 @@
 package org.back.beobachtungapp.entity.monitoring;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.back.beobachtungapp.entity.child.Child;
 
 import java.util.Set;
 
+@SuppressFBWarnings
 @Entity
 @Table(name = "monitoring_parameters")
 @Data

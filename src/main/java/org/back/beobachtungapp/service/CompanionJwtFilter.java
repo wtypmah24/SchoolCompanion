@@ -5,8 +5,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.entity.companion.CompanionAuthentication;
+import org.back.beobachtungapp.mapper.CompanionMapper;
 import org.back.beobachtungapp.repository.CompanionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -29,11 +31,13 @@ public class CompanionJwtFilter extends OncePerRequestFilter {
 
     private final JwtDecoder jwtDecoder;
     private final CompanionRepository companionRepository;
+    private final CompanionMapper companionMapper;
 
     @Autowired
-    public CompanionJwtFilter(JwtDecoder jwtDecoder, CompanionRepository companionRepository) {
+    public CompanionJwtFilter(JwtDecoder jwtDecoder, CompanionRepository companionRepository, CompanionMapper companionMapper) {
         this.jwtDecoder = jwtDecoder;
         this.companionRepository = companionRepository;
+        this.companionMapper = companionMapper;
     }
 
     @Override
@@ -47,14 +51,11 @@ public class CompanionJwtFilter extends OncePerRequestFilter {
             try {
                 Jwt jwt = jwtDecoder.decode(token);
                 String email = jwt.getSubject();
-
-
                 Companion companion = companionRepository.findByEmail(email)
                         .orElseThrow(() -> new NoSuchElementException("Companion not found with email: " + email));
-
+                CompanionDto companionDto = companionMapper.companionToCompanionDto(companion);
                 List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-
-                CompanionAuthentication authentication = new CompanionAuthentication(companion, authorities);
+                CompanionAuthentication authentication = new CompanionAuthentication(companionDto, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } catch (JwtException e) {
