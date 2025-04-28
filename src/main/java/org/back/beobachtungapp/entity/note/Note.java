@@ -11,15 +11,17 @@ import org.back.beobachtungapp.entity.companion.Companion;
 @Table()
 @Data
 public class Note {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    @Column()
-    String content;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "child_id")
-    private Child child;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "companion_id")
-    private Companion companion;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
+
+  @Column() String content;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "child_id")
+  private Child child;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "companion_id")
+  private Companion companion;
 }

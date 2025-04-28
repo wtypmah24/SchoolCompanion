@@ -7,7 +7,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface EventMapper {
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "companion", ignore = true)
-    Event eventRequestDtoToEvent(EventRequestDto eventRequestDto);
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "companion", ignore = true)
+  Event eventRequestDtoToEvent(EventRequestDto eventRequestDto);
 }

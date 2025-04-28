@@ -8,7 +8,8 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface MonitoringEntryMapper {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "monitoringParameter", ignore = true)
-    MonitoringEntry monitoringEntryRequestDtoToEntry(MonitoringEntryRequestDto monitoringEntryRequestDto);
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "monitoringParameter", ignore = true)
+  MonitoringEntry monitoringEntryRequestDtoToEntry(
+      MonitoringEntryRequestDto monitoringEntryRequestDto);
 }

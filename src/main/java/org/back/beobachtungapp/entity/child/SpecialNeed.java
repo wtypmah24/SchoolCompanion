@@ -9,14 +9,14 @@ import lombok.Data;
 @Table()
 @Data
 public class SpecialNeed {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    @Column()
-    private String type;
-    @Column()
-    private String description;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn()
-    private Child child;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
+
+  @Column() private String type;
+  @Column() private String description;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn()
+  private Child child;
 }

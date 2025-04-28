@@ -3,4 +3,18 @@ pre-commit:
   commands:
     format-java:
       name: "Format Java code"
-      run: "mvn com.coveo:format-maven-plugin:format"
+      run: "mvn spotless:apply"
+    spotbugs-check:
+      name: "SpotBugs static analysis"
+      run: "mvn spotbugs:check"
+#    check-dependencies:
+#      name: "Check for dependency vulnerabilities"
+#      run: "mvn org.owasp:dependency-check-maven:check"
+
+commit-msg:
+  enabled: true
+  commands:
+    validate-commit-msg:
+      name: "Validate commit message"
+      run: "commitlint --edit {1}"
+

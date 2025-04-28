@@ -7,8 +7,8 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface NoteMapper {
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "child", ignore = true)
-    @Mapping(target = "companion", ignore = true)
-    Note noteRequestDtoToNote(NoteRequestDto noteRequestDto);
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "child", ignore = true)
+  @Mapping(target = "companion", ignore = true)
+  Note noteRequestDtoToNote(NoteRequestDto noteRequestDto);
 }

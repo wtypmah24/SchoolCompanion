@@ -7,7 +7,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface SpecialNeedMapper {
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "child", ignore = true)
-    SpecialNeed specialNeedRequestDtoToSpecialNeed(SpecialNeedRequestDto specialNeedRequestDto);
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "child", ignore = true)
+  SpecialNeed specialNeedRequestDtoToSpecialNeed(SpecialNeedRequestDto specialNeedRequestDto);
 }

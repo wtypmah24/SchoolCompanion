@@ -18,25 +18,26 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Component
 public class CurrentCompanionArgumentResolver implements HandlerMethodArgumentResolver {
 
-    @Override
-    public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.hasParameterAnnotation(CurrentCompanion.class)
-                && CompanionDto.class.isAssignableFrom(parameter.getParameterType());
+  @Override
+  public boolean supportsParameter(MethodParameter parameter) {
+    return parameter.hasParameterAnnotation(CurrentCompanion.class)
+        && CompanionDto.class.isAssignableFrom(parameter.getParameterType());
+  }
+
+  @Override
+  public Object resolveArgument(
+      @NonNull MethodParameter parameter,
+      ModelAndViewContainer mavContainer,
+      @NonNull NativeWebRequest webRequest,
+      WebDataBinderFactory binderFactory)
+      throws Exception {
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    if (authentication instanceof CompanionAuthentication companionAuth) {
+      return companionAuth.getPrincipal();
     }
 
-    @Override
-    public Object resolveArgument(
-            @NonNull MethodParameter parameter,
-            ModelAndViewContainer mavContainer,
-            @NonNull NativeWebRequest webRequest,
-            WebDataBinderFactory binderFactory) throws Exception {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication instanceof CompanionAuthentication companionAuth) {
-            return companionAuth.getPrincipal();
-        }
-
-        throw new IllegalStateException("No authenticated Companion found");
-    }
+    throw new IllegalStateException("No authenticated Companion found");
+  }
 }

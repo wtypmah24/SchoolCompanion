@@ -8,8 +8,8 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface GoalMapper {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "child", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    Goal goalRequestDtoToGoal(GoalRequestDto goalRequestDto);
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "child", ignore = true)
+  @Mapping(target = "createdAt", ignore = true)
+  Goal goalRequestDtoToGoal(GoalRequestDto goalRequestDto);
 }

@@ -9,11 +9,11 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface CompanionMapper {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "children", ignore = true)
-    @Mapping(target = "notes", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    Companion companionRequestDtoToCompanion(CompanionRequestDto companionRequestDto);
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "children", ignore = true)
+  @Mapping(target = "notes", ignore = true)
+  @Mapping(target = "createdAt", ignore = true)
+  Companion companionRequestDtoToCompanion(CompanionRequestDto companionRequestDto);
 
-    CompanionDto companionToCompanionDto(Companion companion);
+  CompanionDto companionToCompanionDto(Companion companion);
 }
