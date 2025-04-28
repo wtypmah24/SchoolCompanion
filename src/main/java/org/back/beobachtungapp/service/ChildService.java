@@ -27,8 +27,10 @@ public class ChildService {
   }
 
   @Transactional
-  public ChildResponseDto save(ChildRequestDto child, Companion companion) {
+  public ChildResponseDto save(ChildRequestDto child, CompanionDto companionDto) {
     Child newChild = childMapper.childRequestDtoToChild(child);
+    Companion companion = new Companion();
+    companion.setId(companionDto.id());
     newChild.setSchoolCompanion(companion);
     Child savedChild = childRepository.save(newChild);
     return childMapper.childToChildResponseDto(savedChild);

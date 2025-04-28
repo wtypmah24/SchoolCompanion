@@ -1,5 +1,6 @@
 package org.back.beobachtungapp.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.dto.request.companion.CompanionRequestDto;
 import org.back.beobachtungapp.entity.companion.Companion;
@@ -7,6 +8,7 @@ import org.back.beobachtungapp.mapper.CompanionMapper;
 import org.back.beobachtungapp.repository.CompanionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,13 +43,14 @@ public class CompanionService {
 
   @Cacheable(value = "users", key = "#id", unless = "#result == null")
   public Companion findById(Long id) {
-    return companionRepository.findById(id).orElse(null); // TODO: mb switch to throw exception
+    return companionRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Companion not found with id: " + id));
   }
 
   @Cacheable(value = "users", key = "#email", unless = "#result == null")
   public Companion findCompanionByEmail(String email) {
     return companionRepository
         .findByEmail(email)
-        .orElse(null); // TODO: mb switch to throw exception
+            .orElseThrow(() -> new EntityNotFoundException("Companion not found with email: " + email));
   }
 }
