@@ -7,9 +7,9 @@ pre-commit:
     spotbugs-check:
       name: "SpotBugs static analysis"
       run: "mvn spotbugs:check"
-#    check-dependencies:
-#      name: "Check for dependency vulnerabilities"
-#      run: "mvn org.owasp:dependency-check-maven:check"
+    check-dependencies:
+      name: "Check for dependency vulnerabilities"
+      run: "mvn org.owasp:dependency-check-maven:check"
 
 commit-msg:
   enabled: true
