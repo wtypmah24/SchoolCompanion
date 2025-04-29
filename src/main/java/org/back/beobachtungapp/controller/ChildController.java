@@ -39,7 +39,7 @@ public class ChildController {
   @PostMapping()
   public ResponseEntity<ChildResponseDto> add(
       @Parameter(description = "Child details to be added") @RequestBody ChildRequestDto child,
-      @CurrentCompanion Companion companion // TODO: switch to companionDto
+      @CurrentCompanion CompanionDto companion
       ) {
     return ResponseEntity.status(HttpStatus.CREATED).body(childService.save(child, companion));
   }

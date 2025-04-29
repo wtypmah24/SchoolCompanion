@@ -2,19 +2,23 @@ package org.back.beobachtungapp.entity.child;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
 import lombok.Data;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.entity.monitoring.MonitoringParameter;
 import org.back.beobachtungapp.entity.note.Note;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 @SuppressFBWarnings
 @Entity
 @Table()
 @Data
+@EntityListeners(AuditingEntityListener.class)
 public class Child {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,5 +46,12 @@ public class Child {
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<Note> notes;
 
-  @CreatedDate() LocalDate createdAt;
+  @LastModifiedDate
+  @Column(name = "updated_at")
+  LocalDateTime updatedAt;
+
+  @CreatedDate()
+  @Column(name = "created_at", updatable = false)
+  LocalDateTime createdAt;
 }
+
