@@ -3,14 +3,13 @@ package org.back.beobachtungapp.filter;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CachedBodyHttpServletRequest extends HttpServletRequestWrapper {

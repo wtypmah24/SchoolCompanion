@@ -2,6 +2,9 @@ package org.back.beobachtungapp.entity.child;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 import lombok.Data;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.entity.monitoring.MonitoringParameter;
@@ -9,10 +12,6 @@ import org.back.beobachtungapp.entity.note.Note;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
 
 @SuppressFBWarnings
 @Entity
@@ -54,4 +53,3 @@ public class Child {
   @Column(name = "created_at", updatable = false)
   LocalDateTime createdAt;
 }
-

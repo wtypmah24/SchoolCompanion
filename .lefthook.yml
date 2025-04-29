@@ -3,7 +3,7 @@ pre-commit:
   commands:
     format-java:
       name: "Format Java code"
-      run: "mvn spotless:apply"
+      run: "mvn spotless:check"
     spotbugs-check:
       name: "SpotBugs static analysis"
       run: "mvn spotbugs:check"
