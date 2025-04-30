@@ -2,7 +2,6 @@ package org.back.beobachtungapp.entity.monitoring;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 import java.util.Set;
 import lombok.Data;

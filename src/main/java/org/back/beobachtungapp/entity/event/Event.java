@@ -4,7 +4,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import lombok.Data;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.springframework.data.annotation.CreatedDate;
