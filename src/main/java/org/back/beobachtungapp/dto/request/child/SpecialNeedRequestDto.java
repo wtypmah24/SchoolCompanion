@@ -11,6 +11,6 @@ public record SpecialNeedRequestDto(
         @Size(min = 5, max = 500, message = "Description must be between 5 and 500 characters")
         String description
 
-    // We don't include childId here, if we send child id in URL:
+    // We don't include entityId here, if we send child id in URL:
     // for example: POST /children/{id}/special-needs
     ) {}

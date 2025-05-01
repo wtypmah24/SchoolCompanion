@@ -17,5 +17,5 @@ public record EventRequestDto(
         @FutureOrPresent(message = "Event date must be today or in the future")
         LocalDate eventDate
 
-    // companionId don't include, if Companion will be taken from current auth companion
+    // groupId don't include, if Companion will be taken from current auth companion
     ) {}

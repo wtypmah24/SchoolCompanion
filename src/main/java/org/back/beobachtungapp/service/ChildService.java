@@ -9,8 +9,7 @@ import org.back.beobachtungapp.dto.response.child.ChildResponseDto;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.companion.Companion;
-import org.back.beobachtungapp.event.ChildCacheEvictEvent;
-import org.back.beobachtungapp.event.ChildCacheUpdateEvent;
+import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.ChildMapper;
 import org.back.beobachtungapp.repository.ChildRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +42,6 @@ public class ChildService {
     companion.setId(companionDto.id());
     newChild.setSchoolCompanion(companion);
     Child savedChild = childRepository.save(newChild);
-    eventPublisher.publishEvent(new ChildCacheUpdateEvent(savedChild.getId(), companion.getId()));
     return childMapper.childToChildResponseDto(savedChild);
   }
 
@@ -57,7 +55,9 @@ public class ChildService {
                 () -> new EntityNotFoundException("Companion not found with id: " + childId));
     childMapper.updateChildFromDto(childUpdateDto, child);
     eventPublisher.publishEvent(
-        new ChildCacheUpdateEvent(child.getId(), child.getSchoolCompanion().getId()));
+        new CacheEvent(
+            new String[] {"child", "children"},
+            new Object[] {childId, child.getSchoolCompanion().getId()}));
     return childMapper.childToChildResponseDto(child);
   }
 
@@ -68,10 +68,12 @@ public class ChildService {
             .findById(childId)
             .orElseThrow(() -> new EntityNotFoundException("Child not found: " + childId));
 
-    Long companionId = child.getSchoolCompanion().getId();
     childRepository.delete(child);
 
-    eventPublisher.publishEvent(new ChildCacheEvictEvent(childId, companionId));
+    eventPublisher.publishEvent(
+        new CacheEvent(
+            new String[] {"child", "children"},
+            new Object[] {childId, child.getSchoolCompanion().getId()}));
   }
 
   @Cacheable(value = "children", key = "#companion.id()")
