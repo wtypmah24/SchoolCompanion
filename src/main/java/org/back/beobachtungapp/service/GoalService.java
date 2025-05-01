@@ -2,7 +2,6 @@ package org.back.beobachtungapp.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.dto.request.child.GoalRequestDto;
 import org.back.beobachtungapp.dto.response.child.GoalResponseDto;

@@ -36,11 +36,11 @@ public class GoalController {
         @ApiResponse(responseCode = "400", description = "Invalid input"),
         @ApiResponse(responseCode = "401", description = "Unauthorized access")
       })
-  @PostMapping("{goalId}")
+  @PostMapping("{childId}")
   public ResponseEntity<GoalResponseDto> add(
       @Parameter(description = "Goal details to be added") @RequestBody GoalRequestDto goal,
-      @PathVariable long goalId) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(goalService.save(goal, goalId));
+      @PathVariable long childId) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(goalService.save(goal, childId));
   }
 
   @Operation(

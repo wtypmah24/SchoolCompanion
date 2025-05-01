@@ -37,7 +37,10 @@ public class CacheConfig {
     Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
     cacheConfigurations.put("child", redisCacheConfiguration);
     cacheConfigurations.put("children", redisCacheConfiguration);
-
+    cacheConfigurations.put("goals", redisCacheConfiguration);
+    cacheConfigurations.put("goal", redisCacheConfiguration);
+    cacheConfigurations.put("need", redisCacheConfiguration);
+    cacheConfigurations.put("needs", redisCacheConfiguration);
     return RedisCacheManager.builder(factory)
         .cacheDefaults(redisCacheConfiguration)
         .withInitialCacheConfigurations(cacheConfigurations)

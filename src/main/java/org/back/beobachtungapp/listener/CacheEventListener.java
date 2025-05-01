@@ -32,7 +32,6 @@ public class CacheEventListener {
     }
   }
 
-
   private Cache getRequiredCache(String name) {
     Cache cache = cacheManager.getCache(name);
     if (cache == null) {
