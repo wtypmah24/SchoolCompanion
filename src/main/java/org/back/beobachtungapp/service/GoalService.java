@@ -9,6 +9,7 @@ import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.child.Goal;
 import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.GoalMapper;
+import org.back.beobachtungapp.repository.ChildRepository;
 import org.back.beobachtungapp.repository.GoalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,15 +23,18 @@ public class GoalService {
   private final GoalRepository goalRepository;
   private final GoalMapper goalMapper;
   private final ApplicationEventPublisher eventPublisher;
+  private final ChildRepository childRepository;
 
   @Autowired
   public GoalService(
       GoalRepository goalRepository,
       GoalMapper goalMapper,
-      ApplicationEventPublisher eventPublisher) {
+      ApplicationEventPublisher eventPublisher,
+      ChildRepository childRepository) {
     this.goalRepository = goalRepository;
     this.goalMapper = goalMapper;
     this.eventPublisher = eventPublisher;
+    this.childRepository = childRepository;
   }
 
   @Transactional
@@ -39,10 +43,11 @@ public class GoalService {
 
     Goal goal = goalMapper.goalRequestDtoToGoal(goalDto);
 
-    Child childRef = new Child();
-    childRef.setId(childId);
-    goal.setChild(childRef);
-
+    Child child =
+        childRepository
+            .findByIdCustom(childId)
+            .orElseThrow(() -> new EntityNotFoundException("Child not found"));
+    child.addGoal(goal);
     Goal savedGoal = goalRepository.save(goal);
     log.info(
         "Successfully saved goal with id: {} for child with id: {}", savedGoal.getId(), childId);

@@ -11,6 +11,7 @@ import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.entity.note.Note;
 import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.NoteMapper;
+import org.back.beobachtungapp.repository.ChildRepository;
 import org.back.beobachtungapp.repository.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,15 +25,18 @@ public class NoteService {
   private final NoteRepository noteRepository;
   private final NoteMapper noteMapper;
   private final ApplicationEventPublisher eventPublisher;
+  private final ChildRepository childRepository;
 
   @Autowired
   public NoteService(
       NoteRepository noteRepository,
       NoteMapper noteMapper,
-      ApplicationEventPublisher eventPublisher) {
+      ApplicationEventPublisher eventPublisher,
+      ChildRepository childRepository) {
     this.noteRepository = noteRepository;
     this.noteMapper = noteMapper;
     this.eventPublisher = eventPublisher;
+    this.childRepository = childRepository;
   }
 
   @Transactional
@@ -45,11 +49,13 @@ public class NoteService {
 
     Note note = noteMapper.noteRequestDtoToNote(noteRequestDto);
 
-    Child childRef = new Child();
-    childRef.setId(childId);
+    Child child =
+        childRepository
+            .findByIdCustom(childId)
+            .orElseThrow(() -> new EntityNotFoundException("Child not found"));
     Companion companionRef = new Companion();
     companionRef.setId(companionDto.id());
-    note.setChild(childRef);
+    child.addNote(note);
     note.setCompanion(companionRef);
 
     Note savedNote = noteRepository.save(note);

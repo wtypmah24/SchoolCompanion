@@ -11,7 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @SuppressFBWarnings
 @Entity
-@Table(name = "monitoring_entry")
+@Table(name = "monitoring_entries")
 @Data
 @EntityListeners(AuditingEntityListener.class)
 public class MonitoringEntry {

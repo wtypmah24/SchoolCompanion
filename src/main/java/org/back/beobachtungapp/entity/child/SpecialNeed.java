@@ -10,7 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @SuppressFBWarnings
 @Entity
-@Table(name = "special_need")
+@Table(name = "special_needs")
 @EntityListeners(AuditingEntityListener.class)
 @Data
 public class SpecialNeed {

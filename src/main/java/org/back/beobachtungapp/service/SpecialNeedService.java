@@ -10,6 +10,7 @@ import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.child.SpecialNeed;
 import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.SpecialNeedMapper;
+import org.back.beobachtungapp.repository.ChildRepository;
 import org.back.beobachtungapp.repository.SpecialNeedRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,15 +24,18 @@ public class SpecialNeedService {
   private final SpecialNeedRepository specialNeedRepo;
   private final SpecialNeedMapper specialNeedMapper;
   private final ApplicationEventPublisher eventPublisher;
+  private final ChildRepository childRepository;
 
   @Autowired
   public SpecialNeedService(
       SpecialNeedRepository specialNeedRepo,
       SpecialNeedMapper specialNeedMapper,
-      ApplicationEventPublisher eventPublisher) {
+      ApplicationEventPublisher eventPublisher,
+      ChildRepository childRepository) {
     this.specialNeedRepo = specialNeedRepo;
     this.specialNeedMapper = specialNeedMapper;
     this.eventPublisher = eventPublisher;
+    this.childRepository = childRepository;
   }
 
   @Transactional
@@ -39,10 +43,11 @@ public class SpecialNeedService {
     log.info("Saving special need for child with id: {}", childId);
 
     SpecialNeed need = specialNeedMapper.specialNeedRequestDtoToSpecialNeed(goalDto);
-    Child childRef = new Child();
-    childRef.setId(childId);
-    need.setChild(childRef);
-
+    Child child =
+        childRepository
+            .findByIdCustom(childId)
+            .orElseThrow(() -> new EntityNotFoundException("Child not found"));
+    child.addSpecialNeed(need);
     SpecialNeed savedNeed = specialNeedRepo.save(need);
     log.info(
         "Successfully saved special need with id: {} for child with id: {}",

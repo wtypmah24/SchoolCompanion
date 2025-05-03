@@ -19,6 +19,8 @@ public interface ChildMapper {
   Child childRequestDtoToChild(ChildRequestDto childRequestDto);
 
   @Mapping(target = "specialNeeds", source = "specialNeeds")
+  @Mapping(target = "goals", source = "goals")
+  @Mapping(target = "notes", source = "notes")
   ChildResponseDto childToChildResponseDto(Child child);
 
   List<ChildResponseDto> childToChildResponseDtoList(List<Child> children);

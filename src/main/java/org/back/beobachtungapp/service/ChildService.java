@@ -55,7 +55,7 @@ public class ChildService {
 
     Child child =
         childRepository
-            .findById(childId)
+            .findByIdCustom(childId)
             .orElseThrow(
                 () -> {
                   log.error("Child not found with id: {}", childId);
@@ -80,7 +80,7 @@ public class ChildService {
 
     Child child =
         childRepository
-            .findById(childId)
+            .findByIdCustom(childId)
             .orElseThrow(
                 () -> {
                   log.error("Child not found with id: {}", childId);
@@ -119,7 +119,7 @@ public class ChildService {
 
     Child child =
         childRepository
-            .findById(id)
+            .findByIdCustom(id)
             .orElseThrow(
                 () -> {
                   log.error("Child not found with id: {}", id);

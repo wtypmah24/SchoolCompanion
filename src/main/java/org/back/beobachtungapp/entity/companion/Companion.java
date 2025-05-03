@@ -16,7 +16,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 // TODO: add roles
 @SuppressFBWarnings
 @Entity
-@Table(name = "companion")
+@Table(name = "companions")
 @Data
 @EntityListeners(AuditingEntityListener.class)
 public class Companion {

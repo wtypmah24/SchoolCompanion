@@ -40,4 +40,4 @@ public record ChildUpdateDto(
             example = "2010-05-15",
             type = "string",
             format = "date")
-        LocalDate dOb) {}
+        LocalDate dateOfBirth) {}

@@ -10,7 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @SuppressFBWarnings
 @Entity
-@Table()
+@Table(name = "goals")
 @Data
 @EntityListeners(AuditingEntityListener.class)
 public class Goal {

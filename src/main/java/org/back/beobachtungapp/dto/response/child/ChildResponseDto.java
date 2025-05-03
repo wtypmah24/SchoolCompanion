@@ -15,7 +15,7 @@ public record ChildResponseDto(
     @Schema(description = "Email address of the child", example = "john.doe@example.com")
         String email,
     @Schema(description = "Phone number of the child", example = "+1234567890") String phoneNumber,
-    @Schema(description = "Date of birth of the child", example = "18-02-2012") LocalDate dOb,
+    @Schema(description = "Date of birth of the child", example = "18-02-2012") LocalDate dateOfBirth,
     @Schema(description = "Notes associated with the child") Set<NoteResponseDto> notes,
     @Schema(description = "Special needs of the child") Set<SpecialNeedResponseDto> specialNeeds,
     @Schema(description = "Goals assigned to the child") Set<GoalResponseDto> goals) {}

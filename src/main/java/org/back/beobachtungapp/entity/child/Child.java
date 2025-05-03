@@ -16,7 +16,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @SuppressFBWarnings
 @Entity
-@Table()
+@Table(name = "children")
 @Data
 @EntityListeners(AuditingEntityListener.class)
 public class Child {
@@ -28,9 +28,8 @@ public class Child {
   @Column() private String surname;
   @Column() private String email;
   @Column() private String phoneNumber;
+  @Column() private LocalDate dateOfBirth;
   @ElementCollection List<String> interests;
-  @Column private LocalDate dOb;
-
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "companion_id")
   private Companion schoolCompanion;
@@ -54,4 +53,16 @@ public class Child {
   @CreatedDate()
   @Column(name = "created_at", updatable = false)
   LocalDateTime createdAt;
+
+  public void addSpecialNeed(SpecialNeed need) {
+    specialNeeds.add(need);
+  }
+
+  public void addNote(Note note) {
+    notes.add(note);
+  }
+
+  public void addGoal(Goal goal) {
+    goals.add(goal);
+  }
 }
