@@ -1,9 +1,10 @@
 package org.back.beobachtungapp.dto.request.note;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
+@Schema(description = "Request payload for creating a new note")
 public record NoteRequestDto(
-    @NotBlank(message = "Value can't be blank") String content,
-    @NotNull(message = "Child id is required") Long childId,
-    @NotNull(message = "Companion ID is required") Long companionId) {}
+    @Schema(description = "Content of the note", example = "This is a note about the event.")
+        @NotBlank(message = "Value can't be blank")
+        String content) {}

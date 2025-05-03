@@ -1,3 +1,22 @@
 package org.back.beobachtungapp.dto.response.child;
 
-public record ChildResponseDto(String name, String surname, String email, String phoneNumber) {}
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDate;
+import java.util.Set;
+import org.back.beobachtungapp.dto.response.note.NoteResponseDto;
+
+@SuppressFBWarnings
+@Schema(description = "Response payload for a child object")
+public record ChildResponseDto(
+    @Schema(description = "Unique identifier of the child", example = "1") Long id,
+    @Schema(description = "First name of the child", example = "John") String name,
+    @Schema(description = "Surname of the child", example = "Doe") String surname,
+    @Schema(description = "Email address of the child", example = "john.doe@example.com")
+        String email,
+    @Schema(description = "Phone number of the child", example = "+1234567890") String phoneNumber,
+    @Schema(description = "Date of birth of the child", example = "18-02-2012")
+        LocalDate dateOfBirth,
+    @Schema(description = "Notes associated with the child") Set<NoteResponseDto> notes,
+    @Schema(description = "Special needs of the child") Set<SpecialNeedResponseDto> specialNeeds,
+    @Schema(description = "Goals assigned to the child") Set<GoalResponseDto> goals) {}

@@ -7,6 +7,7 @@ import java.util.Set;
 import lombok.Data;
 import lombok.ToString;
 import org.back.beobachtungapp.entity.child.Child;
+import org.back.beobachtungapp.entity.monitoring.MonitoringParameter;
 import org.back.beobachtungapp.entity.note.Note;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -15,7 +16,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 // TODO: add roles
 @SuppressFBWarnings
 @Entity
-@Table(name = "companion")
+@Table(name = "companions")
 @Data
 @EntityListeners(AuditingEntityListener.class)
 public class Companion {
@@ -42,6 +43,10 @@ public class Companion {
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @ToString.Exclude
   private Set<Note> notes;
+
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  @ToString.Exclude
+  private Set<MonitoringParameter> params;
 
   @LastModifiedDate
   @Column(name = "updated_at")

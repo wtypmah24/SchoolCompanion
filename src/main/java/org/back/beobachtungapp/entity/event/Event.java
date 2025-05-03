@@ -12,7 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @SuppressFBWarnings
 @Entity
-@Table()
+@Table(name = "events")
 @Data
 @EntityListeners(AuditingEntityListener.class)
 public class Event {

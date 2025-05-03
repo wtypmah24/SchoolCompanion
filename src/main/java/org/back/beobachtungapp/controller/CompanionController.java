@@ -3,8 +3,10 @@ package org.back.beobachtungapp.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.back.beobachtungapp.annotation.CurrentCompanion;
 import org.back.beobachtungapp.dto.request.companion.CompanionRequestDto;
 import org.back.beobachtungapp.dto.request.companion.LoginRequest;
+import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.service.CompanionService;
 import org.back.beobachtungapp.service.TokenService;
@@ -14,10 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("auth")
@@ -69,5 +68,10 @@ public class CompanionController {
 
     String token = tokenService.generateToken(authentication);
     return ResponseEntity.ok(token);
+  }
+
+  @GetMapping("/me")
+  public ResponseEntity<CompanionDto> me(@CurrentCompanion CompanionDto companionDto) {
+    return ResponseEntity.status(HttpStatus.OK).body((companionDto));
   }
 }

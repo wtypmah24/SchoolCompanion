@@ -1,11 +1,10 @@
 package org.back.beobachtungapp.dto.request.child;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
+import java.time.LocalDate;
 
+@Schema(description = "Request payload for  creating a child")
 public record ChildRequestDto(
     @NotBlank(message = "Name cannot be blank")
         @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
@@ -33,4 +32,11 @@ public record ChildRequestDto(
             description = "Phone number of the child",
             example = "+1234567890",
             pattern = "^\\+?[0-9]{7,15}$")
-        String phoneNumber) {}
+        String phoneNumber,
+    @Past(message = "Date of birth must be in the past")
+        @Schema(
+            description = "Date of birth of the child",
+            example = "2010-05-15",
+            type = "string",
+            format = "date")
+        LocalDate dateOfBirth) {}

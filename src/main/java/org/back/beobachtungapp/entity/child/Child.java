@@ -2,6 +2,7 @@ package org.back.beobachtungapp.entity.child;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -15,18 +16,19 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @SuppressFBWarnings
 @Entity
-@Table()
+@Table(name = "children")
 @Data
 @EntityListeners(AuditingEntityListener.class)
 public class Child {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+  private Long id;
 
   @Column() private String name;
   @Column() private String surname;
   @Column() private String email;
   @Column() private String phoneNumber;
+  @Column() private LocalDate dateOfBirth;
   @ElementCollection List<String> interests;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -52,4 +54,16 @@ public class Child {
   @CreatedDate()
   @Column(name = "created_at", updatable = false)
   LocalDateTime createdAt;
+
+  public void addSpecialNeed(SpecialNeed need) {
+    specialNeeds.add(need);
+  }
+
+  public void addNote(Note note) {
+    notes.add(note);
+  }
+
+  public void addGoal(Goal goal) {
+    goals.add(goal);
+  }
 }

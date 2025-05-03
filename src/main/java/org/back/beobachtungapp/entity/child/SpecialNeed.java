@@ -10,7 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @SuppressFBWarnings
 @Entity
-@Table(name = "special_need")
+@Table(name = "special_needs")
 @EntityListeners(AuditingEntityListener.class)
 @Data
 public class SpecialNeed {
@@ -22,7 +22,7 @@ public class SpecialNeed {
   @Column() private String description;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn()
+  @JoinColumn(name = "child_id")
   private Child child;
 
   @LastModifiedDate

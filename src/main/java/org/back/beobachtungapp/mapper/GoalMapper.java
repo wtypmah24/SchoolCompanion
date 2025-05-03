@@ -1,15 +1,23 @@
 package org.back.beobachtungapp.mapper;
 
+import java.util.List;
 import org.back.beobachtungapp.dto.request.child.GoalRequestDto;
+import org.back.beobachtungapp.dto.response.child.GoalResponseDto;
 import org.back.beobachtungapp.entity.child.Goal;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring")
+@Mapper(
+    componentModel = "spring",
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface GoalMapper {
 
-  @Mapping(target = "id", ignore = true)
-  @Mapping(target = "child", ignore = true)
-  @Mapping(target = "createdAt", ignore = true)
   Goal goalRequestDtoToGoal(GoalRequestDto goalRequestDto);
+
+  GoalResponseDto goalToGoalResponseDto(Goal goal);
+
+  void updateGoalFromDto(GoalRequestDto dto, @MappingTarget Goal goal);
+
+  List<GoalResponseDto> goalToGoalResponseDtoList(List<Goal> goals);
 }

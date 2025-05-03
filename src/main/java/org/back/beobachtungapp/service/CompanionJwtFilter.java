@@ -50,8 +50,12 @@ public class CompanionJwtFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
 
     String authHeader = request.getHeader("Authorization");
+    log.debug("AuthHeader: {}", authHeader);
+    System.out.println("AuthHeader:" + authHeader);
     if (authHeader != null && authHeader.startsWith("Bearer ")) {
       String token = authHeader.substring(7);
+      log.debug("token: {}", token);
+      System.out.println("token:" + token);
       try {
         Jwt jwt = jwtDecoder.decode(token);
         String email = jwt.getSubject();

@@ -4,15 +4,13 @@ import org.back.beobachtungapp.dto.request.companion.CompanionRequestDto;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring")
+@Mapper(
+    componentModel = "spring",
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface CompanionMapper {
 
-  @Mapping(target = "id", ignore = true)
-  @Mapping(target = "children", ignore = true)
-  @Mapping(target = "notes", ignore = true)
-  @Mapping(target = "createdAt", ignore = true)
   Companion companionRequestDtoToCompanion(CompanionRequestDto companionRequestDto);
 
   CompanionDto companionToCompanionDto(Companion companion);
