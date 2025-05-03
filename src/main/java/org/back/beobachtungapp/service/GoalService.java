@@ -35,22 +35,37 @@ public class GoalService {
 
   @Transactional
   public GoalResponseDto save(GoalRequestDto goalDto, Long childId) {
+    log.info("Saving new goal for child with id: {}", childId);
+
     Goal goal = goalMapper.goalRequestDtoToGoal(goalDto);
 
     Child childRef = new Child();
     childRef.setId(childId);
     goal.setChild(childRef);
 
-    return goalMapper.goalToGoalResponseDto(goalRepository.save(goal));
+    Goal savedGoal = goalRepository.save(goal);
+    log.info(
+        "Successfully saved goal with id: {} for child with id: {}", savedGoal.getId(), childId);
+
+    return goalMapper.goalToGoalResponseDto(savedGoal);
   }
 
   @Transactional
   public GoalResponseDto update(GoalRequestDto goalDto, Long goalId) {
+    log.info("Updating goal with id: {}", goalId);
+
     Goal goal =
         goalRepository
             .findById(goalId)
-            .orElseThrow(() -> new EntityNotFoundException("Goal not found with id: " + goalId));
+            .orElseThrow(
+                () -> {
+                  log.error("Goal not found with id: {}", goalId);
+                  return new EntityNotFoundException("Goal not found with id: " + goalId);
+                });
+
     goalMapper.updateGoalFromDto(goalDto, goal);
+    log.info("Goal with id: {} successfully updated", goalId);
+
     eventPublisher.publishEvent(
         new CacheEvent(
             new String[] {"goal", "goals"}, new Object[] {goalId, goal.getChild().getId()}));
@@ -60,11 +75,20 @@ public class GoalService {
 
   @Transactional
   public void delete(Long goalId) {
+    log.info("Deleting goal with id: {}", goalId);
+
     Goal goal =
         goalRepository
             .findById(goalId)
-            .orElseThrow(() -> new EntityNotFoundException("Goal not found with id: " + goalId));
+            .orElseThrow(
+                () -> {
+                  log.error("Goal not found with id: {}", goalId);
+                  return new EntityNotFoundException("Goal not found with id: " + goalId);
+                });
+
     goalRepository.delete(goal);
+    log.info("Goal with id: {} successfully deleted", goalId);
+
     eventPublisher.publishEvent(
         new CacheEvent(
             new String[] {"goal", "goals"}, new Object[] {goalId, goal.getChild().getId()}));
@@ -72,15 +96,30 @@ public class GoalService {
 
   @Cacheable(value = "goals", key = "#childId")
   public List<GoalResponseDto> findAll(Long childId) {
+    log.info("Fetching all goals for child with id: {}", childId);
 
-    return goalMapper.goalToGoalResponseDtoList(goalRepository.findByChildId(childId));
+    List<GoalResponseDto> goals =
+        goalMapper.goalToGoalResponseDtoList(goalRepository.findByChildId(childId));
+
+    log.info("Found {} goals for child with id: {}", goals.size(), childId);
+
+    return goals;
   }
 
   @Cacheable(value = "goal", key = "#goalId")
   public GoalResponseDto findById(Long goalId) {
-    return goalMapper.goalToGoalResponseDto(
+    log.info("Fetching goal with id: {}", goalId);
+
+    Goal goal =
         goalRepository
             .findById(goalId)
-            .orElseThrow(() -> new EntityNotFoundException("Goal not found with id: " + goalId)));
+            .orElseThrow(
+                () -> {
+                  log.error("Goal not found with id: {}", goalId);
+                  return new EntityNotFoundException("Goal not found with id: " + goalId);
+                });
+
+    log.info("Found goal with id: {}", goalId);
+    return goalMapper.goalToGoalResponseDto(goal);
   }
 }

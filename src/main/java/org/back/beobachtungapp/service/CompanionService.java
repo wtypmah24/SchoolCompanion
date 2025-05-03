@@ -29,12 +29,20 @@ public class CompanionService {
 
   @Transactional
   public Companion save(CompanionRequestDto companion) {
+    log.info(
+        "Saving new companion with name: {} and email: {}", companion.name(), companion.email());
+
     String encodedPassword = passwordEncoder.encode(companion.password());
+    log.debug("Password for companion with email: {} encoded successfully", companion.email());
 
     CompanionRequestDto newCompanion =
         new CompanionRequestDto(
             companion.name(), companion.surname(), companion.email(), encodedPassword);
 
-    return companionRepository.save(companionMapper.companionRequestDtoToCompanion(newCompanion));
+    Companion savedCompanion =
+        companionRepository.save(companionMapper.companionRequestDtoToCompanion(newCompanion));
+    log.info("Successfully saved new companion with id: {}", savedCompanion.getId());
+
+    return savedCompanion;
   }
 }

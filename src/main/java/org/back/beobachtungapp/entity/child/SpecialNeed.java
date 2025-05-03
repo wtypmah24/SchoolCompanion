@@ -22,7 +22,7 @@ public class SpecialNeed {
   @Column() private String description;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn()
+  @JoinColumn(name = "child_id")
   private Child child;
 
   @LastModifiedDate

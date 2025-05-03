@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
     justification = "SpecialNeedService is injected and not externally exposed")
 @Tag(name = "Goal controller", description = "Operations related to child's goal management")
 @RestController
-@RequestMapping("goal")
+@RequestMapping("need")
 public class SpecialNeedController {
   private final SpecialNeedService specialNeedService;
 

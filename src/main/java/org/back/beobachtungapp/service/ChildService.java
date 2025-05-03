@@ -13,7 +13,6 @@ import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.ChildMapper;
 import org.back.beobachtungapp.repository.ChildRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,57 +36,98 @@ public class ChildService {
 
   @Transactional
   public ChildResponseDto save(ChildRequestDto child, CompanionDto companionDto) {
+    log.info("Saving new child with data: {} and companion: {}", child, companionDto);
     Child newChild = childMapper.childRequestDtoToChild(child);
     Companion companion = new Companion();
     companion.setId(companionDto.id());
     newChild.setSchoolCompanion(companion);
+
     Child savedChild = childRepository.save(newChild);
+    log.info("Successfully saved child with id: {}", savedChild.getId());
+
     return childMapper.childToChildResponseDto(savedChild);
   }
 
   @Transactional
   public ChildResponseDto update(
       ChildUpdateDto childUpdateDto, Long childId, CompanionDto companion) {
+    log.info("Updating child with id: {} and companion: {}", childId, companion);
+
     Child child =
         childRepository
             .findById(childId)
             .orElseThrow(
-                () -> new EntityNotFoundException("Companion not found with id: " + childId));
+                () -> {
+                  log.error("Child not found with id: {}", childId);
+                  return new EntityNotFoundException("Child not found with id: " + childId);
+                });
+
     childMapper.updateChildFromDto(childUpdateDto, child);
+    log.info("Child with id: {} successfully updated", childId);
+
+    // Publish cache event
     eventPublisher.publishEvent(
         new CacheEvent(
             new String[] {"child", "children"},
             new Object[] {childId, child.getSchoolCompanion().getId()}));
+
     return childMapper.childToChildResponseDto(child);
   }
 
   @Transactional
   public void delete(Long childId) {
+    log.info("Deleting child with id: {}", childId);
+
     Child child =
         childRepository
             .findById(childId)
-            .orElseThrow(() -> new EntityNotFoundException("Child not found: " + childId));
+            .orElseThrow(
+                () -> {
+                  log.error("Child not found with id: {}", childId);
+                  return new EntityNotFoundException("Child not found: " + childId);
+                });
 
     childRepository.delete(child);
+    log.info("Child with id: {} successfully deleted", childId);
 
+    // Publish cache event
     eventPublisher.publishEvent(
         new CacheEvent(
             new String[] {"child", "children"},
             new Object[] {childId, child.getSchoolCompanion().getId()}));
   }
 
-  @Cacheable(value = "children", key = "#companion.id()")
+  //  @Cacheable(
+  //      value = "children",
+  //      key = "#companion.id",
+  //      unless = "#result == null or #result.isEmpty()")
   public List<ChildResponseDto> findAll(CompanionDto companion) {
-    log.info("findAllByCompanion{}", companion);
-    return childMapper.childToChildResponseDtoList(
-        childRepository.findAllBySchoolCompanionId(companion.id()));
+    log.info("Fetching all children for companion with id: {}", companion.id());
+
+    List<ChildResponseDto> children =
+        childMapper.childToChildResponseDtoList(
+            childRepository.findAllBySchoolCompanionId(companion.id()));
+
+    log.info("Found {} children for companion with id: {}", children.size(), companion.id());
+
+    return children;
   }
 
-  @Cacheable(value = "child", key = "#id")
+  //  @Cacheable(value = "child", key = "#id")
   public ChildResponseDto findById(Long id) {
-    return childMapper.childToChildResponseDto(
+    log.info("Fetching child with id: {}", id);
+
+    Child child =
         childRepository
             .findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Child not found with id: " + id)));
+            .orElseThrow(
+                () -> {
+                  log.error("Child not found with id: {}", id);
+                  return new EntityNotFoundException("Child not found with id: " + id);
+                });
+
+    log.info("Found child with id: {}", id);
+    log.info("Found child: {}", child);
+    return childMapper.childToChildResponseDto(child);
   }
 }

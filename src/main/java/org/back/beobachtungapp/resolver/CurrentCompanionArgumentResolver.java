@@ -29,8 +29,7 @@ public class CurrentCompanionArgumentResolver implements HandlerMethodArgumentRe
       @NonNull MethodParameter parameter,
       ModelAndViewContainer mavContainer,
       @NonNull NativeWebRequest webRequest,
-      WebDataBinderFactory binderFactory)
-      throws Exception {
+      WebDataBinderFactory binderFactory) {
 
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

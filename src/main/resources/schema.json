@@ -1,0 +1,2800 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "School companion"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Note controller",
+      "description": "Operations related to child's notes management"
+    },
+    {
+      "name": "Monitoring param controller",
+      "description": "Operations related to child's Monitoring params management"
+    },
+    {
+      "name": "Event controller",
+      "description": "Operations related to companion's events management"
+    },
+    {
+      "name": "Goal controller",
+      "description": "Operations related to child's goal management"
+    },
+    {
+      "name": "Authentication and Registration",
+      "description": "Operations for companion registration and login"
+    },
+    {
+      "name": "Children controller",
+      "description": "Operations related to children management"
+    },
+    {
+      "name": "Monitoring entry controller",
+      "description": "Operations related to child's Monitoring entries management"
+    }
+  ],
+  "paths": {
+    "/param": {
+      "get": {
+        "tags": [
+          "Monitoring param controller"
+        ],
+        "summary": "Get all Monitoring params",
+        "description": "Retrieve all Monitoring params associated with a child.",
+        "operationId": "getAll",
+        "parameters": [
+          {
+            "name": "companionDto",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CompanionDto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of Monitoring params retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MonitoringParamResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No Monitoring params found for the child",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MonitoringParamResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MonitoringParamResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Monitoring param controller"
+        ],
+        "summary": "Add a new Monitoring param",
+        "description": "Creates a new Monitoring param record.",
+        "operationId": "add",
+        "parameters": [
+          {
+            "name": "companionDto",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CompanionDto"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MonitoringParamRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Monitoring param created successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringParamResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringParamResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringParamResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/note/child/{childId}": {
+      "get": {
+        "tags": [
+          "Note controller"
+        ],
+        "summary": "Get all notes",
+        "description": "Retrieve all notes associated with a child.",
+        "operationId": "getAll_1",
+        "parameters": [
+          {
+            "name": "childId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of notes retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NoteResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No notes found for the child",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NoteResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NoteResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Note controller"
+        ],
+        "summary": "Add a new note",
+        "description": "Creates a new note record.",
+        "operationId": "add_1",
+        "parameters": [
+          {
+            "name": "childId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "companion",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CompanionDto"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoteRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Note created successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/need/{childId}": {
+      "post": {
+        "tags": [
+          "Goal controller"
+        ],
+        "summary": "Add a new special need",
+        "description": "Creates a new special need record.",
+        "operationId": "add_2",
+        "parameters": [
+          {
+            "name": "childId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpecialNeedRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "SpecialNeed created successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpecialNeedResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpecialNeedResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpecialNeedResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goal/child/{childId}": {
+      "get": {
+        "tags": [
+          "Goal controller"
+        ],
+        "summary": "Get all goals",
+        "description": "Retrieve all goals associated with a child.",
+        "operationId": "getAll_3",
+        "parameters": [
+          {
+            "name": "childId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of goals retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GoalResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No goals found for the child",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GoalResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GoalResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Goal controller"
+        ],
+        "summary": "Add a new goal",
+        "description": "Creates a new goal record.",
+        "operationId": "add_3",
+        "parameters": [
+          {
+            "name": "childId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoalRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Goal created successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/event": {
+      "get": {
+        "tags": [
+          "Event controller"
+        ],
+        "summary": "Get all events",
+        "description": "Retrieve all events associated with a companion.",
+        "operationId": "getAll_4",
+        "parameters": [
+          {
+            "name": "companionDto",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CompanionDto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of events retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EventResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No events found for the child",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EventResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EventResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Event controller"
+        ],
+        "summary": "Add a new event",
+        "description": "Creates a new event record.",
+        "operationId": "add_4",
+        "parameters": [
+          {
+            "name": "companion",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CompanionDto"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Event created successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/entry/child/{childId}": {
+      "get": {
+        "tags": [
+          "Monitoring entry controller"
+        ],
+        "summary": "Get all Monitoring entries",
+        "description": "Retrieve all Monitoring entries associated with a child.",
+        "operationId": "getAll_5",
+        "parameters": [
+          {
+            "name": "childId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of Monitoring entries retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MonitoringEntryResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No Monitoring entries found for the child",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MonitoringEntryResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MonitoringEntryResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Monitoring entry controller"
+        ],
+        "summary": "Add a new Monitoring entry",
+        "description": "Creates a new Monitoring entry record.",
+        "operationId": "add_5",
+        "parameters": [
+          {
+            "name": "childId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MonitoringEntryRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Monitoring entry created successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringEntryResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringEntryResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringEntryResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/child": {
+      "get": {
+        "tags": [
+          "Children controller"
+        ],
+        "summary": "Get all children",
+        "description": "Retrieve all children associated with a companion.",
+        "operationId": "getAll_6",
+        "parameters": [
+          {
+            "name": "companion",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CompanionDto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of children retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChildResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No children found for the companion",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChildResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChildResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Children controller"
+        ],
+        "summary": "Add a new child",
+        "description": "Creates a new child record.",
+        "operationId": "add_6",
+        "parameters": [
+          {
+            "name": "companion",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CompanionDto"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChildRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Child created successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "Authentication and Registration"
+        ],
+        "summary": "Register a new companion",
+        "description": "Registers a new companion in the system.",
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanionRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Companion successfully registered",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Companion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid registration data",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Companion"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication and Registration"
+        ],
+        "summary": "Login for an existing companion",
+        "description": "Logs in a companion using email and password and returns an authentication token.",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully logged in and token generated",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid email or password",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/param/{paramId}": {
+      "get": {
+        "tags": [
+          "Monitoring param controller"
+        ],
+        "summary": "Get Monitoring param by ID",
+        "description": "Retrieve Monitoring param by ID.",
+        "operationId": "getById",
+        "parameters": [
+          {
+            "name": "paramId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Monitoring param retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringParamResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No Monitoring param found with provided ID",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringParamResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringParamResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Monitoring param controller"
+        ],
+        "summary": "Delete Monitoring param",
+        "description": "Delete Monitoring param record.",
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "paramId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Monitoring param deleted successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized access"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Monitoring param controller"
+        ],
+        "summary": "Update Monitoring param",
+        "description": "Update Monitoring param record.",
+        "operationId": "update",
+        "parameters": [
+          {
+            "name": "paramId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MonitoringParamUpdateDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Monitoring param updated successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringParamResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringParamResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringParamResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/note/{noteId}": {
+      "get": {
+        "tags": [
+          "Note controller"
+        ],
+        "summary": "Get note by ID",
+        "description": "Retrieve note by ID.",
+        "operationId": "getById_1",
+        "parameters": [
+          {
+            "name": "noteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Note retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No note found with provided ID",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Note controller"
+        ],
+        "summary": "Delete note",
+        "description": "Delete note record.",
+        "operationId": "delete_1",
+        "parameters": [
+          {
+            "name": "noteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Note deleted successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized access"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Note controller"
+        ],
+        "summary": "Update note",
+        "description": "Update note record.",
+        "operationId": "update_1",
+        "parameters": [
+          {
+            "name": "noteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoteRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Note updated successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/need/{needId}": {
+      "get": {
+        "tags": [
+          "Goal controller"
+        ],
+        "summary": "Get special need by ID",
+        "description": "Retrieve special need by ID.",
+        "operationId": "getById_2",
+        "parameters": [
+          {
+            "name": "needId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Special need retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpecialNeedResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No special need found with provided ID",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpecialNeedResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpecialNeedResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Goal controller"
+        ],
+        "summary": "Delete special need",
+        "description": "Delete special need record.",
+        "operationId": "delete_2",
+        "parameters": [
+          {
+            "name": "needId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Special need deleted successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized access"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Goal controller"
+        ],
+        "summary": "Update special need",
+        "description": "Update special need record.",
+        "operationId": "update_2",
+        "parameters": [
+          {
+            "name": "needId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpecialNeedUpdateDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Special need updated successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpecialNeedResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpecialNeedResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpecialNeedResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goal/{goalId}": {
+      "delete": {
+        "tags": [
+          "Goal controller"
+        ],
+        "summary": "Delete goal",
+        "description": "Delete goal record.",
+        "operationId": "delete_3",
+        "parameters": [
+          {
+            "name": "goalId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Goal deleted successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized access"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Goal controller"
+        ],
+        "summary": "Update goal",
+        "description": "Update goal record.",
+        "operationId": "update_3",
+        "parameters": [
+          {
+            "name": "goalId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoalRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Goal updated successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/event/{eventId}": {
+      "get": {
+        "tags": [
+          "Event controller"
+        ],
+        "summary": "Get event by ID",
+        "description": "Retrieve event by ID.",
+        "operationId": "getById_4",
+        "parameters": [
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No event found with provided ID",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Event controller"
+        ],
+        "summary": "Delete event",
+        "description": "Delete event record.",
+        "operationId": "delete_4",
+        "parameters": [
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event deleted successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized access"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Event controller"
+        ],
+        "summary": "Update event",
+        "description": "Update event record.",
+        "operationId": "update_4",
+        "parameters": [
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventUpdateDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Event updated successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/entry/{entryId}": {
+      "get": {
+        "tags": [
+          "Monitoring entry controller"
+        ],
+        "summary": "Get Monitoring entry by ID",
+        "description": "Retrieve Monitoring entry by ID.",
+        "operationId": "getById_5",
+        "parameters": [
+          {
+            "name": "entryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Monitoring entry retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringEntryResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No Monitoring entry found with provided ID",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringEntryResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringEntryResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Monitoring entry controller"
+        ],
+        "summary": "Delete Monitoring entry",
+        "description": "Delete Monitoring entry record.",
+        "operationId": "delete_5",
+        "parameters": [
+          {
+            "name": "entryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Monitoring entry deleted successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized access"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Monitoring entry controller"
+        ],
+        "summary": "Update Monitoring entry",
+        "description": "Update Monitoring entry record.",
+        "operationId": "update_5",
+        "parameters": [
+          {
+            "name": "entryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MonitoringEntryUpdateDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Monitoring entry updated successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringEntryResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringEntryResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringEntryResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/child/{childId}": {
+      "get": {
+        "tags": [
+          "Children controller"
+        ],
+        "summary": "Get child by ID",
+        "description": "Retrieve child by ID.",
+        "operationId": "getChildById",
+        "parameters": [
+          {
+            "name": "childId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Child retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No child found with provided ID",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Children controller"
+        ],
+        "summary": "Delete child",
+        "description": "Delete child record.",
+        "operationId": "delete_6",
+        "parameters": [
+          {
+            "name": "childId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Child deleted successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized access"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Children controller"
+        ],
+        "summary": "Update child",
+        "description": "Update child record.",
+        "operationId": "update_6",
+        "parameters": [
+          {
+            "name": "childId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "companion",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CompanionDto"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChildUpdateDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Child updated successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/need/child/{childId}": {
+      "get": {
+        "tags": [
+          "Goal controller"
+        ],
+        "summary": "Get all special needs",
+        "description": "Retrieve all special need associated with a child.",
+        "operationId": "getAll_2",
+        "parameters": [
+          {
+            "name": "childId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of special needs retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SpecialNeedResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No special needs found for the child",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SpecialNeedResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SpecialNeedResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goal/{goaId}": {
+      "get": {
+        "tags": [
+          "Goal controller"
+        ],
+        "summary": "Get goal by ID",
+        "description": "Retrieve goal by ID.",
+        "operationId": "getById_3",
+        "parameters": [
+          {
+            "name": "goaId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Goal retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No goal found with provided ID",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MonitoringParamRequestDto": {
+        "required": [
+          "description",
+          "scaleType",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "maxLength": 100,
+            "minLength": 3,
+            "type": "string",
+            "description": "Title of the monitoring parameter",
+            "example": "Blood Pressure"
+          },
+          "scaleType": {
+            "type": "string",
+            "description": "Type of scale used for monitoring",
+            "example": "NUMERIC",
+            "enum": [
+              "QUANTITATIVE",
+              "QUALITATIVE",
+              "BINARY"
+            ]
+          },
+          "description": {
+            "maxLength": 500,
+            "minLength": 5,
+            "type": "string",
+            "description": "Description of the monitoring parameter",
+            "example": "Measures systolic and diastolic pressure"
+          }
+        },
+        "description": "Monitoring param details to be added"
+      },
+      "CompanionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier of the companion",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "First name of the companion",
+            "example": "John"
+          },
+          "surname": {
+            "type": "string",
+            "description": "Surname of the companion",
+            "example": "Doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address of the companion",
+            "example": "john.doe@example.com"
+          }
+        },
+        "description": "Response payload for a companion object"
+      },
+      "MonitoringParamResponseDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Title of the monitoring parameter",
+            "example": "Blood Pressure"
+          },
+          "scaleType": {
+            "type": "string",
+            "description": "Scale type used for the monitoring parameter",
+            "example": "NUMERIC",
+            "enum": [
+              "QUANTITATIVE",
+              "QUALITATIVE",
+              "BINARY"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the monitoring parameter",
+            "example": "Measures systolic and diastolic pressure"
+          }
+        },
+        "description": "Response payload for a monitoring parameter"
+      },
+      "NoteRequestDto": {
+        "required": [
+          "content"
+        ],
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Content of the note",
+            "example": "This is a note about the event."
+          }
+        },
+        "description": "Note details to be updated"
+      },
+      "NoteResponseDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Content of the note",
+            "example": "This is a note about the event."
+          }
+        },
+        "description": "Response payload for a note"
+      },
+      "SpecialNeedRequestDto": {
+        "required": [
+          "description",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "maxLength": 100,
+            "minLength": 2,
+            "type": "string",
+            "description": "Type of the special need",
+            "example": "Mobility support"
+          },
+          "description": {
+            "maxLength": 500,
+            "minLength": 5,
+            "type": "string",
+            "description": "Detailed description of the special need",
+            "example": "Requires wheelchair access and ramp availability"
+          }
+        },
+        "description": "Special need details to be added"
+      },
+      "SpecialNeedResponseDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type of the special need",
+            "example": "Mobility support"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the special need",
+            "example": "Requires wheelchair access and ramp availability"
+          }
+        },
+        "description": "Response payload for a special need"
+      },
+      "GoalRequestDto": {
+        "required": [
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "description": {
+            "maxLength": 255,
+            "minLength": 5,
+            "type": "string",
+            "description": "Description of the goal",
+            "example": "Pay more attention to the learning"
+          }
+        },
+        "description": "Goal details to be updated"
+      },
+      "GoalResponseDto": {
+        "required": [
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "description": {
+            "maxLength": 255,
+            "minLength": 5,
+            "type": "string",
+            "description": "Description of the goal",
+            "example": "Complete the marathon by the end of the year"
+          }
+        },
+        "description": "Response payload for a goal"
+      },
+      "EventRequestDto": {
+        "required": [
+          "description",
+          "eventDate",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "maxLength": 100,
+            "minLength": 3,
+            "type": "string",
+            "description": "Title of the event",
+            "example": "Monthly meeting"
+          },
+          "description": {
+            "maxLength": 500,
+            "minLength": 5,
+            "type": "string",
+            "description": "Detailed description of the event",
+            "example": "A class event to discuss children problems."
+          },
+          "eventDate": {
+            "type": "string",
+            "description": "Date of the event (must be today or in the future)",
+            "format": "date",
+            "example": "2025-07-15"
+          }
+        },
+        "description": "Event details to be added"
+      },
+      "EventResponseDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Title of the event",
+            "example": "Annual Charity Gala"
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description of the event",
+            "example": "A charity event to support local shelters."
+          },
+          "eventDate": {
+            "type": "string",
+            "description": "Date when the event will take place",
+            "format": "date",
+            "example": "2025-07-15"
+          }
+        },
+        "description": "Response payload for an event"
+      },
+      "MonitoringEntryRequestDto": {
+        "required": [
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "Value of the monitoring entry",
+            "example": "120/80"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Optional notes or comments related to the entry",
+            "nullable": true,
+            "example": "Measured after medication"
+          }
+        },
+        "description": "Monitoring entry details to be added"
+      },
+      "MonitoringEntryResponseDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "Value of the monitoring entry",
+            "example": "120/80"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Additional notes or comments related to the monitoring entry",
+            "example": "Measured after exercise"
+          }
+        },
+        "description": "Response payload for a monitoring entry"
+      },
+      "ChildRequestDto": {
+        "required": [
+          "name",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 50,
+            "minLength": 2,
+            "type": "string",
+            "description": "First name of the child",
+            "example": "John"
+          },
+          "surname": {
+            "maxLength": 50,
+            "minLength": 2,
+            "type": "string",
+            "description": "Last name of the child",
+            "example": "Doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address of the child",
+            "example": "john.doe@example.com"
+          },
+          "phoneNumber": {
+            "pattern": "^\\+?[0-9]{7,15}$",
+            "type": "string",
+            "description": "Phone number of the child",
+            "example": "+1234567890"
+          }
+        },
+        "description": "Child details to be added"
+      },
+      "ChildResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier of the child",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "First name of the child",
+            "example": "John"
+          },
+          "surname": {
+            "type": "string",
+            "description": "Surname of the child",
+            "example": "Doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address of the child",
+            "example": "john.doe@example.com"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Phone number of the child",
+            "example": "+1234567890"
+          }
+        },
+        "description": "Response payload for a child object"
+      },
+      "CompanionRequestDto": {
+        "required": [
+          "email",
+          "name",
+          "password",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 50,
+            "minLength": 2,
+            "type": "string",
+            "description": "Name of the companion",
+            "example": "John"
+          },
+          "surname": {
+            "maxLength": 50,
+            "minLength": 2,
+            "type": "string",
+            "description": "Surname of the companion",
+            "example": "Doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address of the companion",
+            "example": "john.doe@example.com"
+          },
+          "password": {
+            "maxLength": 2147483647,
+            "minLength": 8,
+            "type": "string",
+            "description": "Password for the companion",
+            "example": "password123"
+          }
+        },
+        "description": "Request payload for registering or creating a companion user"
+      },
+      "Child": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "schoolCompanion": {
+            "$ref": "#/components/schemas/Companion"
+          },
+          "specialNeeds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SpecialNeed"
+            }
+          },
+          "goals": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Goal"
+            }
+          },
+          "monitoringParameters": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MonitoringParameter"
+            }
+          },
+          "notes": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Note"
+            }
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Companion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "children": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Child"
+            }
+          },
+          "notes": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Note"
+            }
+          },
+          "params": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MonitoringParameter"
+            }
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Goal": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": {
+            "type": "string"
+          },
+          "child": {
+            "$ref": "#/components/schemas/Child"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MonitoringEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "value": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "monitoringParameter": {
+            "$ref": "#/components/schemas/MonitoringParameter"
+          },
+          "child": {
+            "$ref": "#/components/schemas/Child"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MonitoringParameter": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "scaleType": {
+            "type": "string",
+            "enum": [
+              "QUANTITATIVE",
+              "QUALITATIVE",
+              "BINARY"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "companion": {
+            "$ref": "#/components/schemas/Companion"
+          },
+          "monitoringEntries": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MonitoringEntry"
+            }
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Note": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "content": {
+            "type": "string"
+          },
+          "child": {
+            "$ref": "#/components/schemas/Child"
+          },
+          "companion": {
+            "$ref": "#/components/schemas/Companion"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SpecialNeed": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "type": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "child": {
+            "$ref": "#/components/schemas/Child"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "LoginRequest": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User email address",
+            "example": "user@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "User password",
+            "example": "StrongPassword123!"
+          }
+        },
+        "description": "Request payload for user login containing email and password"
+      },
+      "MonitoringParamUpdateDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "maxLength": 100,
+            "minLength": 3,
+            "type": "string",
+            "description": "Updated title of the monitoring parameter",
+            "example": "Updated Blood Pressure"
+          },
+          "scaleType": {
+            "type": "string",
+            "description": "Updated scale type of the monitoring parameter",
+            "example": "NUMERIC",
+            "enum": [
+              "QUANTITATIVE",
+              "QUALITATIVE",
+              "BINARY"
+            ]
+          },
+          "description": {
+            "maxLength": 500,
+            "minLength": 5,
+            "type": "string",
+            "description": "Updated description of the monitoring parameter",
+            "example": "Updated description for measuring systolic and diastolic pressure"
+          }
+        },
+        "description": "Monitoring param details to be updated"
+      },
+      "SpecialNeedUpdateDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "maxLength": 100,
+            "minLength": 2,
+            "type": "string",
+            "description": "Type of the special need",
+            "example": "Mobility support"
+          },
+          "description": {
+            "maxLength": 500,
+            "minLength": 5,
+            "type": "string",
+            "description": "Detailed description of the special need",
+            "example": "Requires wheelchair access and ramp availability"
+          }
+        },
+        "description": "Needs details to be updated"
+      },
+      "EventUpdateDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "maxLength": 100,
+            "minLength": 3,
+            "type": "string",
+            "description": "Updated title of the event",
+            "example": "Updated Gala Title"
+          },
+          "description": {
+            "maxLength": 500,
+            "minLength": 5,
+            "type": "string",
+            "description": "Updated event description",
+            "example": "Updated description for the annual charity gala"
+          },
+          "eventDate": {
+            "type": "string",
+            "description": "Updated date of the event (must be today or in the future)",
+            "format": "date",
+            "example": "2025-08-01"
+          }
+        },
+        "description": "Event details to be updated"
+      },
+      "MonitoringEntryUpdateDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "Updated value of the monitoring entry",
+            "nullable": true,
+            "example": "130/85"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Updated notes or comments",
+            "nullable": true,
+            "example": "After light exercise"
+          }
+        },
+        "description": "Monitoring param details to be updated"
+      },
+      "ChildUpdateDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 50,
+            "minLength": 2,
+            "type": "string",
+            "description": "First name of the child",
+            "example": "John"
+          },
+          "surname": {
+            "maxLength": 50,
+            "minLength": 2,
+            "type": "string",
+            "description": "Last name of the child",
+            "example": "Doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address of the child",
+            "example": "john.doe@example.com"
+          },
+          "phoneNumber": {
+            "pattern": "^\\+?[0-9]{7,15}$",
+            "type": "string",
+            "description": "Phone number of the child",
+            "example": "+1234567890"
+          }
+        },
+        "description": "Child details to be updated"
+      }
+    }
+  }
+}

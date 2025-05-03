@@ -2,6 +2,7 @@ package org.back.beobachtungapp.entity.child;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +29,7 @@ public class Child {
   @Column() private String email;
   @Column() private String phoneNumber;
   @ElementCollection List<String> interests;
+  @Column private LocalDate dOb;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "companion_id")

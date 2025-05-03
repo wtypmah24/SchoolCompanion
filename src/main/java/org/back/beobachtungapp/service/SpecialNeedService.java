@@ -36,23 +36,38 @@ public class SpecialNeedService {
 
   @Transactional
   public SpecialNeedResponseDto save(SpecialNeedRequestDto goalDto, Long childId) {
-    SpecialNeed need = specialNeedMapper.specialNeedRequestDtoToSpecialNeed(goalDto);
+    log.info("Saving special need for child with id: {}", childId);
 
+    SpecialNeed need = specialNeedMapper.specialNeedRequestDtoToSpecialNeed(goalDto);
     Child childRef = new Child();
     childRef.setId(childId);
     need.setChild(childRef);
 
-    return specialNeedMapper.specialNeedToSpecialNeedResponseDto(specialNeedRepo.save(need));
+    SpecialNeed savedNeed = specialNeedRepo.save(need);
+    log.info(
+        "Successfully saved special need with id: {} for child with id: {}",
+        savedNeed.getId(),
+        childId);
+
+    return specialNeedMapper.specialNeedToSpecialNeedResponseDto(savedNeed);
   }
 
   @Transactional
   public SpecialNeedResponseDto update(SpecialNeedUpdateDto needUpdateDto, Long needId) {
+    log.info("Updating special need with id: {}", needId);
+
     SpecialNeed need =
         specialNeedRepo
             .findById(needId)
             .orElseThrow(
-                () -> new EntityNotFoundException("SpecialNeed not found with id: " + needId));
+                () -> {
+                  log.error("SpecialNeed not found with id: {}", needId);
+                  return new EntityNotFoundException("SpecialNeed not found with id: " + needId);
+                });
+
     specialNeedMapper.updateSpecialNeedFromDto(needUpdateDto, need);
+    log.info("Successfully updated special need with id: {}", needId);
+
     eventPublisher.publishEvent(
         new CacheEvent(
             new String[] {"need", "needs"}, new Object[] {needId, need.getChild().getId()}));
@@ -62,12 +77,20 @@ public class SpecialNeedService {
 
   @Transactional
   public void delete(Long needId) {
+    log.info("Deleting special need with id: {}", needId);
+
     SpecialNeed need =
         specialNeedRepo
             .findById(needId)
             .orElseThrow(
-                () -> new EntityNotFoundException("SpecialNeed not found with id: " + needId));
+                () -> {
+                  log.error("SpecialNeed not found with id: {}", needId);
+                  return new EntityNotFoundException("SpecialNeed not found with id: " + needId);
+                });
+
     specialNeedRepo.delete(need);
+    log.info("Successfully deleted special need with id: {}", needId);
+
     eventPublisher.publishEvent(
         new CacheEvent(
             new String[] {"need", "needs"}, new Object[] {needId, need.getChild().getId()}));
@@ -75,17 +98,31 @@ public class SpecialNeedService {
 
   @Cacheable(value = "needs", key = "#childId")
   public List<SpecialNeedResponseDto> findAll(Long childId) {
+    log.info("Fetching all special needs for child with id: {}", childId);
 
-    return specialNeedMapper.specialNeedToSpecialNeedResponseDtoList(
-        specialNeedRepo.findByChildId(childId));
+    List<SpecialNeedResponseDto> specialNeeds =
+        specialNeedMapper.specialNeedToSpecialNeedResponseDtoList(
+            specialNeedRepo.findByChildId(childId));
+
+    log.info("Found {} special needs for child with id: {}", specialNeeds.size(), childId);
+
+    return specialNeeds;
   }
 
   @Cacheable(value = "need", key = "#needId")
   public SpecialNeedResponseDto findById(Long needId) {
-    return specialNeedMapper.specialNeedToSpecialNeedResponseDto(
+    log.info("Fetching special need with id: {}", needId);
+
+    SpecialNeed need =
         specialNeedRepo
             .findById(needId)
             .orElseThrow(
-                () -> new EntityNotFoundException("SpecialNeed not found with id: " + needId)));
+                () -> {
+                  log.error("SpecialNeed not found with id: {}", needId);
+                  return new EntityNotFoundException("SpecialNeed not found with id: " + needId);
+                });
+
+    log.info("Found special need with id: {}", needId);
+    return specialNeedMapper.specialNeedToSpecialNeedResponseDto(need);
   }
 }

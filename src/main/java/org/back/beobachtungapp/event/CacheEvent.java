@@ -1,4 +1,5 @@
 package org.back.beobachtungapp.event;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 

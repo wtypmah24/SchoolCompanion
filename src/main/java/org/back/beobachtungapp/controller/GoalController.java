@@ -36,7 +36,7 @@ public class GoalController {
         @ApiResponse(responseCode = "400", description = "Invalid input"),
         @ApiResponse(responseCode = "401", description = "Unauthorized access")
       })
-  @PostMapping("{childId}")
+  @PostMapping("child/{childId}")
   public ResponseEntity<GoalResponseDto> add(
       @Parameter(description = "Goal details to be added") @RequestBody GoalRequestDto goal,
       @PathVariable long childId) {
@@ -53,7 +53,7 @@ public class GoalController {
       })
   @PatchMapping("{goalId}")
   public ResponseEntity<GoalResponseDto> update(
-      @Parameter(description = "Child details to be updated") @RequestBody
+      @Parameter(description = "Goal details to be updated") @RequestBody
           GoalRequestDto goalRequestDto,
       @PathVariable long goalId) {
     return ResponseEntity.status(HttpStatus.OK).body(goalService.update(goalRequestDto, goalId));
