@@ -3,13 +3,13 @@ pre-commit:
   commands:
     format-java:
       name: "Format Java code"
-      run: "mvn spotless:apply"
+      run: "mvn spotless:check"
     spotbugs-check:
       name: "SpotBugs static analysis"
       run: "mvn spotbugs:check"
-#    check-dependencies:
-#      name: "Check for dependency vulnerabilities"
-#      run: "mvn org.owasp:dependency-check-maven:check"
+    check-dependencies:
+      name: "Check for dependency vulnerabilities"
+      run: "mvn org.owasp:dependency-check-maven:check"
 
 commit-msg:
   enabled: true

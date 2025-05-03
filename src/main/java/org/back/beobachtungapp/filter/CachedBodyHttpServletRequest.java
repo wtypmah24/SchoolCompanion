@@ -9,15 +9,25 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class CachedBodyHttpServletRequest extends HttpServletRequestWrapper {
 
   private final byte[] cachedBody;
 
-  public CachedBodyHttpServletRequest(HttpServletRequest request) throws IOException {
+  public CachedBodyHttpServletRequest(HttpServletRequest request) {
     super(request);
-    InputStream inputStream = request.getInputStream();
-    this.cachedBody = inputStream.readAllBytes();
+    this.cachedBody = readRequestBody(request);
+  }
+
+  private byte[] readRequestBody(HttpServletRequest request) {
+    try (InputStream inputStream = request.getInputStream()) {
+      return inputStream.readAllBytes();
+    } catch (IOException e) {
+      log.warn("Error during reading req. body: {}", e.getMessage(), e);
+      return new byte[0];
+    }
   }
 
   @Override

@@ -10,7 +10,6 @@ import org.back.beobachtungapp.dto.request.child.ChildRequestDto;
 import org.back.beobachtungapp.dto.response.child.ChildResponseDto;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.entity.child.Child;
-import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.service.ChildService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,8 +38,7 @@ public class ChildController {
   @PostMapping()
   public ResponseEntity<ChildResponseDto> add(
       @Parameter(description = "Child details to be added") @RequestBody ChildRequestDto child,
-      @CurrentCompanion CompanionDto companion
-      ) {
+      @CurrentCompanion CompanionDto companion) {
     return ResponseEntity.status(HttpStatus.CREATED).body(childService.save(child, companion));
   }
 
