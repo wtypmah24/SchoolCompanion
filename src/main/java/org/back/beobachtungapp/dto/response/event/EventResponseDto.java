@@ -1,14 +1,22 @@
 package org.back.beobachtungapp.dto.response.event;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Schema(description = "Response payload for an event")
 public record EventResponseDto(
-    @Schema(description = "Title of the event", example = "Annual Charity Gala") String title,
+    @Schema(description = "Id of the event", example = "1L") Long id,
+    @Schema(description = "Title of the event", example = "Monthly meeting") String title,
     @Schema(
             description = "Detailed description of the event",
-            example = "A charity event to support local shelters.")
+            example = "A class event to discuss children problems.")
         String description,
-    @Schema(description = "Date when the event will take place", example = "2025-07-15")
-        LocalDate eventDate) {}
+    @Schema(
+            description = "Start date and time of the event (must be today or in the future)",
+            example = "2025-07-15")
+        LocalDateTime startDateTime,
+    @Schema(
+            description = "End date and time of the event (must be today or in the future)",
+            example = "2025-07-15")
+        LocalDateTime endDateTime,
+    @Schema(description = "Location of the event", example = "Classroom.") String location) {}

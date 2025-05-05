@@ -41,7 +41,7 @@ public class MonitoringParamController {
         @ApiResponse(responseCode = "400", description = "Invalid input"),
         @ApiResponse(responseCode = "401", description = "Unauthorized access")
       })
-  @PostMapping("")
+  @PostMapping()
   public ResponseEntity<MonitoringParamResponseDto> add(
       @Parameter(description = "Monitoring param details to be added") @RequestBody
           MonitoringParamRequestDto requestDto,

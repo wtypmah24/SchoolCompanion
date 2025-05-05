@@ -39,12 +39,14 @@ public class MonitoringEntryController {
         @ApiResponse(responseCode = "400", description = "Invalid input"),
         @ApiResponse(responseCode = "401", description = "Unauthorized access")
       })
-  @PostMapping("child/{childId}")
+  @PostMapping("child/{childId}/param/{paramId}")
   public ResponseEntity<MonitoringEntryResponseDto> add(
       @Parameter(description = "Monitoring entry details to be added") @RequestBody
           MonitoringEntryRequestDto requestDto,
-      @PathVariable Long childId) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(entryService.save(requestDto, childId));
+      @PathVariable("childId") Long childId,
+      @PathVariable("paramId") Long paramId) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(entryService.save(requestDto, childId, paramId));
   }
 
   @Operation(
@@ -105,7 +107,22 @@ public class MonitoringEntryController {
         @ApiResponse(responseCode = "401", description = "Unauthorized access")
       })
   @GetMapping("child/{childId}")
-  public ResponseEntity<List<MonitoringEntryResponseDto>> getAll(@PathVariable Long childId) {
-    return ResponseEntity.status(HttpStatus.OK).body(entryService.findAll(childId));
+  public ResponseEntity<List<MonitoringEntryResponseDto>> getAllByChildId(
+      @PathVariable Long childId) {
+    return ResponseEntity.status(HttpStatus.OK).body(entryService.findAllByChildId(childId));
+  }
+
+  @Operation(
+      summary = "Get all Monitoring entries",
+      description = "Retrieve all Monitoring entries.",
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "List of Monitoring entries retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized access")
+      })
+  @GetMapping()
+  public ResponseEntity<List<MonitoringEntryResponseDto>> getAll() {
+    return ResponseEntity.status(HttpStatus.OK).body(entryService.findAll());
   }
 }

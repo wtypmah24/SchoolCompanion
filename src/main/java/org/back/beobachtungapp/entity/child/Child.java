@@ -7,8 +7,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.back.beobachtungapp.entity.companion.Companion;
-import org.back.beobachtungapp.entity.monitoring.MonitoringParameter;
+import org.back.beobachtungapp.entity.event.Event;
+import org.back.beobachtungapp.entity.monitoring.MonitoringEntry;
 import org.back.beobachtungapp.entity.note.Note;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -18,6 +21,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Table(name = "children")
 @Data
+@ToString(exclude = {"events", "goals", "notes", "specialNeeds", "entries"})
+@EqualsAndHashCode(exclude = {"events", "goals", "notes", "specialNeeds", "entries"})
 @EntityListeners(AuditingEntityListener.class)
 public class Child {
   @Id
@@ -35,17 +40,20 @@ public class Child {
   @JoinColumn(name = "companion_id")
   private Companion schoolCompanion;
 
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
   private Set<SpecialNeed> specialNeeds;
 
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
   private Set<Goal> goals;
 
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<MonitoringParameter> monitoringParameters;
+  @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
+  private Set<MonitoringEntry> entries;
 
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
   private Set<Note> notes;
+
+  @OneToMany(mappedBy = "child", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<Event> events;
 
   @LastModifiedDate
   @Column(name = "updated_at")
@@ -56,14 +64,27 @@ public class Child {
   LocalDateTime createdAt;
 
   public void addSpecialNeed(SpecialNeed need) {
+    need.setChild(this);
     specialNeeds.add(need);
   }
 
   public void addNote(Note note) {
+    note.setChild(this);
     notes.add(note);
   }
 
   public void addGoal(Goal goal) {
+    goal.setChild(this);
     goals.add(goal);
+  }
+
+  public void addMonitoringEntry(MonitoringEntry monitoringEntry) {
+    monitoringEntry.setChild(this);
+    entries.add(monitoringEntry);
+  }
+
+  public void addEvent(Event event) {
+    event.setChild(this);
+    events.add(event);
   }
 }

@@ -37,7 +37,7 @@ public class SpecialNeedController {
         @ApiResponse(responseCode = "400", description = "Invalid input"),
         @ApiResponse(responseCode = "401", description = "Unauthorized access")
       })
-  @PostMapping("{childId}")
+  @PostMapping("child/{childId}")
   public ResponseEntity<SpecialNeedResponseDto> add(
       @Parameter(description = "Special need details to be added") @RequestBody
           SpecialNeedRequestDto need,

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 
 @Schema(description = "Response payload for a goal")
 public record GoalResponseDto(
+    @Schema(description = "Id of the goal", example = "1L") Long id,
     @Schema(
             description = "Description of the goal",
             example = "Complete the marathon by the end of the year",

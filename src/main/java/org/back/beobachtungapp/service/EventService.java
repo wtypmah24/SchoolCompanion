@@ -7,13 +7,14 @@ import org.back.beobachtungapp.dto.request.event.EventRequestDto;
 import org.back.beobachtungapp.dto.request.event.EventUpdateDto;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.response.event.EventResponseDto;
+import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.entity.event.Event;
 import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.EventMapper;
+import org.back.beobachtungapp.repository.ChildRepository;
 import org.back.beobachtungapp.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,34 +24,41 @@ import org.springframework.transaction.annotation.Transactional;
 public class EventService {
   private final EventRepository eventRepository;
   private final EventMapper eventMapper;
+  private final ChildRepository childRepository;
   private final ApplicationEventPublisher eventPublisher;
 
   @Autowired
   public EventService(
       EventRepository eventRepository,
       EventMapper eventMapper,
+      ChildRepository childRepository,
       ApplicationEventPublisher eventPublisher) {
     this.eventRepository = eventRepository;
     this.eventMapper = eventMapper;
+    this.childRepository = childRepository;
     this.eventPublisher = eventPublisher;
   }
 
   @Transactional
-  public EventResponseDto save(EventRequestDto eventRequestDto, CompanionDto companionDto) {
+  public EventResponseDto save(
+      EventRequestDto eventRequestDto, CompanionDto companionDto, Long childId) {
     log.info(
-        "Saving new event with title: {} and companion: {}",
+        "Saving new event with title: {}, companion: {} and child: {}",
         eventRequestDto.title(),
-        companionDto.id());
+        companionDto.id(),
+        childId);
 
     Event event = eventMapper.eventRequestDtoToEvent(eventRequestDto);
+    Child child =
+        childRepository
+            .findByIdCustom(childId)
+            .orElseThrow(() -> new EntityNotFoundException("Child not found"));
+    child.addEvent(event);
 
     Companion companionRef = new Companion();
     companionRef.setId(companionDto.id());
     event.setCompanion(companionRef);
-
     Event savedEvent = eventRepository.save(event);
-    log.info("Successfully saved event with id: {}", savedEvent.getId());
-
     return eventMapper.eventToEventResponseDto(savedEvent);
   }
 
@@ -100,7 +108,7 @@ public class EventService {
             new Object[] {eventId, event.getCompanion().getId()}));
   }
 
-  @Cacheable(value = "events", key = "#companionDto.id()")
+  //  @Cacheable(value = "events", key = "#companionDto.id()")
   public List<EventResponseDto> findAll(CompanionDto companionDto) {
     log.info("Fetching all events for companion with id: {}", companionDto.id());
 
@@ -113,7 +121,19 @@ public class EventService {
     return events;
   }
 
-  @Cacheable(value = "event", key = "#eventId")
+  //  @Cacheable(value = "events", key = "#childId")
+  public List<EventResponseDto> findByChildId(Long childId) {
+    log.info("Fetching all events for child with id: {}", childId);
+
+    List<EventResponseDto> events =
+        eventMapper.eventToEventResponseDtoList(eventRepository.findEventsByChildId(childId));
+
+    log.info("Found {} events for child with id: {}", events.size(), childId);
+
+    return events;
+  }
+
+  //  @Cacheable(value = "event", key = "#eventId")
   public EventResponseDto findById(Long eventId) {
     log.info("Fetching event with id: {}", eventId);
 

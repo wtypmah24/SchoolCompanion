@@ -39,13 +39,14 @@ public class EventController {
         @ApiResponse(responseCode = "400", description = "Invalid input"),
         @ApiResponse(responseCode = "401", description = "Unauthorized access")
       })
-  @PostMapping()
+  @PostMapping("child/{childId}")
   public ResponseEntity<EventResponseDto> add(
+      @PathVariable("childId") Long childId,
       @Parameter(description = "Event details to be added") @RequestBody
           EventRequestDto eventRequestDto,
       @CurrentCompanion CompanionDto companion) {
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(eventService.save(eventRequestDto, companion));
+        .body(eventService.save(eventRequestDto, companion, childId));
   }
 
   @Operation(
@@ -103,5 +104,18 @@ public class EventController {
   public ResponseEntity<List<EventResponseDto>> getAll(
       @CurrentCompanion CompanionDto companionDto) {
     return ResponseEntity.status(HttpStatus.OK).body(eventService.findAll(companionDto));
+  }
+
+  @Operation(
+      summary = "Get events by child ID",
+      description = "Retrieve events by child ID.",
+      responses = {
+        @ApiResponse(responseCode = "200", description = "Event retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "No event found with provided child ID"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized access")
+      })
+  @GetMapping("child/{childId}")
+  public ResponseEntity<List<EventResponseDto>> getByChildId(@PathVariable long childId) {
+    return ResponseEntity.status(HttpStatus.OK).body(eventService.findByChildId(childId));
   }
 }

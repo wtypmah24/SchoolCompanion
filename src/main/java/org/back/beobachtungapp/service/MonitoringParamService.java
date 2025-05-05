@@ -103,7 +103,7 @@ public class MonitoringParamService {
             new Object[] {paramId, param.getCompanion().getId()}));
   }
 
-  @Cacheable(value = "params", key = "#companionDto.id()")
+  //  @Cacheable(value = "params", key = "#companionDto.id()")
   public List<MonitoringParamResponseDto> findAll(CompanionDto companionDto) {
     log.info("Fetching all monitoring parameters for companion with id: {}", companionDto.id());
 

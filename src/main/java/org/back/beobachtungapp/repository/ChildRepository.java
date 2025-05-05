@@ -11,7 +11,7 @@ public interface ChildRepository extends JpaRepository<Child, Integer> {
 
   List<Child> findAllBySchoolCompanionId(Long companionId);
 
-  @EntityGraph(attributePaths = {"specialNeeds", "goals", "notes"})
+  @EntityGraph(attributePaths = {"specialNeeds", "goals", "notes", "entries", "events"})
   @Query("SELECT c FROM Child c WHERE c.id = :id")
   Optional<Child> findByIdCustom(Long id);
 }

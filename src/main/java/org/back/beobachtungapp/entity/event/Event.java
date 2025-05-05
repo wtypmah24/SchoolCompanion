@@ -2,9 +2,11 @@ package org.back.beobachtungapp.entity.event;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -14,6 +16,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Table(name = "events")
 @Data
+@ToString(exclude = {"child", "companion"})
+@EqualsAndHashCode(exclude = {"child", "companion"})
 @EntityListeners(AuditingEntityListener.class)
 public class Event {
   @Id
@@ -27,7 +31,13 @@ public class Event {
   @JoinColumn(name = "companion_id")
   private Companion companion;
 
-  @Column() LocalDate eventDate;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "child_id")
+  private Child child;
+
+  @Column() LocalDateTime startDateTime;
+  @Column() LocalDateTime endDateTime;
+  @Column() String location;
 
   @LastModifiedDate
   @Column(name = "updated_at")

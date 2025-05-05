@@ -8,8 +8,10 @@ import org.back.beobachtungapp.dto.request.monitoring.MonitoringEntryUpdateDto;
 import org.back.beobachtungapp.dto.response.monitoring.MonitoringEntryResponseDto;
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.monitoring.MonitoringEntry;
+import org.back.beobachtungapp.entity.monitoring.MonitoringParameter;
 import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.MonitoringEntryMapper;
+import org.back.beobachtungapp.repository.ChildRepository;
 import org.back.beobachtungapp.repository.MonitoringEntryRepository;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
@@ -21,31 +23,39 @@ import org.springframework.transaction.annotation.Transactional;
 public class MonitoringEntryService {
   private final MonitoringEntryRepository monitoringEntryRepository;
   private final MonitoringEntryMapper monitoringEntryMapper;
+  private final ChildRepository childRepository;
   private final ApplicationEventPublisher eventPublisher;
 
   public MonitoringEntryService(
       MonitoringEntryRepository monitoringEntryRepository,
       MonitoringEntryMapper monitoringEntryMapper,
+      ChildRepository childRepository,
       ApplicationEventPublisher eventPublisher) {
     this.monitoringEntryRepository = monitoringEntryRepository;
     this.monitoringEntryMapper = monitoringEntryMapper;
+    this.childRepository = childRepository;
     this.eventPublisher = eventPublisher;
   }
 
   @Transactional
-  public MonitoringEntryResponseDto save(MonitoringEntryRequestDto requestDto, Long paramId) {
-    log.info("Saving new monitoring entry for child with id: {}", paramId);
+  public MonitoringEntryResponseDto save(
+      MonitoringEntryRequestDto requestDto, Long childId, Long paramId) {
+    log.info("Saving new monitoring entry for child with id: {}", childId);
 
     MonitoringEntry entry = monitoringEntryMapper.monitoringEntryRequestDtoToEntry(requestDto);
-    Child child = new Child();
-    child.setId(paramId);
-    entry.setChild(child);
-
+    Child child =
+        childRepository
+            .findByIdCustom(childId)
+            .orElseThrow(() -> new EntityNotFoundException("Child not found"));
+    MonitoringParameter param = new MonitoringParameter();
+    param.setId(paramId);
+    child.addMonitoringEntry(entry);
+    entry.setMonitoringParameter(param);
     MonitoringEntry savedEntry = monitoringEntryRepository.save(entry);
     log.info(
         "Successfully saved monitoring entry with id: {} for child with id: {}",
         savedEntry.getId(),
-        paramId);
+        childId);
 
     return monitoringEntryMapper.monitoringEntryToMonitoringEntryResponseDto(savedEntry);
   }
@@ -97,7 +107,7 @@ public class MonitoringEntryService {
   }
 
   @Cacheable(value = "entries", key = "#childId")
-  public List<MonitoringEntryResponseDto> findAll(Long childId) {
+  public List<MonitoringEntryResponseDto> findAllByChildId(Long childId) {
     log.info("Fetching all monitoring entries for child with id: {}", childId);
 
     List<MonitoringEntryResponseDto> entries =
@@ -125,5 +135,11 @@ public class MonitoringEntryService {
 
     log.info("Found monitoring entry with id: {}", entryId);
     return monitoringEntryMapper.monitoringEntryToMonitoringEntryResponseDto(entry);
+  }
+
+  public List<MonitoringEntryResponseDto> findAll() {
+
+    return monitoringEntryMapper.monitoringEntriesToMonitoringsDtoList(
+        monitoringEntryRepository.findAll());
   }
 }

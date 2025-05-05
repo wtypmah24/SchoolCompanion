@@ -5,7 +5,7 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Schema(description = "Request payload for creating a new event")
 public record EventRequestDto(
@@ -20,8 +20,18 @@ public record EventRequestDto(
         @Size(min = 5, max = 500, message = "Description must be between 5 and 500 characters")
         String description,
     @Schema(
-            description = "Date of the event (must be today or in the future)",
+            description = "Start date and time of the event (must be today or in the future)",
             example = "2025-07-15")
         @NotNull(message = "Event date is required")
         @FutureOrPresent(message = "Event date must be today or in the future")
-        LocalDate eventDate) {}
+        LocalDateTime startDateTime,
+    @Schema(
+            description = "End date and time of the event (must be today or in the future)",
+            example = "2025-07-15")
+        @NotNull(message = "Event date is required")
+        @FutureOrPresent(message = "Event date must be today or in the future")
+        LocalDateTime endDateTime,
+    @Schema(description = "Location of the event", example = "Classroom.")
+        @NotBlank(message = "Location cannot be blank")
+        @Size(min = 2, max = 500, message = "Location must be between 2 and 500 characters")
+        String location) {}
