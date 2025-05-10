@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Set;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -14,6 +16,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Table(name = "monitoring_parameters")
 @Data
+@ToString(exclude = {"companion"})
+@EqualsAndHashCode(exclude = {"companion"})
 @EntityListeners(AuditingEntityListener.class)
 public class MonitoringParameter {
   @Id
@@ -23,7 +27,7 @@ public class MonitoringParameter {
   @Column() String title;
 
   @Enumerated(EnumType.STRING)
-  ScaleType scaleType;
+  ScaleType type;
 
   @Column() String description;
 
@@ -31,7 +35,10 @@ public class MonitoringParameter {
   @JoinColumn(name = "companion_id")
   private Companion companion;
 
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @Column() private int minValue;
+  @Column() private int maxValue;
+
+  @OneToMany(mappedBy = "monitoringParameter", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<MonitoringEntry> monitoringEntries;
 
   @LastModifiedDate
@@ -41,4 +48,16 @@ public class MonitoringParameter {
   @CreatedDate()
   @Column(name = "created_at", updatable = false)
   LocalDateTime createdAt;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof MonitoringParameter that)) return false;
+    return id == that.id;
+  }
+
+  @Override
+  public int hashCode() {
+    return Long.hashCode(id);
+  }
 }

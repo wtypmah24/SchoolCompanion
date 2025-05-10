@@ -127,7 +127,6 @@ public class ChildService {
                 });
 
     log.info("Found child with id: {}", id);
-    log.info("Found child: {}", child);
     return childMapper.childToChildResponseDto(child);
   }
 }

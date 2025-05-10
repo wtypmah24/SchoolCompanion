@@ -13,7 +13,6 @@ import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.MonitoringEntryMapper;
 import org.back.beobachtungapp.repository.ChildRepository;
 import org.back.beobachtungapp.repository.MonitoringEntryRepository;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,7 +105,7 @@ public class MonitoringEntryService {
             new String[] {"entry", "entries"}, new Object[] {entryId, entry.getChild().getId()}));
   }
 
-  @Cacheable(value = "entries", key = "#childId")
+  //  @Cacheable(value = "entries", key = "#childId")
   public List<MonitoringEntryResponseDto> findAllByChildId(Long childId) {
     log.info("Fetching all monitoring entries for child with id: {}", childId);
 
@@ -119,7 +118,7 @@ public class MonitoringEntryService {
     return entries;
   }
 
-  @Cacheable(value = "entry", key = "#entryId")
+  //  @Cacheable(value = "entry", key = "#entryId")
   public MonitoringEntryResponseDto findById(Long entryId) {
     log.info("Fetching monitoring entry with id: {}", entryId);
 

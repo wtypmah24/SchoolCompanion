@@ -27,7 +27,7 @@ public interface ChildMapper {
   @Mapping(target = "specialNeeds", source = "specialNeeds")
   @Mapping(target = "goals", source = "goals")
   @Mapping(target = "notes", source = "notes")
-  //  @Mapping(target = "entries", source = "entries")
+  @Mapping(target = "entries", source = "entries")
   @Mapping(target = "events", source = "events")
   ChildResponseDto childToChildResponseDto(Child child);
 

@@ -47,7 +47,9 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowedOriginPatterns(
-        List.of("http://localhost:8080")); // TODO: change to actual host
+        List.of(
+            "https://kinder-compass-companion.onrender.com",
+            "http://localhost")); // TODO: change to actual host
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
     config.setAllowedHeaders(List.of("*"));
     config.setAllowCredentials(true);

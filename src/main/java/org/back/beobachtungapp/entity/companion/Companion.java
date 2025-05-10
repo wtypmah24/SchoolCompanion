@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.ToString;
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.monitoring.MonitoringParameter;
-import org.back.beobachtungapp.entity.note.Note;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -40,9 +39,9 @@ public class Companion {
   @ToString.Exclude
   private Set<Child> children;
 
-  @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
-  @ToString.Exclude
-  private Set<Note> notes;
+  //  @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+  //  @ToString.Exclude
+  //  private Set<Note> notes;
 
   @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
   @ToString.Exclude

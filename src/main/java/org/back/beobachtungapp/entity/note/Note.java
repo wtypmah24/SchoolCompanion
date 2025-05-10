@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Data;
 import org.back.beobachtungapp.entity.child.Child;
-import org.back.beobachtungapp.entity.companion.Companion;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -26,9 +25,9 @@ public class Note {
   @JoinColumn(name = "child_id")
   private Child child;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "companion_id")
-  private Companion companion;
+  //  @ManyToOne(fetch = FetchType.LAZY)
+  //  @JoinColumn(name = "companion_id")
+  //  private Companion companion;
 
   @LastModifiedDate
   @Column(name = "updated_at")

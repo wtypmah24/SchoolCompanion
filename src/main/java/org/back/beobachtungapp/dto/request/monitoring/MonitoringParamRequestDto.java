@@ -18,7 +18,7 @@ public record MonitoringParamRequestDto(
         String title,
     @Schema(description = "Type of scale used for monitoring", example = "NUMERIC")
         @NotNull(message = "Scale type is required")
-        ScaleType scaleType,
+        ScaleType type,
     @Schema(
             description = "Description of the monitoring parameter",
             example = "Measures systolic and diastolic pressure",
@@ -26,4 +26,6 @@ public record MonitoringParamRequestDto(
             maxLength = 500)
         @NotBlank(message = "Description cannot be blank")
         @Size(min = 5, max = 500, message = "Description must be between 5 and 500 characters")
-        String description) {}
+        String description,
+    @Schema(description = "Min value of the param", example = "1") int minValue,
+    @Schema(description = "Max value of the param", example = "100") int maxValue) {}

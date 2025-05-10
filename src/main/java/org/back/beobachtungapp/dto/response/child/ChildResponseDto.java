@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.util.Set;
 import org.back.beobachtungapp.dto.response.event.EventResponseDto;
+import org.back.beobachtungapp.dto.response.monitoring.MonitoringEntryResponseDto;
 import org.back.beobachtungapp.dto.response.note.NoteResponseDto;
 
 @SuppressFBWarnings
@@ -21,4 +22,6 @@ public record ChildResponseDto(
     @Schema(description = "Notes associated with the child") Set<NoteResponseDto> notes,
     @Schema(description = "Special needs of the child") Set<SpecialNeedResponseDto> specialNeeds,
     @Schema(description = "Goals assigned to the child") Set<GoalResponseDto> goals,
-    @Schema(description = "Events assigned to the child") Set<EventResponseDto> events) {}
+    @Schema(description = "Events assigned to the child") Set<EventResponseDto> events,
+    @Schema(description = "Monitoring entries assigned to the child")
+        Set<MonitoringEntryResponseDto> entries) {}

@@ -7,7 +7,6 @@ import org.back.beobachtungapp.dto.request.note.NoteRequestDto;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.response.note.NoteResponseDto;
 import org.back.beobachtungapp.entity.child.Child;
-import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.entity.note.Note;
 import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.NoteMapper;
@@ -53,10 +52,10 @@ public class NoteService {
         childRepository
             .findByIdCustom(childId)
             .orElseThrow(() -> new EntityNotFoundException("Child not found"));
-    Companion companionRef = new Companion();
-    companionRef.setId(companionDto.id());
+    //    Companion companionRef = new Companion();
+    //    companionRef.setId(companionDto.id());
     child.addNote(note);
-    note.setCompanion(companionRef);
+    //    note.setCompanion(companionRef);
 
     Note savedNote = noteRepository.save(note);
     log.info(

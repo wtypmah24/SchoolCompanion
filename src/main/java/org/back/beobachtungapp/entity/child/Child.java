@@ -40,16 +40,16 @@ public class Child {
   @JoinColumn(name = "companion_id")
   private Companion schoolCompanion;
 
-  @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @OneToMany(mappedBy = "child", cascade = CascadeType.REMOVE, orphanRemoval = true)
   private Set<SpecialNeed> specialNeeds;
 
-  @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @OneToMany(mappedBy = "child", cascade = CascadeType.REMOVE, orphanRemoval = true)
   private Set<Goal> goals;
 
-  @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @OneToMany(mappedBy = "child", cascade = CascadeType.REMOVE, orphanRemoval = true)
   private Set<MonitoringEntry> entries;
 
-  @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @OneToMany(mappedBy = "child", cascade = CascadeType.REMOVE, orphanRemoval = true)
   private Set<Note> notes;
 
   @OneToMany(mappedBy = "child", cascade = CascadeType.ALL, orphanRemoval = true)

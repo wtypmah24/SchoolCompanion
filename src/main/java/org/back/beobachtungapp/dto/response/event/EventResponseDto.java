@@ -19,4 +19,6 @@ public record EventResponseDto(
             description = "End date and time of the event (must be today or in the future)",
             example = "2025-07-15")
         LocalDateTime endDateTime,
-    @Schema(description = "Location of the event", example = "Classroom.") String location) {}
+    @Schema(description = "Location of the event", example = "Classroom.") String location,
+    @Schema(description = "Id of the child associated with the event", example = "1")
+        Long childId) {}

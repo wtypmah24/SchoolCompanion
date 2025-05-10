@@ -6,6 +6,7 @@ import org.back.beobachtungapp.dto.request.monitoring.MonitoringEntryUpdateDto;
 import org.back.beobachtungapp.dto.response.monitoring.MonitoringEntryResponseDto;
 import org.back.beobachtungapp.entity.monitoring.MonitoringEntry;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
@@ -17,6 +18,10 @@ public interface MonitoringEntryMapper {
   MonitoringEntry monitoringEntryRequestDtoToEntry(
       MonitoringEntryRequestDto monitoringEntryRequestDto);
 
+  @Mapping(source = "monitoringParameter.id", target = "parameterId")
+  @Mapping(source = "child.id", target = "childId")
+  @Mapping(source = "monitoringParameter.title", target = "parameterName")
+  @Mapping(source = "monitoringParameter.type", target = "type")
   MonitoringEntryResponseDto monitoringEntryToMonitoringEntryResponseDto(MonitoringEntry entry);
 
   List<MonitoringEntryResponseDto> monitoringEntriesToMonitoringsDtoList(
