@@ -42,6 +42,8 @@ public class CacheConfig {
     cacheConfigurations.put("note", redisCacheConfiguration);
     cacheConfigurations.put("entry", redisCacheConfiguration);
     cacheConfigurations.put("entries", redisCacheConfiguration);
+    cacheConfigurations.put("task", redisCacheConfiguration);
+    cacheConfigurations.put("tasks", redisCacheConfiguration);
     return RedisCacheManager.builder(factory)
         .cacheDefaults(redisCacheConfiguration)
         .withInitialCacheConfigurations(cacheConfigurations)
