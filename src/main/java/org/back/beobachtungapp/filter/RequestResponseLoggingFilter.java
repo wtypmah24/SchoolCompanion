@@ -31,26 +31,30 @@ public class RequestResponseLoggingFilter implements Filter {
     CachedBodyHttpServletResponse wrappedResponse =
         new CachedBodyHttpServletResponse((HttpServletResponse) response);
 
+    // Log the request path
+    String requestPath = wrappedRequest.getRequestURI();
+
     // Continue filter chain
     chain.doFilter(wrappedRequest, wrappedResponse);
 
     // Log request body (masked)
     String requestBody = new String(wrappedRequest.getCachedBody(), StandardCharsets.UTF_8);
-    logger.info("Request body: {}", maskSensitiveFields(requestBody));
+    logger.info(
+        "Request path: {}, Request body: {}", requestPath, maskSensitiveFields(requestBody));
 
     // Copy response back to real response
     wrappedResponse.copyBodyToResponse();
 
     // Log response body (masked/truncated)
     String responseBody = new String(wrappedResponse.getCachedBody(), StandardCharsets.UTF_8);
-    logResponseBody(responseBody);
+    logResponseBody(requestPath, responseBody);
   }
 
-  private void logResponseBody(String body) {
+  private void logResponseBody(String requestPath, String body) {
     if (body.length() > 1000) {
       body = body.substring(0, 1000) + "... (truncated)";
     }
-    logger.info("Response body: {}", maskSensitiveFields(body));
+    logger.info("Response body for {}: {}", requestPath, maskSensitiveFields(body));
   }
 
   private String maskSensitiveFields(String body) {

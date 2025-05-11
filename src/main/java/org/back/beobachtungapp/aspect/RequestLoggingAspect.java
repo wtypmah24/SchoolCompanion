@@ -25,6 +25,7 @@ public class RequestLoggingAspect {
   @Around("execution(* org.back.beobachtungapp.controller..*(..))")
   public Object logRequest(ProceedingJoinPoint joinPoint) throws Throwable {
     String methodName = joinPoint.getSignature().getName();
+    String className = joinPoint.getTarget().getClass().getSimpleName();
     Object[] args = joinPoint.getArgs();
 
     String filteredParams =
@@ -32,12 +33,13 @@ public class RequestLoggingAspect {
             .map(this::maskSensitiveObject)
             .collect(Collectors.joining(", ", "[", "]"));
 
-    log.info("Calling method: {} with params: {}", methodName, filteredParams);
+    log.info(
+        "In class: {}, calling method: {} with params: {}", className, methodName, filteredParams);
 
     Object result = joinPoint.proceed();
 
     String filteredResult = maskSensitiveObject(result);
-    log.info("Method {} returned: {}", methodName, filteredResult);
+    log.info("In class: {}, method {} returned: {}", className, methodName, filteredResult);
 
     return result;
   }
@@ -62,6 +64,10 @@ public class RequestLoggingAspect {
         while (fields.hasNext()) {
           Map.Entry<String, JsonNode> entry = fields.next();
           JsonNode value = entry.getValue();
+
+          if ("password".equals(entry.getKey())) {
+            objectNode.put(entry.getKey(), "***");
+          }
 
           if (value.isTextual()) {
             String text = value.asText();
