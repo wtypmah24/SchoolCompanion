@@ -49,7 +49,8 @@ public class SecurityConfig {
     config.setAllowedOriginPatterns(
         List.of(
             "https://kinder-compass-companion.onrender.com",
-            "http://localhost")); // TODO: change to actual host
+            "http://localhost:4173",
+            "http://localhost:8080")); // TODO: change to actual host
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
     config.setAllowedHeaders(List.of("*"));
     config.setAllowCredentials(true);

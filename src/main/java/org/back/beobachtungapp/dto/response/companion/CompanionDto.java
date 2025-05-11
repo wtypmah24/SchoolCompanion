@@ -1,7 +1,6 @@
 package org.back.beobachtungapp.dto.response.companion;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.io.Serial;
 import java.io.Serializable;
 
 @Schema(description = "Response payload for a companion object")
@@ -11,6 +10,4 @@ public record CompanionDto(
     @Schema(description = "Surname of the companion", example = "Doe") String surname,
     @Schema(description = "Email address of the companion", example = "john.doe@example.com")
         String email)
-    implements Serializable {
-  @Serial private static final long serialVersionUID = 1L;
-}
+    implements Serializable {}

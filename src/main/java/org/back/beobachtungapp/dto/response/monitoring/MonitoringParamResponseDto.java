@@ -1,5 +1,9 @@
 package org.back.beobachtungapp.dto.response.monitoring;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import org.back.beobachtungapp.entity.monitoring.ScaleType;
@@ -17,4 +21,6 @@ public record MonitoringParamResponseDto(
         String description,
     @Schema(description = "Min value of the param", example = "1") int minValue,
     @Schema(description = "Max value of the param", example = "100") int maxValue,
-    LocalDateTime createdAt) {}
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+        @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+        LocalDateTime createdAt) {}

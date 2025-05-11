@@ -1,5 +1,9 @@
 package org.back.beobachtungapp.dto.response.child;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
@@ -17,7 +21,9 @@ public record ChildResponseDto(
     @Schema(description = "Email address of the child", example = "john.doe@example.com")
         String email,
     @Schema(description = "Phone number of the child", example = "+1234567890") String phoneNumber,
-    @Schema(description = "Date of birth of the child", example = "18-02-2012")
+    @JsonSerialize(using = LocalDateSerializer.class)
+        @JsonDeserialize(using = LocalDateDeserializer.class)
+        @Schema(description = "Date of birth of the child", example = "18-02-2012")
         LocalDate dateOfBirth,
     @Schema(description = "Notes associated with the child") Set<NoteResponseDto> notes,
     @Schema(description = "Special needs of the child") Set<SpecialNeedResponseDto> specialNeeds,
