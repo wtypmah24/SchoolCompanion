@@ -99,7 +99,7 @@ public class GoalService {
             new String[] {"goal", "goals"}, new Object[] {goalId, goal.getChild().getId()}));
   }
 
-  @Cacheable(value = "goals", key = "#childId")
+  @Cacheable(value = "goals", key = "#childId", unless = "#result.isEmpty()")
   public List<GoalResponseDto> findAll(Long childId) {
     log.info("Fetching all goals for child with id: {}", childId);
 
@@ -111,7 +111,7 @@ public class GoalService {
     return goals;
   }
 
-  @Cacheable(value = "goal", key = "#goalId")
+  @Cacheable(value = "goal", key = "#goalId", unless = "#result == null")
   public GoalResponseDto findById(Long goalId) {
     log.info("Fetching goal with id: {}", goalId);
 

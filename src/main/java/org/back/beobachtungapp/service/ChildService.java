@@ -13,6 +13,7 @@ import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.ChildMapper;
 import org.back.beobachtungapp.repository.ChildRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -97,10 +98,10 @@ public class ChildService {
             new Object[] {childId, child.getSchoolCompanion().getId()}));
   }
 
-  //  @Cacheable(
-  //      value = "children",
-  //      key = "#companion.id",
-  //      unless = "#result == null or #result.isEmpty()")
+  @Cacheable(
+      value = "children",
+      key = "#companion.id",
+      unless = "#result == null or #result.isEmpty()")
   public List<ChildResponseDto> findAll(CompanionDto companion) {
     log.info("Fetching all children for companion with id: {}", companion.id());
 
@@ -113,7 +114,7 @@ public class ChildService {
     return children;
   }
 
-  //  @Cacheable(value = "child", key = "#id")
+  @Cacheable(value = "child", key = "#id", unless = "#result == null")
   public ChildResponseDto findById(Long id) {
     log.info("Fetching child with id: {}", id);
 

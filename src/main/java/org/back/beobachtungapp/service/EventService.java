@@ -15,6 +15,7 @@ import org.back.beobachtungapp.mapper.EventMapper;
 import org.back.beobachtungapp.repository.ChildRepository;
 import org.back.beobachtungapp.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -108,7 +109,7 @@ public class EventService {
             new Object[] {eventId, event.getCompanion().getId()}));
   }
 
-  //  @Cacheable(value = "events", key = "#companionDto.id()")
+  @Cacheable(value = "events", key = "#companionDto.id()", unless = "#result.isEmpty()")
   public List<EventResponseDto> findAll(CompanionDto companionDto) {
     log.info("Fetching all events for companion with id: {}", companionDto.id());
 
@@ -121,7 +122,6 @@ public class EventService {
     return events;
   }
 
-  //  @Cacheable(value = "events", key = "#childId")
   public List<EventResponseDto> findByChildId(Long childId) {
     log.info("Fetching all events for child with id: {}", childId);
 
@@ -133,7 +133,7 @@ public class EventService {
     return events;
   }
 
-  //  @Cacheable(value = "event", key = "#eventId")
+  @Cacheable(value = "event", key = "#eventId", unless = "#result == null")
   public EventResponseDto findById(Long eventId) {
     log.info("Fetching event with id: {}", eventId);
 

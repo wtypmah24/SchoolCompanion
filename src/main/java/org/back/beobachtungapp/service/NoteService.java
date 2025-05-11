@@ -52,10 +52,8 @@ public class NoteService {
         childRepository
             .findByIdCustom(childId)
             .orElseThrow(() -> new EntityNotFoundException("Child not found"));
-    //    Companion companionRef = new Companion();
-    //    companionRef.setId(companionDto.id());
+
     child.addNote(note);
-    //    note.setCompanion(companionRef);
 
     Note savedNote = noteRepository.save(note);
     log.info(
@@ -111,7 +109,7 @@ public class NoteService {
             new String[] {"note", "notes"}, new Object[] {noteId, note.getChild().getId()}));
   }
 
-  @Cacheable(value = "notes", key = "#childId")
+  @Cacheable(value = "notes", key = "#childId", unless = "#result.isEmpty()")
   public List<NoteResponseDto> findAll(Long childId) {
     log.info("Fetching all notes for child with id: {}", childId);
 
@@ -123,7 +121,7 @@ public class NoteService {
     return notes;
   }
 
-  @Cacheable(value = "note", key = "#noteId")
+  @Cacheable(value = "note", key = "#noteId", unless = "#result == null")
   public NoteResponseDto findById(Long noteId) {
     log.info("Fetching note with id: {}", noteId);
 

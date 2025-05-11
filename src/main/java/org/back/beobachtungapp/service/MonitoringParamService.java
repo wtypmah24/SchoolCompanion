@@ -13,6 +13,7 @@ import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.MonitoringParamMapper;
 import org.back.beobachtungapp.repository.MonitoringParamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,7 +103,7 @@ public class MonitoringParamService {
             new Object[] {paramId, param.getCompanion().getId()}));
   }
 
-  //  @Cacheable(value = "params", key = "#companionDto.id()")
+  @Cacheable(value = "params", key = "#companionDto.id()", unless = "#result.isEmpty()")
   public List<MonitoringParamResponseDto> findAll(CompanionDto companionDto) {
     log.info("Fetching all monitoring parameters for companion with id: {}", companionDto.id());
 
@@ -118,7 +119,7 @@ public class MonitoringParamService {
     return params;
   }
 
-  //  @Cacheable(value = "param", key = "#paramId")
+  @Cacheable(value = "param", key = "#paramId", unless = "#result == null")
   public MonitoringParamResponseDto findById(Long paramId) {
     log.info("Fetching monitoring parameter with id: {}", paramId);
 

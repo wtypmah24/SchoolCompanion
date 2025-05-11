@@ -101,7 +101,7 @@ public class SpecialNeedService {
             new String[] {"need", "needs"}, new Object[] {needId, need.getChild().getId()}));
   }
 
-  @Cacheable(value = "needs", key = "#childId")
+  @Cacheable(value = "needs", key = "#childId", unless = "#result.isEmpty()")
   public List<SpecialNeedResponseDto> findAll(Long childId) {
     log.info("Fetching all special needs for child with id: {}", childId);
 
@@ -114,7 +114,7 @@ public class SpecialNeedService {
     return specialNeeds;
   }
 
-  @Cacheable(value = "need", key = "#needId")
+  @Cacheable(value = "need", key = "#needId", unless = "#result == null")
   public SpecialNeedResponseDto findById(Long needId) {
     log.info("Fetching special need with id: {}", needId);
 
