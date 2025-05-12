@@ -68,7 +68,13 @@ public class SecurityConfig {
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(
             authorize ->
-                authorize.requestMatchers("/auth/**").permitAll().anyRequest().authenticated())
+                authorize
+                    .requestMatchers("/auth/**")
+                    .permitAll()
+                    .requestMatchers("/webhook/**")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .httpBasic(Customizer.withDefaults());
