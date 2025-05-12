@@ -13,6 +13,7 @@ import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.entity.event.Event;
 import org.back.beobachtungapp.entity.monitoring.MonitoringEntry;
 import org.back.beobachtungapp.entity.note.Note;
+import org.back.beobachtungapp.entity.task.Task;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -21,8 +22,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Table(name = "children")
 @Data
-@ToString(exclude = {"events", "goals", "notes", "specialNeeds", "entries"})
-@EqualsAndHashCode(exclude = {"events", "goals", "notes", "specialNeeds", "entries"})
+@ToString(exclude = {"events", "goals", "notes", "specialNeeds", "entries", "tasks"})
+@EqualsAndHashCode(exclude = {"events", "goals", "notes", "specialNeeds", "entries", "tasks"})
 @EntityListeners(AuditingEntityListener.class)
 public class Child {
   @Id
@@ -55,6 +56,9 @@ public class Child {
   @OneToMany(mappedBy = "child", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<Event> events;
 
+  @OneToMany(mappedBy = "child", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<Task> tasks;
+
   @LastModifiedDate
   @Column(name = "updated_at")
   LocalDateTime updatedAt;
@@ -86,5 +90,10 @@ public class Child {
   public void addEvent(Event event) {
     event.setChild(this);
     events.add(event);
+  }
+
+  public void addTask(Task task) {
+    task.setChild(this);
+    tasks.add(task);
   }
 }
