@@ -27,7 +27,6 @@ public class WebhookRegister {
   @PostConstruct
   public void registerWebhook() {
     SetWebhook setWebhook = SetWebhook.builder().url(webhookUrl + path).build();
-
     try {
       bot.setWebhook(setWebhook);
       log.info("Webhook registered successfully");
