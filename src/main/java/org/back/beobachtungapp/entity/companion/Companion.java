@@ -36,6 +36,8 @@ public class Companion {
   @Column(nullable = false)
   private String password;
 
+  @Column() private String tgId;
+
   @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
   @ToString.Exclude
   private Set<Child> children;

@@ -14,11 +14,11 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Slf4j
 @Component
 public class WebhookRegister {
-  private final TgBotWebHook bot;
+  private final TgBot bot;
   private final String webhookUrl;
   private final String path;
 
-  public WebhookRegister(TgBotWebHook bot, TelegramProperties telegramProperties) {
+  public WebhookRegister(TgBot bot, TelegramProperties telegramProperties) {
     this.bot = bot;
     this.webhookUrl = telegramProperties.getWebhook_url();
     this.path = telegramProperties.getPath();

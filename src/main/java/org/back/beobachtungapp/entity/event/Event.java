@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.companion.Companion;
+import org.back.beobachtungapp.listener.EventEntityListener;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -18,7 +19,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Data
 @ToString(exclude = {"child", "companion"})
 @EqualsAndHashCode(exclude = {"child", "companion"})
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners({AuditingEntityListener.class, EventEntityListener.class})
 public class Event {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

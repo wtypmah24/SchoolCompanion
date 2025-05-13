@@ -35,7 +35,11 @@ public class CompanionService {
 
     CompanionRequestDto newCompanion =
         new CompanionRequestDto(
-            companion.name(), companion.surname(), companion.email(), encodedPassword);
+            companion.name(),
+            companion.surname(),
+            companion.email(),
+            companion.tgId(),
+            encodedPassword);
 
     return companionRepository.save(companionMapper.companionRequestDtoToCompanion(newCompanion));
   }

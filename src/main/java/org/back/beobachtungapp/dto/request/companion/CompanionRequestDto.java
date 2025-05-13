@@ -15,6 +15,7 @@ public record CompanionRequestDto(
         @Size(min = 2, max = 50, message = "Surname must be between 2 and 50 characters")
         @Schema(description = "Surname of the companion", example = "Doe")
         String surname,
+    @Schema(description = "Telegram id of the companion", example = "31245667") String tgId,
     @Email(message = "Email should be valid")
         @NotBlank(message = "Email cannot be blank")
         @Schema(description = "Email address of the companion", example = "john.doe@example.com")
