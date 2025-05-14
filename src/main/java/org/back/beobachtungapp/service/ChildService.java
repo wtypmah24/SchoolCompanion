@@ -9,12 +9,11 @@ import org.back.beobachtungapp.dto.response.child.ChildResponseDto;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.companion.Companion;
-import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.ChildMapper;
 import org.back.beobachtungapp.repository.ChildRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,16 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChildService {
   private final ChildMapper childMapper;
   private final ChildRepository childRepository;
-  private final ApplicationEventPublisher eventPublisher;
 
   @Autowired
-  public ChildService(
-      ChildMapper childMapper,
-      ChildRepository childRepository,
-      ApplicationEventPublisher eventPublisher) {
+  public ChildService(ChildMapper childMapper, ChildRepository childRepository) {
     this.childMapper = childMapper;
     this.childRepository = childRepository;
-    this.eventPublisher = eventPublisher;
   }
 
   @Transactional
@@ -49,6 +43,7 @@ public class ChildService {
     return childMapper.childToChildResponseDto(savedChild);
   }
 
+  @CacheEvict(value = "child", key = "#childId")
   @Transactional
   public ChildResponseDto update(
       ChildUpdateDto childUpdateDto, Long childId, CompanionDto companion) {
@@ -65,16 +60,10 @@ public class ChildService {
 
     childMapper.updateChildFromDto(childUpdateDto, child);
     log.info("Child with id: {} successfully updated", childId);
-
-    // Publish cache event
-    eventPublisher.publishEvent(
-        new CacheEvent(
-            new String[] {"child", "children"},
-            new Object[] {childId, child.getSchoolCompanion().getId()}));
-
     return childMapper.childToChildResponseDto(child);
   }
 
+  @CacheEvict(value = "child", key = "#childId")
   @Transactional
   public void delete(Long childId) {
     log.info("Deleting child with id: {}", childId);
@@ -90,18 +79,8 @@ public class ChildService {
 
     childRepository.delete(child);
     log.info("Child with id: {} successfully deleted", childId);
-
-    // Publish cache event
-    eventPublisher.publishEvent(
-        new CacheEvent(
-            new String[] {"child", "children"},
-            new Object[] {childId, child.getSchoolCompanion().getId()}));
   }
 
-  @Cacheable(
-      value = "children",
-      key = "#companion.id",
-      unless = "#result == null or #result.isEmpty()")
   public List<ChildResponseDto> findAll(CompanionDto companion) {
     log.info("Fetching all children for companion with id: {}", companion.id());
 

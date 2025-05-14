@@ -9,12 +9,11 @@ import org.back.beobachtungapp.dto.response.monitoring.MonitoringEntryResponseDt
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.monitoring.MonitoringEntry;
 import org.back.beobachtungapp.entity.monitoring.MonitoringParameter;
-import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.MonitoringEntryMapper;
 import org.back.beobachtungapp.repository.ChildRepository;
 import org.back.beobachtungapp.repository.MonitoringEntryRepository;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,17 +23,14 @@ public class MonitoringEntryService {
   private final MonitoringEntryRepository monitoringEntryRepository;
   private final MonitoringEntryMapper monitoringEntryMapper;
   private final ChildRepository childRepository;
-  private final ApplicationEventPublisher eventPublisher;
 
   public MonitoringEntryService(
       MonitoringEntryRepository monitoringEntryRepository,
       MonitoringEntryMapper monitoringEntryMapper,
-      ChildRepository childRepository,
-      ApplicationEventPublisher eventPublisher) {
+      ChildRepository childRepository) {
     this.monitoringEntryRepository = monitoringEntryRepository;
     this.monitoringEntryMapper = monitoringEntryMapper;
     this.childRepository = childRepository;
-    this.eventPublisher = eventPublisher;
   }
 
   @Transactional
@@ -56,10 +52,10 @@ public class MonitoringEntryService {
         "Successfully saved monitoring entry with id: {} for child with id: {}",
         savedEntry.getId(),
         childId);
-
     return monitoringEntryMapper.monitoringEntryToMonitoringEntryResponseDto(savedEntry);
   }
 
+  @CacheEvict(value = "entry", key = "#entryId")
   @Transactional
   public MonitoringEntryResponseDto update(MonitoringEntryUpdateDto updateDto, Long entryId) {
     log.info("Updating monitoring entry with id: {}", entryId);
@@ -76,14 +72,10 @@ public class MonitoringEntryService {
 
     monitoringEntryMapper.updateMonitoringEntry(updateDto, entry);
     log.info("Monitoring entry with id: {} successfully updated", entryId);
-
-    eventPublisher.publishEvent(
-        new CacheEvent(
-            new String[] {"entry", "entries"}, new Object[] {entryId, entry.getChild().getId()}));
-
     return monitoringEntryMapper.monitoringEntryToMonitoringEntryResponseDto(entry);
   }
 
+  @CacheEvict(value = "entry", key = "#entryId")
   @Transactional
   public void delete(Long entryId) {
     log.info("Deleting monitoring entry with id: {}", entryId);
@@ -100,13 +92,8 @@ public class MonitoringEntryService {
 
     monitoringEntryRepository.delete(entry);
     log.info("Successfully deleted monitoring entry with id: {}", entryId);
-
-    eventPublisher.publishEvent(
-        new CacheEvent(
-            new String[] {"entry", "entries"}, new Object[] {entryId, entry.getChild().getId()}));
   }
 
-  @Cacheable(value = "entries", key = "#childId", unless = "#result.isEmpty()")
   public List<MonitoringEntryResponseDto> findAllByChildId(Long childId) {
     log.info("Fetching all monitoring entries for child with id: {}", childId);
 

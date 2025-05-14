@@ -7,6 +7,7 @@ import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.mapper.CompanionMapper;
 import org.back.beobachtungapp.repository.CompanionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class CompanionService {
     this.companionMapper = companionMapper;
   }
 
+  @CacheEvict(value = "users")
   @Transactional
   public Companion save(CompanionRequestDto companion) {
     String encodedPassword = passwordEncoder.encode(companion.password());

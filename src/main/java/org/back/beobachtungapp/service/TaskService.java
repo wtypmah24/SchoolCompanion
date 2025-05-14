@@ -10,12 +10,11 @@ import org.back.beobachtungapp.dto.response.task.TaskResponseDto;
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.entity.task.Task;
-import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.TaskMapper;
 import org.back.beobachtungapp.repository.ChildRepository;
 import org.back.beobachtungapp.repository.TaskRepository;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,17 +24,12 @@ public class TaskService {
   private final TaskRepository taskRepository;
   private final TaskMapper taskMapper;
   private final ChildRepository childRepository;
-  private final ApplicationEventPublisher eventPublisher;
 
   public TaskService(
-      TaskRepository taskRepository,
-      TaskMapper taskMapper,
-      ChildRepository childRepository,
-      ApplicationEventPublisher eventPublisher) {
+      TaskRepository taskRepository, TaskMapper taskMapper, ChildRepository childRepository) {
     this.taskRepository = taskRepository;
     this.taskMapper = taskMapper;
     this.childRepository = childRepository;
-    this.eventPublisher = eventPublisher;
   }
 
   public TaskResponseDto save(TaskRequestDto dto, CompanionDto companionDto, Long childId) {
@@ -56,6 +50,7 @@ public class TaskService {
     return taskMapper.taskToTaskResponseDto(savedTask);
   }
 
+  @CacheEvict(value = "task", key = "#taskId")
   @Transactional
   public TaskResponseDto update(TaskUpdateDto taskUpdateDto, Long taskId) {
     log.info("Updating task with id: {}", taskId);
@@ -71,14 +66,10 @@ public class TaskService {
 
     taskMapper.updateTask(taskUpdateDto, task);
     log.info("Event with id: {} successfully updated", taskId);
-
-    eventPublisher.publishEvent(
-        new CacheEvent(
-            new String[] {"task", "tasks"}, new Object[] {taskId, task.getCompanion().getId()}));
-
     return taskMapper.taskToTaskResponseDto(task);
   }
 
+  @CacheEvict(value = "task", key = "#taskId")
   @Transactional
   public void delete(Long taskId) {
     log.info("Deleting task with id: {}", taskId);
@@ -94,13 +85,8 @@ public class TaskService {
 
     taskRepository.delete(task);
     log.info("Task with id: {} successfully deleted", taskId);
-
-    eventPublisher.publishEvent(
-        new CacheEvent(
-            new String[] {"task", "tasks"}, new Object[] {taskId, task.getCompanion().getId()}));
   }
 
-  @Cacheable(value = "tasks", key = "#companionDto.id()", unless = "#result.isEmpty()")
   public List<TaskResponseDto> findAll(CompanionDto companionDto) {
     log.info("Fetching all tasks for companion with id: {}", companionDto.id());
 

@@ -8,13 +8,12 @@ import org.back.beobachtungapp.dto.request.child.SpecialNeedUpdateDto;
 import org.back.beobachtungapp.dto.response.child.SpecialNeedResponseDto;
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.child.SpecialNeed;
-import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.SpecialNeedMapper;
 import org.back.beobachtungapp.repository.ChildRepository;
 import org.back.beobachtungapp.repository.SpecialNeedRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,18 +22,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class SpecialNeedService {
   private final SpecialNeedRepository specialNeedRepo;
   private final SpecialNeedMapper specialNeedMapper;
-  private final ApplicationEventPublisher eventPublisher;
   private final ChildRepository childRepository;
 
   @Autowired
   public SpecialNeedService(
       SpecialNeedRepository specialNeedRepo,
       SpecialNeedMapper specialNeedMapper,
-      ApplicationEventPublisher eventPublisher,
       ChildRepository childRepository) {
     this.specialNeedRepo = specialNeedRepo;
     this.specialNeedMapper = specialNeedMapper;
-    this.eventPublisher = eventPublisher;
     this.childRepository = childRepository;
   }
 
@@ -53,10 +49,10 @@ public class SpecialNeedService {
         "Successfully saved special need with id: {} for child with id: {}",
         savedNeed.getId(),
         childId);
-
     return specialNeedMapper.specialNeedToSpecialNeedResponseDto(savedNeed);
   }
 
+  @CacheEvict(value = "need", key = "#needId")
   @Transactional
   public SpecialNeedResponseDto update(SpecialNeedUpdateDto needUpdateDto, Long needId) {
     log.info("Updating special need with id: {}", needId);
@@ -72,14 +68,10 @@ public class SpecialNeedService {
 
     specialNeedMapper.updateSpecialNeedFromDto(needUpdateDto, need);
     log.info("Successfully updated special need with id: {}", needId);
-
-    eventPublisher.publishEvent(
-        new CacheEvent(
-            new String[] {"need", "needs"}, new Object[] {needId, need.getChild().getId()}));
-
     return specialNeedMapper.specialNeedToSpecialNeedResponseDto(need);
   }
 
+  @CacheEvict(value = "need", key = "#needId")
   @Transactional
   public void delete(Long needId) {
     log.info("Deleting special need with id: {}", needId);
@@ -95,13 +87,8 @@ public class SpecialNeedService {
 
     specialNeedRepo.delete(need);
     log.info("Successfully deleted special need with id: {}", needId);
-
-    eventPublisher.publishEvent(
-        new CacheEvent(
-            new String[] {"need", "needs"}, new Object[] {needId, need.getChild().getId()}));
   }
 
-  @Cacheable(value = "needs", key = "#childId", unless = "#result.isEmpty()")
   public List<SpecialNeedResponseDto> findAll(Long childId) {
     log.info("Fetching all special needs for child with id: {}", childId);
 

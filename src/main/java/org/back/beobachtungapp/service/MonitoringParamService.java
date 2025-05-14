@@ -9,12 +9,11 @@ import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.response.monitoring.MonitoringParamResponseDto;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.entity.monitoring.MonitoringParameter;
-import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.MonitoringParamMapper;
 import org.back.beobachtungapp.repository.MonitoringParamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,16 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class MonitoringParamService {
   private final MonitoringParamRepository monitoringParamRepository;
   private final MonitoringParamMapper monitoringParamMapper;
-  private final ApplicationEventPublisher eventPublisher;
 
   @Autowired
   public MonitoringParamService(
       MonitoringParamRepository monitoringParamRepository,
-      MonitoringParamMapper monitoringParamMapper,
-      ApplicationEventPublisher eventPublisher) {
+      MonitoringParamMapper monitoringParamMapper) {
     this.monitoringParamRepository = monitoringParamRepository;
     this.monitoringParamMapper = monitoringParamMapper;
-    this.eventPublisher = eventPublisher;
   }
 
   @Transactional
@@ -51,10 +47,10 @@ public class MonitoringParamService {
         "Successfully saved monitoring parameter with id: {} for companion with id: {}",
         savedParam.getId(),
         companionDto.id());
-
     return monitoringParamMapper.monitoringParamToMonitoringParamResponseDto(savedParam);
   }
 
+  @CacheEvict(value = "param", key = "#paramId")
   @Transactional
   public MonitoringParamResponseDto update(MonitoringParamUpdateDto updateDto, Long paramId) {
     log.info("Updating monitoring parameter with id: {}", paramId);
@@ -71,15 +67,10 @@ public class MonitoringParamService {
 
     monitoringParamMapper.updateMonitoringParam(updateDto, param);
     log.info("Successfully updated monitoring param with id: {}", paramId);
-
-    eventPublisher.publishEvent(
-        new CacheEvent(
-            new String[] {"param", "params"},
-            new Object[] {paramId, param.getCompanion().getId()}));
-
     return monitoringParamMapper.monitoringParamToMonitoringParamResponseDto(param);
   }
 
+  @CacheEvict(value = "param", key = "#paramId")
   @Transactional
   public void delete(Long paramId) {
     log.info("Deleting monitoring parameter with id: {}", paramId);
@@ -96,14 +87,8 @@ public class MonitoringParamService {
 
     monitoringParamRepository.delete(param);
     log.info("Successfully deleted monitoring parameter with id: {}", paramId);
-
-    eventPublisher.publishEvent(
-        new CacheEvent(
-            new String[] {"param", "params"},
-            new Object[] {paramId, param.getCompanion().getId()}));
   }
 
-  @Cacheable(value = "params", key = "#companionDto.id()", unless = "#result.isEmpty()")
   public List<MonitoringParamResponseDto> findAll(CompanionDto companionDto) {
     log.info("Fetching all monitoring parameters for companion with id: {}", companionDto.id());
 

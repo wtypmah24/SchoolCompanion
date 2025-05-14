@@ -8,13 +8,12 @@ import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.response.note.NoteResponseDto;
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.note.Note;
-import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.NoteMapper;
 import org.back.beobachtungapp.repository.ChildRepository;
 import org.back.beobachtungapp.repository.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,18 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class NoteService {
   private final NoteRepository noteRepository;
   private final NoteMapper noteMapper;
-  private final ApplicationEventPublisher eventPublisher;
   private final ChildRepository childRepository;
 
   @Autowired
   public NoteService(
-      NoteRepository noteRepository,
-      NoteMapper noteMapper,
-      ApplicationEventPublisher eventPublisher,
-      ChildRepository childRepository) {
+      NoteRepository noteRepository, NoteMapper noteMapper, ChildRepository childRepository) {
     this.noteRepository = noteRepository;
     this.noteMapper = noteMapper;
-    this.eventPublisher = eventPublisher;
     this.childRepository = childRepository;
   }
 
@@ -61,10 +55,10 @@ public class NoteService {
         savedNote.getId(),
         childId,
         companionDto.id());
-
     return noteMapper.noteToNoteResponseDto(savedNote);
   }
 
+  @CacheEvict(value = "note", key = "#noteId")
   @Transactional
   public NoteResponseDto update(NoteRequestDto noteRequestDto, Long noteId) {
     log.info("Updating note with id: {}", noteId);
@@ -80,14 +74,10 @@ public class NoteService {
 
     noteMapper.updateNote(noteRequestDto, note);
     log.info("Successfully updated note with id: {}", noteId);
-
-    eventPublisher.publishEvent(
-        new CacheEvent(
-            new String[] {"note", "notes"}, new Object[] {noteId, note.getChild().getId()}));
-
     return noteMapper.noteToNoteResponseDto(note);
   }
 
+  @CacheEvict(value = "note", key = "#noteId")
   @Transactional
   public void delete(Long noteId) {
     log.info("Deleting note with id: {}", noteId);
@@ -103,13 +93,8 @@ public class NoteService {
 
     noteRepository.delete(note);
     log.info("Successfully deleted note with id: {}", noteId);
-
-    eventPublisher.publishEvent(
-        new CacheEvent(
-            new String[] {"note", "notes"}, new Object[] {noteId, note.getChild().getId()}));
   }
 
-  @Cacheable(value = "notes", key = "#childId", unless = "#result.isEmpty()")
   public List<NoteResponseDto> findAll(Long childId) {
     log.info("Fetching all notes for child with id: {}", childId);
 

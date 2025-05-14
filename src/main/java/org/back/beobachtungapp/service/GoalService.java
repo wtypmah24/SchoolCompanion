@@ -7,13 +7,12 @@ import org.back.beobachtungapp.dto.request.child.GoalRequestDto;
 import org.back.beobachtungapp.dto.response.child.GoalResponseDto;
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.child.Goal;
-import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.GoalMapper;
 import org.back.beobachtungapp.repository.ChildRepository;
 import org.back.beobachtungapp.repository.GoalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,18 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class GoalService {
   private final GoalRepository goalRepository;
   private final GoalMapper goalMapper;
-  private final ApplicationEventPublisher eventPublisher;
   private final ChildRepository childRepository;
 
   @Autowired
   public GoalService(
-      GoalRepository goalRepository,
-      GoalMapper goalMapper,
-      ApplicationEventPublisher eventPublisher,
-      ChildRepository childRepository) {
+      GoalRepository goalRepository, GoalMapper goalMapper, ChildRepository childRepository) {
     this.goalRepository = goalRepository;
     this.goalMapper = goalMapper;
-    this.eventPublisher = eventPublisher;
     this.childRepository = childRepository;
   }
 
@@ -51,11 +45,11 @@ public class GoalService {
     Goal savedGoal = goalRepository.save(goal);
     log.info(
         "Successfully saved goal with id: {} for child with id: {}", savedGoal.getId(), childId);
-
     return goalMapper.goalToGoalResponseDto(savedGoal);
   }
 
   @Transactional
+  @CacheEvict(value = "goals")
   public GoalResponseDto update(GoalRequestDto goalDto, Long goalId) {
     log.info("Updating goal with id: {}", goalId);
 
@@ -70,14 +64,10 @@ public class GoalService {
 
     goalMapper.updateGoalFromDto(goalDto, goal);
     log.info("Goal with id: {} successfully updated", goalId);
-
-    eventPublisher.publishEvent(
-        new CacheEvent(
-            new String[] {"goal", "goals"}, new Object[] {goalId, goal.getChild().getId()}));
-
     return goalMapper.goalToGoalResponseDto(goal);
   }
 
+  @CacheEvict(value = "goal")
   @Transactional
   public void delete(Long goalId) {
     log.info("Deleting goal with id: {}", goalId);
@@ -93,13 +83,8 @@ public class GoalService {
 
     goalRepository.delete(goal);
     log.info("Goal with id: {} successfully deleted", goalId);
-
-    eventPublisher.publishEvent(
-        new CacheEvent(
-            new String[] {"goal", "goals"}, new Object[] {goalId, goal.getChild().getId()}));
   }
 
-  @Cacheable(value = "goals", key = "#childId", unless = "#result.isEmpty()")
   public List<GoalResponseDto> findAll(Long childId) {
     log.info("Fetching all goals for child with id: {}", childId);
 
@@ -111,7 +96,7 @@ public class GoalService {
     return goals;
   }
 
-  @Cacheable(value = "goal", key = "#goalId", unless = "#result == null")
+  @Cacheable(value = "goal", key = "goalId")
   public GoalResponseDto findById(Long goalId) {
     log.info("Fetching goal with id: {}", goalId);
 

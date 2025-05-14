@@ -10,13 +10,12 @@ import org.back.beobachtungapp.dto.response.event.EventResponseDto;
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.entity.event.Event;
-import org.back.beobachtungapp.event.CacheEvent;
 import org.back.beobachtungapp.mapper.EventMapper;
 import org.back.beobachtungapp.repository.ChildRepository;
 import org.back.beobachtungapp.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,18 +25,13 @@ public class EventService {
   private final EventRepository eventRepository;
   private final EventMapper eventMapper;
   private final ChildRepository childRepository;
-  private final ApplicationEventPublisher eventPublisher;
 
   @Autowired
   public EventService(
-      EventRepository eventRepository,
-      EventMapper eventMapper,
-      ChildRepository childRepository,
-      ApplicationEventPublisher eventPublisher) {
+      EventRepository eventRepository, EventMapper eventMapper, ChildRepository childRepository) {
     this.eventRepository = eventRepository;
     this.eventMapper = eventMapper;
     this.childRepository = childRepository;
-    this.eventPublisher = eventPublisher;
   }
 
   @Transactional
@@ -63,6 +57,7 @@ public class EventService {
     return eventMapper.eventToEventResponseDto(savedEvent);
   }
 
+  @CacheEvict(value = "event", key = "#eventId")
   @Transactional
   public EventResponseDto update(EventUpdateDto eventUpdateDto, Long eventId) {
     log.info("Updating event with id: {}", eventId);
@@ -78,15 +73,10 @@ public class EventService {
 
     eventMapper.updateEvent(eventUpdateDto, event);
     log.info("Event with id: {} successfully updated", eventId);
-
-    eventPublisher.publishEvent(
-        new CacheEvent(
-            new String[] {"event", "events"},
-            new Object[] {eventId, event.getCompanion().getId()}));
-
     return eventMapper.eventToEventResponseDto(event);
   }
 
+  @CacheEvict(value = "event", key = "#eventId")
   @Transactional
   public void delete(Long eventId) {
     log.info("Deleting event with id: {}", eventId);
@@ -102,14 +92,8 @@ public class EventService {
 
     eventRepository.delete(event);
     log.info("Event with id: {} successfully deleted", eventId);
-
-    eventPublisher.publishEvent(
-        new CacheEvent(
-            new String[] {"event", "events"},
-            new Object[] {eventId, event.getCompanion().getId()}));
   }
 
-  @Cacheable(value = "events", key = "#companionDto.id()", unless = "#result.isEmpty()")
   public List<EventResponseDto> findAll(CompanionDto companionDto) {
     log.info("Fetching all events for companion with id: {}", companionDto.id());
 

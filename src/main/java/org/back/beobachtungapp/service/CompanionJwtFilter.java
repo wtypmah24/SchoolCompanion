@@ -68,6 +68,10 @@ public class CompanionJwtFilter extends OncePerRequestFilter {
 
       } catch (JwtException e) {
         logger.warn("Failed to decode JWT");
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"error\": \"Invalid token\"}");
+        return;
       }
     }
 
