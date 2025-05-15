@@ -7,8 +7,8 @@ import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.dto.brevo.BrevoEmailRequest;
+import org.back.beobachtungapp.dto.message.DelayedTgMessage;
 import org.back.beobachtungapp.feign.BrevoClient;
-import org.back.beobachtungapp.message.DelayedTgMessage;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,9 @@ public class DelayedMessageService {
 
     try {
       String json = objectMapper.writeValueAsString(msg);
-      redisTemplate.opsForZSet().add(msg.eventId().toString(), json, executionTime);
+      redisTemplate.opsForZSet().add("delayedMessages", json, executionTime);
+
+      redisTemplate.opsForValue().set("event:" + msg.eventId(), json);
       log.info("Message added to Redis with delay: {} at {}", msg, executionTime);
     } catch (JsonProcessingException e) {
       log.error("Failed to serialize delayed message: {}", msg, e);
@@ -34,8 +36,16 @@ public class DelayedMessageService {
   }
 
   public void removeDelayedTgMessage(String eventId) {
-    redisTemplate.opsForZSet().remove(eventId);
-    log.info("Message removed from Redis: {}", eventId);
+    String redisKey = "event:" + eventId;
+    String json = redisTemplate.opsForValue().get(redisKey);
+
+    if (json != null) {
+      redisTemplate.opsForZSet().remove("delayedMessages", json);
+      redisTemplate.delete(redisKey);
+      log.info("Message removed from Redis: {}", eventId);
+    } else {
+      log.warn("No message found in Redis for eventId: {}", eventId);
+    }
   }
 
   public void scheduleEmail(BrevoEmailRequest request) {

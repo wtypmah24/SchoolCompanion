@@ -2,7 +2,7 @@ package org.back.beobachtungapp.entity.child;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -27,9 +27,9 @@ public class SpecialNeed {
 
   @LastModifiedDate
   @Column(name = "updated_at")
-  LocalDateTime updatedAt;
+  Instant updatedAt;
 
   @CreatedDate()
   @Column(name = "created_at", updatable = false)
-  LocalDateTime createdAt;
+  Instant createdAt;
 }

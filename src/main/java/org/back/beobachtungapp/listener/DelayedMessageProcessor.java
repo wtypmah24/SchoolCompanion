@@ -5,7 +5,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.bot.TgBot;
-import org.back.beobachtungapp.message.DelayedTgMessage;
+import org.back.beobachtungapp.dto.message.DelayedTgMessage;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
 package org.back.beobachtungapp.dto.request.event;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.companion.Companion;
@@ -46,11 +46,9 @@ public record EventNotificationDto(
         Optional.ofNullable(event.getTitle()).orElse("No title"),
         Optional.ofNullable(event.getDescription()).orElse("No description"),
         Optional.ofNullable(event.getStartDateTime())
-            .map(LocalDateTime::toString)
+            .map(Instant::toString)
             .orElse("No start date"),
-        Optional.ofNullable(event.getEndDateTime())
-            .map(LocalDateTime::toString)
-            .orElse("No end date"),
+        Optional.ofNullable(event.getEndDateTime()).map(Instant::toString).orElse("No end date"),
         Optional.ofNullable(event.getLocation()).orElse("Не указано"),
         companionName,
         tgId,

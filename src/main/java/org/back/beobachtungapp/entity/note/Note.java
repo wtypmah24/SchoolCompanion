@@ -2,7 +2,7 @@ package org.back.beobachtungapp.entity.note;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import lombok.Data;
 import org.back.beobachtungapp.entity.child.Child;
 import org.springframework.data.annotation.CreatedDate;
@@ -31,9 +31,9 @@ public class Note {
 
   @LastModifiedDate
   @Column(name = "updated_at")
-  LocalDateTime updatedAt;
+  Instant updatedAt;
 
   @CreatedDate()
   @Column(name = "created_at", updatable = false)
-  LocalDateTime createdAt;
+  Instant createdAt;
 }

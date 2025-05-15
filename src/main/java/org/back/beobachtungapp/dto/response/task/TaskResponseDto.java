@@ -1,9 +1,11 @@
 package org.back.beobachtungapp.dto.response.task;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Schema(description = "DTO for representing task data in responses")
 public record TaskResponseDto(
@@ -12,6 +14,7 @@ public record TaskResponseDto(
     @Schema(description = "Task description", example = "Complete math exercises")
         String description,
     @Schema(description = "Task status", example = "PENDING") String status,
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonDeserialize(using = InstantDeserializer.class)
+        @JsonSerialize(using = InstantSerializer.class)
         @Schema(description = "Task deadline", example = "2025-06-01T18:00:00")
-        LocalDateTime deadLine) {}
+        Instant deadLine) {}

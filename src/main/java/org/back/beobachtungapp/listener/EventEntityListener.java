@@ -4,17 +4,15 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostRemove;
 import jakarta.persistence.PostUpdate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.dto.brevo.BrevoEmailRequest;
+import org.back.beobachtungapp.dto.message.DelayedTgMessage;
 import org.back.beobachtungapp.dto.request.event.EventNotificationDto;
 import org.back.beobachtungapp.entity.event.Event;
-import org.back.beobachtungapp.message.DelayedTgMessage;
 import org.back.beobachtungapp.service.DelayedMessageService;
 import org.back.beobachtungapp.utils.TgUtils;
 import org.springframework.context.MessageSource;
@@ -27,6 +25,7 @@ import org.springframework.stereotype.Component;
 public class EventEntityListener {
   private final DelayedMessageService delayedMessageService;
   private final MessageSource messageSource;
+  private static final long DELAY_IN_MS = 24 * 60 * 60;
 
   @PostPersist
   public void onPostPersist(Event event) {
@@ -99,12 +98,8 @@ public class EventEntityListener {
             },
             Locale.getDefault());
 
-    LocalDateTime notificationTime = event.getStartDateTime().minusDays(1);
-    String scheduledAt =
-        notificationTime
-            .atZone(ZoneId.systemDefault())
-            .withZoneSameInstant(ZoneOffset.ofHours(2))
-            .toString();
+    Instant notificationTime = event.getStartDateTime().minusSeconds(DELAY_IN_MS);
+    String scheduledAt = notificationTime.toString();
 
     String batchId = String.valueOf(event.getId());
 
@@ -124,14 +119,15 @@ public class EventEntityListener {
   }
 
   private Long calculateDelay(Event event) {
-    LocalDateTime start = event.getStartDateTime();
-    LocalDateTime now = LocalDateTime.now();
+    Instant start = event.getStartDateTime();
+    Instant now = Instant.now();
 
     // TODO: change to meaningfully delay
-    LocalDateTime notificationTime = start.minusDays(1);
+    Instant notificationTime = start.minusSeconds(DELAY_IN_MS);
 
     long delayMillis = java.time.Duration.between(now, notificationTime).toMillis();
 
+    // TODO: remove magic number
     long DEFAULT_DELAY_MS = 30_000;
     return Math.max(delayMillis, DEFAULT_DELAY_MS);
   }

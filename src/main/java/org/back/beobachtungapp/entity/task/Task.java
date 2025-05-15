@@ -2,7 +2,8 @@ package org.back.beobachtungapp.entity.task;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import lombok.Data;
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.companion.Companion;
@@ -32,13 +33,13 @@ public class Task {
   @JoinColumn(name = "companion_id")
   private Companion companion;
 
-  @Column private LocalDateTime deadLine;
+  @Column private Instant deadLine;
 
   @CreatedDate()
   @Column(name = "created_at", updatable = false)
-  private LocalDateTime createdAt;
+  private Instant createdAt;
 
   @LastModifiedDate
   @Column(name = "updated_at")
-  private LocalDateTime updatedAt;
+  private OffsetDateTime updatedAt;
 }
