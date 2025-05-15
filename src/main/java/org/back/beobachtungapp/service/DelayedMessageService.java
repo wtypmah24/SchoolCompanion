@@ -6,7 +6,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.back.beobachtungapp.message.DelayedMessage;
+import org.back.beobachtungapp.message.DelayedTgMessage;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,7 @@ public class DelayedMessageService {
   private final RedisTemplate<String, String> redisTemplate;
   private final ObjectMapper objectMapper;
 
-  public void addDelayedMessage(DelayedMessage msg, long delayMillis) {
+  public void addDelayedMessage(DelayedTgMessage msg, long delayMillis) {
     long executionTime = Instant.now().toEpochMilli() + delayMillis;
 
     try {
@@ -30,5 +30,5 @@ public class DelayedMessageService {
     }
   }
 
-  public void addEventDelayedMessage(DelayedMessage msg, long delayMillis) {}
+  public void addEventDelayedMessage(DelayedTgMessage msg, long delayMillis) {}
 }

@@ -2,7 +2,7 @@ package org.back.beobachtungapp.bot;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.back.beobachtungapp.config.TelegramProperties;
-import org.back.beobachtungapp.message.DelayedMessage;
+import org.back.beobachtungapp.message.DelayedTgMessage;
 import org.back.beobachtungapp.service.DelayedMessageService;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
@@ -34,7 +34,7 @@ public class TgBot extends TelegramWebhookBot {
       Long chatId = update.getMessage().getChatId();
       SendMessage message = new SendMessage();
       message.setChatId(chatId.toString());
-      DelayedMessage msg = new DelayedMessage(chatId.toString(), "Pong after 1 min");
+      DelayedTgMessage msg = new DelayedTgMessage(chatId.toString(), "Pong after 1 min");
       delayedMessageService.addDelayedMessage(msg, 6000);
       message.setText("Pong");
 
