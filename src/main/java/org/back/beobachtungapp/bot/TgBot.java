@@ -1,9 +1,12 @@
 package org.back.beobachtungapp.bot;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.config.TelegramProperties;
-import org.back.beobachtungapp.message.DelayedTgMessage;
-import org.back.beobachtungapp.service.DelayedMessageService;
+import org.back.beobachtungapp.dto.request.companion.CompanionAdTgIdDto;
+import org.back.beobachtungapp.service.CompanionService;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
@@ -11,37 +14,70 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+@Slf4j
 @SuppressFBWarnings
 @Component
 public class TgBot extends TelegramWebhookBot {
+  private final Map<Long, BotState> userStates = new ConcurrentHashMap<>();
+
+  private enum BotState {
+    AWAITING_EMAIL
+  }
 
   private final String username;
   private final String path;
   private final boolean enabled;
-  private final DelayedMessageService delayedMessageService;
+  private final CompanionService companionService;
 
-  public TgBot(TelegramProperties telegramProperties, DelayedMessageService delayedMessageService) {
+  public TgBot(TelegramProperties telegramProperties, CompanionService companionService) {
     super(new DefaultBotOptions(), telegramProperties.getToken());
     this.username = telegramProperties.getUsername();
     this.path = telegramProperties.getPath();
     this.enabled = telegramProperties.isEnabled();
-    this.delayedMessageService = delayedMessageService;
+    this.companionService = companionService;
   }
 
   @Override
   public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
     if (update.hasMessage() && update.getMessage().hasText() && enabled) {
-      Long chatId = update.getMessage().getChatId();
-      SendMessage message = new SendMessage();
-      message.setChatId(chatId.toString());
-      DelayedTgMessage msg = new DelayedTgMessage(chatId.toString(), "Pong after 1 min");
-      delayedMessageService.addDelayedMessage(msg, 6000);
-      message.setText("Pong");
+      return handleTgCommands(update);
+    }
+    return null;
+  }
 
+  private SendMessage handleTgCommands(Update update) {
+    String text = update.getMessage().getText().trim();
+    Long chatId = update.getMessage().getChatId();
+    SendMessage message = new SendMessage();
+    message.setChatId(chatId.toString());
+
+    if (text.equalsIgnoreCase("/connect_tgid")) {
+      userStates.put(chatId, BotState.AWAITING_EMAIL);
+      message.setText("Enter your email in KinderCompass app");
       return message;
     }
 
-    return null;
+    if (userStates.get(chatId) == BotState.AWAITING_EMAIL) {
+      try {
+        CompanionAdTgIdDto tgIdDto = new CompanionAdTgIdDto(chatId.toString(), text);
+        companionService.addTgIdToCompanion(tgIdDto);
+        message.setText("✅ Telegram successfully linked to your account.");
+      } catch (Exception e) {
+        log.error(
+            "Failed to link Telegram ID for chat {} with email {}: {}",
+            chatId,
+            text,
+            e.getMessage(),
+            e);
+        message.setText("❌ Failed to link Telegram. Please check your email and try again.");
+      } finally {
+        userStates.remove(chatId);
+      }
+      return message;
+    }
+
+    message.setText("Unknown command. Use /connect_tgid to link your Telegram.");
+    return message;
   }
 
   @Override

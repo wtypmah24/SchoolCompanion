@@ -14,6 +14,8 @@ public record EventNotificationDto(
     String location,
     String companionName,
     String tgId,
+    String companionEmail,
+    String childEmail,
     String childName) {
   public static EventNotificationDto from(Event event) {
     String companionName =
@@ -28,6 +30,14 @@ public record EventNotificationDto(
             .map(Child::getSchoolCompanion)
             .map(Companion::getTgId)
             .orElse(null);
+    String companionEmail =
+        Optional.ofNullable(event)
+            .map(Event::getChild)
+            .map(Child::getSchoolCompanion)
+            .map(Companion::getEmail)
+            .orElse(null);
+    String childEmail =
+        Optional.ofNullable(event).map(Event::getChild).map(Child::getEmail).orElse(null);
     String childName =
         Optional.ofNullable(event).map(Event::getChild).map(Child::getName).orElse("Unknown child");
 
@@ -44,6 +54,8 @@ public record EventNotificationDto(
         Optional.ofNullable(event.getLocation()).orElse("Не указано"),
         companionName,
         tgId,
+        companionEmail,
+        childEmail,
         childName);
   }
 }

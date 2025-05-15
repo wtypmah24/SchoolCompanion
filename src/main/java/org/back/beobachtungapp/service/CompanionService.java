@@ -2,6 +2,7 @@ package org.back.beobachtungapp.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.back.beobachtungapp.dto.request.companion.CompanionAdTgIdDto;
 import org.back.beobachtungapp.dto.request.companion.CompanionRequestDto;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.mapper.CompanionMapper;
@@ -58,5 +59,19 @@ public class CompanionService {
     return companionRepository
         .findByEmail(email)
         .orElseThrow(() -> new EntityNotFoundException("Companion not found with email: " + email));
+  }
+
+  @Transactional
+  public void addTgIdToCompanion(CompanionAdTgIdDto tgDto) {
+    Companion companion =
+        companionRepository
+            .findByEmail(tgDto.email())
+            .orElseThrow(
+                () ->
+                    new EntityNotFoundException(
+                        "Companion not found with email: " + tgDto.email()));
+
+    companion.setTgId(tgDto.tgId());
+    companionRepository.save(companion);
   }
 }
