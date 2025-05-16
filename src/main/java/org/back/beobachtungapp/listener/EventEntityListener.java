@@ -142,7 +142,7 @@ public class EventEntityListener {
 
     Instant notificationTime = event.getStartDateTime().minusSeconds(DELAY_IN_MS);
     if (notificationTime.isBefore(Instant.now())) {
-      notificationTime = Instant.now().plusSeconds(DEFAULT_DELAY_MS);
+      notificationTime = Instant.now().plusMillis(DEFAULT_DELAY_MS);
       log.info(
           "Sending email scheduled in less than {} ms. Sending email notifications now.",
           DELAY_IN_MS);
