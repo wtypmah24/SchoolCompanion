@@ -29,22 +29,63 @@ public class EventEntityListener {
 
   @PostPersist
   public void onPostPersist(Event event) {
-    planTgMessage(event);
-    scheduleEmail(event);
+    try {
+      planTgMessage(event);
+    } catch (Exception e) {
+      log.warn("Failed to plan TG message for event {}: {}", event.getId(), e.getMessage(), e);
+    }
+
+    try {
+      scheduleEmail(event);
+    } catch (Exception e) {
+      log.warn("Failed to schedule email for event {}: {}", event.getId(), e.getMessage(), e);
+    }
   }
 
   @PostUpdate
   public void onPostUpdate(Event event) {
-    delayedMessageService.removeDelayedTgMessage(String.valueOf(event.getId()));
-    planTgMessage(event);
-    delayedMessageService.cancelScheduledEmail(String.valueOf(event.getId()));
-    scheduleEmail(event);
+    String id = String.valueOf(event.getId());
+
+    try {
+      delayedMessageService.removeDelayedTgMessage(id);
+    } catch (Exception e) {
+      log.warn("Failed to remove TG message for event {}: {}", id, e.getMessage(), e);
+    }
+
+    try {
+      planTgMessage(event);
+    } catch (Exception e) {
+      log.warn("Failed to re-plan TG message for event {}: {}", id, e.getMessage(), e);
+    }
+
+    try {
+      delayedMessageService.cancelScheduledEmail(id);
+    } catch (Exception e) {
+      log.warn("Failed to cancel email for event {}: {}", id, e.getMessage(), e);
+    }
+
+    try {
+      scheduleEmail(event);
+    } catch (Exception e) {
+      log.warn("Failed to reschedule email for event {}: {}", id, e.getMessage(), e);
+    }
   }
 
   @PostRemove
   public void onPostRemove(Event event) {
-    delayedMessageService.removeDelayedTgMessage(String.valueOf(event.getId()));
-    delayedMessageService.cancelScheduledEmail(String.valueOf(event.getId()));
+    try {
+      delayedMessageService.removeDelayedTgMessage(String.valueOf(event.getId()));
+    } catch (Exception e) {
+      log.warn(
+          "Failed to remove delayed TG message for event {}: {}", event.getId(), e.getMessage(), e);
+    }
+
+    try {
+      delayedMessageService.cancelScheduledEmail(String.valueOf(event.getId()));
+    } catch (Exception e) {
+      log.warn(
+          "Failed to cancel scheduled email for event {}: {}", event.getId(), e.getMessage(), e);
+    }
   }
 
   private void planTgMessage(Event event) {

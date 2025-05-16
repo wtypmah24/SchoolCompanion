@@ -1,9 +1,5 @@
 package org.back.beobachtungapp.dto.response.monitoring;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 
@@ -24,6 +20,4 @@ public record MonitoringEntryResponseDto(
     @Schema(description = "Type of the associated monitoring parameter", example = "BINARY")
         String type,
     @Schema(description = "ID of the associated child", example = "5") Long childId,
-    @JsonDeserialize(using = InstantDeserializer.class)
-        @JsonSerialize(using = InstantSerializer.class)
-        Instant createdAt) {}
+    Instant createdAt) {}
