@@ -34,7 +34,8 @@ public class OpenAiService {
   }
 
   public List<ChatResponseDto> ask(
-      String prompt, CompanionDto companionDto, Long childId, String threadId) {
+      ChatRequest promptDto, CompanionDto companionDto, Long childId, String threadId) {
+    String prompt = promptDto.message();
     boolean isNewThread = (threadId == null || threadId.isBlank());
 
     if (isNewThread) {

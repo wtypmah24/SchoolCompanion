@@ -3,6 +3,7 @@ package org.back.beobachtungapp.controller;
 import java.util.List;
 import java.util.Set;
 import org.back.beobachtungapp.annotation.CurrentCompanion;
+import org.back.beobachtungapp.dto.openai.ChatRequest;
 import org.back.beobachtungapp.dto.openai.ChatResponseDto;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.service.CompanionService;
@@ -25,7 +26,7 @@ public class OpenAiController {
   @PostMapping("child/{childId}")
   public List<ChatResponseDto> ask(
       @PathVariable() Long childId,
-      @RequestBody String prompt,
+      @RequestBody ChatRequest prompt,
       @CurrentCompanion CompanionDto companionDto) {
     return assistantService.ask(prompt, companionDto, childId, null);
   }
@@ -34,7 +35,7 @@ public class OpenAiController {
   public List<ChatResponseDto> askNewChat(
       @PathVariable() Long childId,
       @PathVariable() String threadId,
-      @RequestBody String prompt,
+      @RequestBody ChatRequest prompt,
       @CurrentCompanion CompanionDto companionDto) {
     return assistantService.ask(prompt, companionDto, childId, threadId);
   }
