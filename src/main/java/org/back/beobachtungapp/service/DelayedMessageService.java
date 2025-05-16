@@ -53,6 +53,10 @@ public class DelayedMessageService {
   }
 
   public void cancelScheduledEmail(String batchIdOrMessageId) {
-    brevoClient.cancelEmail(batchIdOrMessageId);
+    try {
+      brevoClient.cancelEmail(batchIdOrMessageId);
+    } catch (Exception e) {
+      log.error("Failed to cancel scheduled email with ID: {}", batchIdOrMessageId, e);
+    }
   }
 }

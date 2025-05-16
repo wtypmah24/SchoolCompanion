@@ -25,7 +25,8 @@ import org.springframework.stereotype.Component;
 public class EventEntityListener {
   private final DelayedMessageService delayedMessageService;
   private final MessageSource messageSource;
-  private static final long DELAY_IN_MS = 24 * 60 * 60;
+  private static final long DELAY_IN_MS = 24 * 60 * 60 * 1000;
+  private static final long DEFAULT_DELAY_MS = 120_000;
 
   @PostPersist
   public void onPostPersist(Event event) {
@@ -140,6 +141,12 @@ public class EventEntityListener {
             Locale.getDefault());
 
     Instant notificationTime = event.getStartDateTime().minusSeconds(DELAY_IN_MS);
+    if (notificationTime.isBefore(Instant.now())) {
+      notificationTime = Instant.now().plusSeconds(DEFAULT_DELAY_MS);
+      log.info(
+          "Sending email scheduled in less than {} ms. Sending email notifications now.",
+          DELAY_IN_MS);
+    }
     String scheduledAt = notificationTime.toString();
 
     String batchId = String.valueOf(event.getId());
@@ -169,7 +176,6 @@ public class EventEntityListener {
     long delayMillis = java.time.Duration.between(now, notificationTime).toMillis();
 
     // TODO: remove magic number
-    long DEFAULT_DELAY_MS = 30_000;
     return Math.max(delayMillis, DEFAULT_DELAY_MS);
   }
 }

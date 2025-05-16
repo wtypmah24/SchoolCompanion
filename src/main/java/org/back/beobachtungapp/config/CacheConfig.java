@@ -1,9 +1,5 @@
 package org.back.beobachtungapp.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,19 +15,8 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 public class CacheConfig {
 
   @Bean
-  public ObjectMapper redisObjectMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new JavaTimeModule());
-    mapper.registerModule(new ParameterNamesModule());
-    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-    return mapper;
-  }
-
-  @Bean
-  public RedisCacheConfiguration redisCacheConfiguration(ObjectMapper redisObjectMapper) {
-    GenericJackson2JsonRedisSerializer serializer =
-        new GenericJackson2JsonRedisSerializer(redisObjectMapper);
+  public RedisCacheConfiguration redisCacheConfiguration() {
+    GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer();
     return RedisCacheConfiguration.defaultCacheConfig()
         .entryTtl(Duration.ofMinutes(10))
         .disableCachingNullValues()
