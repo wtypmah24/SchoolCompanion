@@ -2,7 +2,7 @@ package org.back.beobachtungapp.entity.companion;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Set;
 import lombok.Data;
 import lombok.ToString;
@@ -36,7 +36,8 @@ public class Companion {
   @Column(nullable = false)
   private String password;
 
-  @Column() private String tgId;
+  @Column(unique = true)
+  private String tgId;
 
   @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
   @ToString.Exclude
@@ -52,9 +53,9 @@ public class Companion {
 
   @LastModifiedDate
   @Column(name = "updated_at")
-  LocalDateTime updatedAt;
+  Instant updatedAt;
 
   @CreatedDate()
   @Column(name = "created_at", updatable = false)
-  LocalDateTime createdAt;
+  Instant createdAt;
 }

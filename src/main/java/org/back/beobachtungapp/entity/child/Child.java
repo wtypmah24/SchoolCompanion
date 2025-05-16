@@ -2,8 +2,8 @@ package org.back.beobachtungapp.entity.child;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import lombok.Data;
@@ -61,11 +61,11 @@ public class Child {
 
   @LastModifiedDate
   @Column(name = "updated_at")
-  LocalDateTime updatedAt;
+  Instant updatedAt;
 
   @CreatedDate()
   @Column(name = "created_at", updatable = false)
-  LocalDateTime createdAt;
+  Instant createdAt;
 
   public void addSpecialNeed(SpecialNeed need) {
     need.setChild(this);

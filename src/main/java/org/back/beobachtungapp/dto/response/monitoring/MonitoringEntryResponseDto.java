@@ -1,11 +1,7 @@
 package org.back.beobachtungapp.dto.response.monitoring;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Schema(description = "Response payload for a monitoring entry")
 public record MonitoringEntryResponseDto(
@@ -24,6 +20,4 @@ public record MonitoringEntryResponseDto(
     @Schema(description = "Type of the associated monitoring parameter", example = "BINARY")
         String type,
     @Schema(description = "ID of the associated child", example = "5") Long childId,
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-        @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-        LocalDateTime createdAt) {}
+    Instant createdAt) {}

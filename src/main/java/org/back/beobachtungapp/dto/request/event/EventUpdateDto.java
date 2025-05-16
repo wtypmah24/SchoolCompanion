@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Schema(
     description =
@@ -22,12 +22,12 @@ public record EventUpdateDto(
             description = "Start date and time of the event (must be today or in the future)",
             example = "2025-07-15")
         @FutureOrPresent(message = "Event date must be today or in the future")
-        LocalDateTime startDateTime,
+        Instant startDateTime,
     @Schema(
             description = "End date and time of the event (must be today or in the future)",
             example = "2025-07-15")
         @FutureOrPresent(message = "Event date must be today or in the future")
-        LocalDateTime endDateTime,
+        Instant endDateTime,
     @Schema(description = "Location of the event", example = "Classroom.")
         @NotBlank(message = "Location cannot be blank")
         @Size(min = 2, max = 500, message = "Location must be between 2 and 500 characters")

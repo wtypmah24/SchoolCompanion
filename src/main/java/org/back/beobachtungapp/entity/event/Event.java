@@ -2,7 +2,7 @@ package org.back.beobachtungapp.entity.event;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -36,15 +36,15 @@ public class Event {
   @JoinColumn(name = "child_id")
   private Child child;
 
-  @Column() LocalDateTime startDateTime;
-  @Column() LocalDateTime endDateTime;
+  @Column() Instant startDateTime;
+  @Column() Instant endDateTime;
   @Column() String location;
 
   @LastModifiedDate
   @Column(name = "updated_at")
-  LocalDateTime updatedAt;
+  Instant updatedAt;
 
   @CreatedDate()
   @Column(name = "created_at", updatable = false)
-  LocalDateTime createdAt;
+  Instant createdAt;
 }

@@ -3,7 +3,7 @@ package org.back.beobachtungapp.dto.request.task;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Schema(description = "DTO for creating or updating a task")
 public record TaskRequestDto(
@@ -18,4 +18,4 @@ public record TaskRequestDto(
         String status,
     @Schema(description = "Task deadline", example = "2025-06-01T18:00:00")
         @NotNull(message = "Deadline is required")
-        LocalDateTime deadLine) {}
+        Instant deadLine) {}
