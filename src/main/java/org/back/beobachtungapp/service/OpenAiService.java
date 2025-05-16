@@ -139,7 +139,8 @@ public class OpenAiService {
                     msg.content().stream()
                         .filter(content -> "text".equals(content.type()))
                         .map(c -> c.text().value())
-                        .collect(Collectors.joining("\n"))))
+                        .collect(Collectors.joining("\n")),
+                    msg.created_at()))
         .collect(Collectors.toList());
   }
 }
