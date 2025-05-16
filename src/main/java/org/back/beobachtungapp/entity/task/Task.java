@@ -3,7 +3,6 @@ package org.back.beobachtungapp.entity.task;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import lombok.Data;
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.companion.Companion;
@@ -41,5 +40,5 @@ public class Task {
 
   @LastModifiedDate
   @Column(name = "updated_at")
-  private OffsetDateTime updatedAt;
+  private Instant updatedAt;
 }
