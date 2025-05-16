@@ -4,7 +4,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,8 +22,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Table(name = "children")
 @Data
-@ToString(exclude = {"events", "goals", "notes", "specialNeeds", "entries", "tasks"})
-@EqualsAndHashCode(exclude = {"events", "goals", "notes", "specialNeeds", "entries", "tasks"})
+@ToString(
+    exclude = {"events", "goals", "notes", "specialNeeds", "entries", "tasks", "schoolCompanion"})
+@EqualsAndHashCode(
+    exclude = {"events", "goals", "notes", "specialNeeds", "entries", "tasks", "schoolCompanion"})
 @EntityListeners(AuditingEntityListener.class)
 public class Child {
   @Id
@@ -35,29 +37,28 @@ public class Child {
   @Column() private String email;
   @Column() private String phoneNumber;
   @Column() private LocalDate dateOfBirth;
-  @ElementCollection List<String> interests;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "companion_id")
   private Companion schoolCompanion;
 
   @OneToMany(mappedBy = "child", cascade = CascadeType.REMOVE, orphanRemoval = true)
-  private Set<SpecialNeed> specialNeeds;
+  private Set<SpecialNeed> specialNeeds = new HashSet<>();
 
   @OneToMany(mappedBy = "child", cascade = CascadeType.REMOVE, orphanRemoval = true)
-  private Set<Goal> goals;
+  private Set<Goal> goals = new HashSet<>();
 
   @OneToMany(mappedBy = "child", cascade = CascadeType.REMOVE, orphanRemoval = true)
-  private Set<MonitoringEntry> entries;
+  private Set<MonitoringEntry> entries = new HashSet<>();
 
   @OneToMany(mappedBy = "child", cascade = CascadeType.REMOVE, orphanRemoval = true)
-  private Set<Note> notes;
+  private Set<Note> notes = new HashSet<>();
 
   @OneToMany(mappedBy = "child", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<Event> events;
+  private Set<Event> events = new HashSet<>();
 
   @OneToMany(mappedBy = "child", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<Task> tasks;
+  private Set<Task> tasks = new HashSet<>();
 
   @LastModifiedDate
   @Column(name = "updated_at")

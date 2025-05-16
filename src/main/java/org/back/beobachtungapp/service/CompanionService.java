@@ -1,6 +1,7 @@
 package org.back.beobachtungapp.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.dto.request.companion.CompanionAdTgIdDto;
 import org.back.beobachtungapp.dto.request.companion.CompanionRequestDto;
@@ -69,5 +70,24 @@ public class CompanionService {
 
     companion.setTgId(tgDto.tgId());
     companionRepository.save(companion);
+  }
+
+  @Transactional
+  public void addChatIdToCompanion(Long companionId, String newChatId) {
+    Companion companion =
+        companionRepository
+            .findById(companionId)
+            .orElseThrow(() -> new EntityNotFoundException("Companion not found"));
+
+    companion.getChatIds().add(newChatId);
+    companionRepository.save(companion);
+  }
+
+  public Set<String> getThreadIds(Long companionId) {
+    Companion companion =
+        companionRepository
+            .findById(companionId)
+            .orElseThrow(() -> new EntityNotFoundException("Companion not found"));
+    return companion.getChatIds();
   }
 }

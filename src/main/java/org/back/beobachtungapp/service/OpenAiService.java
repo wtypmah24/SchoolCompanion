@@ -1,12 +1,17 @@
 package org.back.beobachtungapp.service;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.dto.openai.*;
+import org.back.beobachtungapp.dto.response.child.ChildWithAttachments;
+import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.feign.OpenAiClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -17,25 +22,89 @@ public class OpenAiService {
   private String assistantId;
 
   private final OpenAiClient openAiClient;
+  private final CompanionService companionService;
+  private final ChildService childService;
 
-  public OpenAiService(OpenAiClient openAiClient) {
+  @Autowired
+  public OpenAiService(
+      OpenAiClient openAiClient, CompanionService companionService, ChildService childService) {
     this.openAiClient = openAiClient;
+    this.companionService = companionService;
+    this.childService = childService;
   }
 
-  public List<ChatResponseDto> ask(String prompt) {
+  public List<ChatResponseDto> ask(
+      String prompt, CompanionDto companionDto, Long childId, String threadId) {
+    boolean isNewThread = (threadId == null || threadId.isBlank());
+
+    if (isNewThread) {
+      return askInNewThread(prompt, companionDto, childId);
+    } else {
+      return askInExistingThread(prompt, companionDto, threadId);
+    }
+  }
+
+  private List<ChatResponseDto> askInNewThread(
+      String prompt, CompanionDto companionDto, Long childId) {
     String threadId = openAiClient.createThread().id();
-    log.info("threadId: {}", threadId);
+    log.info("Created new threadId: {}", threadId);
+
+    String context = buildContextForCompanion(childId);
+    log.info("Companion context: {}", context);
+
+    // Добавляем контекст как user-сообщение, т.к. system не поддерживается
+    openAiClient.addMessage(threadId, new MessageRequest("user", context));
     openAiClient.addMessage(threadId, new MessageRequest("user", prompt));
 
     RunResponse run = openAiClient.startRun(threadId, new RunRequest(assistantId));
     log.info("run: {}", run);
-    CompletableFuture<RunResponse> runStatusFuture = checkRunStatusAsync(threadId, run.id());
+    RunResponse completedRun = checkRunStatusAsync(threadId, run.id()).join();
 
-    RunResponse completedRun = runStatusFuture.join();
-    log.info("Run completed: {}", completedRun);
+    List<RootDTO.Message> messages = openAiClient.listMessages(threadId).data();
+    companionService.addChatIdToCompanion(companionDto.id(), threadId);
+    return getMessagesForFrontend(messages);
+  }
+
+  private List<ChatResponseDto> askInExistingThread(
+      String prompt, CompanionDto companionDto, String threadId) {
+    log.info("Using existing threadId: {}", threadId);
+    openAiClient.addMessage(threadId, new MessageRequest("user", prompt));
+
+    RunResponse run = openAiClient.startRun(threadId, new RunRequest(assistantId));
+    log.info("run: {}", run);
+    RunResponse completedRun = checkRunStatusAsync(threadId, run.id()).join();
 
     List<RootDTO.Message> messages = openAiClient.listMessages(threadId).data();
     return getMessagesForFrontend(messages);
+  }
+
+  public List<ChatResponseDto> getChatByThreadId(String threadId) {
+    List<RootDTO.Message> messages = openAiClient.listMessages(threadId).data();
+    return getMessagesForFrontend(messages);
+  }
+
+  private String buildContextForCompanion(Long childId) {
+    ChildWithAttachments child = childService.getChildWithAttachments(childId);
+    int age = calculateAge(child.dateOfBirth());
+
+    return """
+      Du bist der Assistent einer Begleitperson für ein Kind. Hier sind die Informationen über das Kind:
+      - Name: %s
+      - Alter: %d
+      - Besondere Bedürfnisse: %s
+      - Entwicklungsziele: %s
+      - Beobachtungsparameter: %s
+
+      Nutze diese Informationen, um der Begleitperson passende Empfehlungen zu geben.
+    """
+        .formatted(child.name(), age, child.specialNeeds(), child.goals(), child.entries());
+  }
+
+  public int calculateAge(LocalDate birthDate) {
+    if (birthDate == null) {
+      throw new IllegalArgumentException("Dob can't be null");
+    }
+    return Period.between(birthDate, LocalDate.now()).getYears();
   }
 
   private CompletableFuture<RunResponse> checkRunStatusAsync(String threadId, String runId) {

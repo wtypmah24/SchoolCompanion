@@ -4,6 +4,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
 import java.time.Instant;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -23,6 +24,7 @@ public class SpecialNeed {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "child_id")
+  @ToString.Exclude
   private Child child;
 
   @LastModifiedDate
