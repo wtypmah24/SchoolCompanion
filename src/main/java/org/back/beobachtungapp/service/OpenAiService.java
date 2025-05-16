@@ -38,7 +38,7 @@ public class OpenAiService {
     return getMessagesForFrontend(messages);
   }
 
-  public CompletableFuture<RunResponse> checkRunStatusAsync(String threadId, String runId) {
+  private CompletableFuture<RunResponse> checkRunStatusAsync(String threadId, String runId) {
     return CompletableFuture.supplyAsync(
         () -> {
           while (true) {
@@ -59,7 +59,7 @@ public class OpenAiService {
         });
   }
 
-  public List<ChatResponseDto> getMessagesForFrontend(List<RootDTO.Message> messages) {
+  private List<ChatResponseDto> getMessagesForFrontend(List<RootDTO.Message> messages) {
     return messages.stream()
         .map(
             msg ->
