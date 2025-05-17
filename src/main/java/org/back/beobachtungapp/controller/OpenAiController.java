@@ -49,4 +49,10 @@ public class OpenAiController {
   public List<ChatResponseDto> getChatByThreadId(@PathVariable String threadId) {
     return assistantService.getChatByThreadId(threadId);
   }
+
+  @DeleteMapping("thread/{threadId}")
+  public void removeChatByThreadId(
+      @CurrentCompanion CompanionDto companionDto, @PathVariable String threadId) {
+    companionService.deleteThreadIds(companionDto, threadId);
+  }
 }

@@ -5,6 +5,7 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.dto.request.companion.CompanionAdTgIdDto;
 import org.back.beobachtungapp.dto.request.companion.CompanionRequestDto;
+import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.mapper.CompanionMapper;
 import org.back.beobachtungapp.repository.CompanionRepository;
@@ -89,5 +90,10 @@ public class CompanionService {
             .findById(companionId)
             .orElseThrow(() -> new EntityNotFoundException("Companion not found"));
     return companion.getChatIds();
+  }
+
+  @Transactional
+  public void deleteThreadIds(CompanionDto dto, String threadId) {
+    companionRepository.removeThread(dto.id(), threadId);
   }
 }

@@ -14,6 +14,7 @@ import org.back.beobachtungapp.feign.OpenAiClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -33,6 +34,7 @@ public class OpenAiService {
     this.childService = childService;
   }
 
+  @Transactional
   public List<ChatResponseDto> ask(
       ChatRequest promptDto, CompanionDto companionDto, Long childId, String threadId) {
     String prompt = promptDto.message();
@@ -88,7 +90,8 @@ public class OpenAiService {
     ChildWithAttachments child = childService.getChildWithAttachments(childId);
     int age = calculateAge(child.dateOfBirth());
 
-    return """
+    return "[CONTEXT]\n"
+        + """
       Du bist der Assistent einer Begleitperson für ein Kind. Hier sind die Informationen über das Kind:
       - Name: %s
       - Alter: %d
@@ -98,7 +101,7 @@ public class OpenAiService {
 
       Nutze diese Informationen, um der Begleitperson passende Empfehlungen zu geben.
     """
-        .formatted(child.name(), age, child.specialNeeds(), child.goals(), child.entries());
+            .formatted(child.name(), age, child.specialNeeds(), child.goals(), child.entries());
   }
 
   public int calculateAge(LocalDate birthDate) {
@@ -131,6 +134,11 @@ public class OpenAiService {
 
   private List<ChatResponseDto> getMessagesForFrontend(List<RootDTO.Message> messages) {
     return messages.stream()
+        .filter(
+            msg ->
+                msg.content().stream()
+                    .noneMatch(
+                        c -> c.type().equals("text") && c.text().value().startsWith("[CONTEXT]")))
         .map(
             msg ->
                 new ChatResponseDto(
