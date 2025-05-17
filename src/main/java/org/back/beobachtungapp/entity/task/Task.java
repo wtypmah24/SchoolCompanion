@@ -22,7 +22,10 @@ public class Task {
   private Long id;
 
   @Column private String title;
-  @Column private String description;
+
+  @Column(length = 1000)
+  private String description;
+
   @Column private String status;
 
   @ManyToOne(fetch = FetchType.LAZY)

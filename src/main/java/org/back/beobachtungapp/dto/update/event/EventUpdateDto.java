@@ -1,4 +1,4 @@
-package org.back.beobachtungapp.dto.request.event;
+package org.back.beobachtungapp.dto.update.event;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.FutureOrPresent;
@@ -16,7 +16,7 @@ public record EventUpdateDto(
     @Schema(
             description = "Detailed description of the event",
             example = "A class event to discuss children problems.")
-        @Size(min = 5, max = 500, message = "Description must be between 5 and 500 characters")
+        @Size(min = 5, max = 1000, message = "Description must be between 5 and 1000 characters")
         String description,
     @Schema(
             description = "Start date and time of the event (must be today or in the future)",

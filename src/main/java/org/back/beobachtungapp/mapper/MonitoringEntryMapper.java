@@ -2,8 +2,8 @@ package org.back.beobachtungapp.mapper;
 
 import java.util.List;
 import org.back.beobachtungapp.dto.request.monitoring.MonitoringEntryRequestDto;
-import org.back.beobachtungapp.dto.request.monitoring.MonitoringEntryUpdateDto;
 import org.back.beobachtungapp.dto.response.monitoring.MonitoringEntryResponseDto;
+import org.back.beobachtungapp.dto.update.monitoring.MonitoringEntryUpdateDto;
 import org.back.beobachtungapp.entity.monitoring.MonitoringEntry;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -1,4 +1,4 @@
-package org.back.beobachtungapp.dto.request.child;
+package org.back.beobachtungapp.dto.update.child;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;

@@ -1,4 +1,4 @@
-package org.back.beobachtungapp.config;
+package org.back.beobachtungapp.config.properties;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -11,11 +11,9 @@ import org.springframework.validation.annotation.Validated;
 @Setter
 @Configuration
 @Validated
-@ConfigurationProperties(prefix = "telegram")
-public class TelegramProperties {
-  @NotBlank private String username;
-  @NotBlank private String token;
-  @NotBlank private String path;
-  @NotBlank private String webhook_url;
-  private boolean enabled;
+@ConfigurationProperties(prefix = "openai")
+public class OpenAiProperties {
+
+  @NotBlank private String id;
+  @NotBlank private String key;
 }

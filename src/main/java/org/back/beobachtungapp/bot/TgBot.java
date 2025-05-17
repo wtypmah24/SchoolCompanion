@@ -4,7 +4,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
-import org.back.beobachtungapp.config.TelegramProperties;
+import org.back.beobachtungapp.config.properties.TelegramProperties;
 import org.back.beobachtungapp.dto.request.companion.CompanionAdTgIdDto;
 import org.back.beobachtungapp.service.CompanionService;
 import org.springframework.stereotype.Component;

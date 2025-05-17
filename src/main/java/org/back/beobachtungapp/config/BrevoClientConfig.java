@@ -1,17 +1,20 @@
 package org.back.beobachtungapp.config;
 
 import feign.RequestInterceptor;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
+import org.back.beobachtungapp.config.properties.BrevoProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
+@RequiredArgsConstructor
 public class BrevoClientConfig {
-  @Value("${brevo.api-key}")
-  private String apiKey;
+  private final BrevoProperties properties;
 
   @Bean
-  public RequestInterceptor requestInterceptor() {
+  public RequestInterceptor requestBrevoInterceptor() {
     return requestTemplate -> {
-      requestTemplate.header("api-key", apiKey);
+      requestTemplate.header("api-key", properties.getApi_key());
       requestTemplate.header("Content-Type", "application/json");
     };
   }

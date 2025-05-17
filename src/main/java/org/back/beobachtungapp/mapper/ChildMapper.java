@@ -2,9 +2,9 @@ package org.back.beobachtungapp.mapper;
 
 import java.util.List;
 import org.back.beobachtungapp.dto.request.child.ChildRequestDto;
-import org.back.beobachtungapp.dto.request.child.ChildUpdateDto;
 import org.back.beobachtungapp.dto.response.child.ChildResponseDto;
 import org.back.beobachtungapp.dto.response.child.ChildWithAttachments;
+import org.back.beobachtungapp.dto.update.child.ChildUpdateDto;
 import org.back.beobachtungapp.entity.child.Child;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

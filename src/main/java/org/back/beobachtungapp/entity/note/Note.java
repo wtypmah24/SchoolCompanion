@@ -20,7 +20,8 @@ public class Note {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
-  @Column() String content;
+  @Column(length = 1000)
+  String content;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "child_id")

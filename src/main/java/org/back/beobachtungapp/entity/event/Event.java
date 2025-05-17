@@ -26,7 +26,9 @@ public class Event {
   private long id;
 
   @Column() String title;
-  @Column() String description;
+
+  @Column(length = 1000)
+  String description;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "companion_id")

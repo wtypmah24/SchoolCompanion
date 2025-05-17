@@ -1,39 +1,56 @@
 package org.back.beobachtungapp.service;
 
-import java.time.LocalDate;
-import java.time.Period;
+import static org.back.beobachtungapp.utils.PersonUtils.calculateAge;
+import static org.back.beobachtungapp.utils.TexTemplatesUtil.loadTemplate;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.back.beobachtungapp.config.properties.OpenAiProperties;
 import org.back.beobachtungapp.dto.openai.*;
 import org.back.beobachtungapp.dto.response.child.ChildWithAttachments;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.feign.OpenAiClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Service for interacting with the OpenAI Assistant API. Responsible for managing chat threads,
+ * sending prompts, and retrieving responses.
+ */
 @Slf4j
 @Service
 public class OpenAiService {
-  @Value("${openai.assistant.id}")
-  private String assistantId;
 
+  private final OpenAiProperties openAiProperties;
   private final OpenAiClient openAiClient;
   private final CompanionService companionService;
   private final ChildService childService;
 
   @Autowired
   public OpenAiService(
-      OpenAiClient openAiClient, CompanionService companionService, ChildService childService) {
+      OpenAiProperties openAiProperties,
+      OpenAiClient openAiClient,
+      CompanionService companionService,
+      ChildService childService) {
+    this.openAiProperties = openAiProperties;
     this.openAiClient = openAiClient;
     this.companionService = companionService;
     this.childService = childService;
   }
 
+  /**
+   * Handles a user prompt by either starting a new thread or continuing an existing one.
+   *
+   * @param promptDto the incoming user message
+   * @param companionDto the companion related to the conversation
+   * @param childId ID of the child the context is built around
+   * @param threadId optional ID of an existing chat thread
+   * @return list of responses suitable for frontend display
+   */
   @Transactional
   public List<ChatResponseDto> ask(
       ChatRequest promptDto, CompanionDto companionDto, Long childId, String threadId) {
@@ -41,76 +58,84 @@ public class OpenAiService {
     boolean isNewThread = (threadId == null || threadId.isBlank());
 
     if (isNewThread) {
-      return askInNewThread(prompt, companionDto, childId);
-    } else {
-      return askInExistingThread(prompt, companionDto, threadId);
+      threadId = createNewThreadWithContext(childId);
+      companionService.addChatIdToCompanion(companionDto.id(), threadId);
     }
+
+    return sendPromptAndGetResponse(threadId, prompt);
   }
 
-  private List<ChatResponseDto> askInNewThread(
-      String prompt, CompanionDto companionDto, Long childId) {
+  /**
+   * Creates a new chat thread and sends initial context based on the child's data.
+   *
+   * @param childId ID of the child used to build the context
+   * @return newly created thread ID
+   */
+  private String createNewThreadWithContext(Long childId) {
     String threadId = openAiClient.createThread().id();
     log.info("Created new threadId: {}", threadId);
 
     String context = buildContextForCompanion(childId);
     log.info("Companion context: {}", context);
 
-    // Добавляем контекст как user-сообщение, т.к. system не поддерживается
     openAiClient.addMessage(threadId, new MessageRequest("user", context));
+    return threadId;
+  }
+
+  /**
+   * Sends a user prompt to the assistant and waits for the response.
+   *
+   * @param threadId ID of the thread to continue
+   * @param prompt user message to send
+   * @return list of assistant messages formatted for frontend
+   */
+  private List<ChatResponseDto> sendPromptAndGetResponse(String threadId, String prompt) {
+    log.info("Using threadId: {}", threadId);
     openAiClient.addMessage(threadId, new MessageRequest("user", prompt));
 
-    RunResponse run = openAiClient.startRun(threadId, new RunRequest(assistantId));
-    log.info("run: {}", run);
+    RunResponse run = openAiClient.startRun(threadId, new RunRequest(openAiProperties.getId()));
+    log.info("Started run: {}", run);
+
     RunResponse completedRun = checkRunStatusAsync(threadId, run.id()).join();
+    log.info("Completed run: {}", completedRun);
 
     List<RootDTO.Message> messages = openAiClient.listMessages(threadId).data();
-    companionService.addChatIdToCompanion(companionDto.id(), threadId);
     return getMessagesForFrontend(messages);
   }
 
-  private List<ChatResponseDto> askInExistingThread(
-      String prompt, CompanionDto companionDto, String threadId) {
-    log.info("Using existing threadId: {}", threadId);
-    openAiClient.addMessage(threadId, new MessageRequest("user", prompt));
-
-    RunResponse run = openAiClient.startRun(threadId, new RunRequest(assistantId));
-    log.info("run: {}", run);
-    RunResponse completedRun = checkRunStatusAsync(threadId, run.id()).join();
-
-    List<RootDTO.Message> messages = openAiClient.listMessages(threadId).data();
-    return getMessagesForFrontend(messages);
-  }
-
+  /**
+   * Retrieves all messages in a given thread, formatted for frontend display.
+   *
+   * @param threadId ID of the thread
+   * @return list of messages from the assistant
+   */
   public List<ChatResponseDto> getChatByThreadId(String threadId) {
     List<RootDTO.Message> messages = openAiClient.listMessages(threadId).data();
     return getMessagesForFrontend(messages);
   }
 
+  /**
+   * Builds a context message for the assistant using the child's data.
+   *
+   * @param childId ID of the child
+   * @return formatted context string
+   */
   private String buildContextForCompanion(Long childId) {
     ChildWithAttachments child = childService.getChildWithAttachments(childId);
     int age = calculateAge(child.dateOfBirth());
 
-    return "[CONTEXT]\n"
-        + """
-      Du bist der Assistent einer Begleitperson für ein Kind. Hier sind die Informationen über das Kind:
-      - Name: %s
-      - Alter: %d
-      - Besondere Bedürfnisse: %s
-      - Entwicklungsziele: %s
-      - Beobachtungsparameter: %s
-
-      Nutze diese Informationen, um der Begleitperson passende Empfehlungen zu geben.
-    """
-            .formatted(child.name(), age, child.specialNeeds(), child.goals(), child.entries());
+    String template = loadTemplate("templates/context-template.txt");
+    return String.format(
+        template, child.name(), age, child.specialNeeds(), child.goals(), child.entries());
   }
 
-  public int calculateAge(LocalDate birthDate) {
-    if (birthDate == null) {
-      throw new IllegalArgumentException("Dob can't be null");
-    }
-    return Period.between(birthDate, LocalDate.now()).getYears();
-  }
-
+  /**
+   * Asynchronously checks the status of a running assistant task until it is completed.
+   *
+   * @param threadId ID of the thread
+   * @param runId ID of the current run
+   * @return completed RunResponse object
+   */
   private CompletableFuture<RunResponse> checkRunStatusAsync(String threadId, String runId) {
     return CompletableFuture.supplyAsync(
         () -> {
@@ -132,6 +157,13 @@ public class OpenAiService {
         });
   }
 
+  /**
+   * Filters and maps assistant messages to a DTO format used on the frontend. Context messages
+   * (prefixed with [CONTEXT]) are excluded.
+   *
+   * @param messages list of raw messages from OpenAI
+   * @return list of processed messages
+   */
   private List<ChatResponseDto> getMessagesForFrontend(List<RootDTO.Message> messages) {
     return messages.stream()
         .filter(

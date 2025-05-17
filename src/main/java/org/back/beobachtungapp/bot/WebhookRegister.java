@@ -3,7 +3,7 @@ package org.back.beobachtungapp.bot;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.back.beobachtungapp.config.TelegramProperties;
+import org.back.beobachtungapp.config.properties.TelegramProperties;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;

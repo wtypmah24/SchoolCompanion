@@ -52,13 +52,6 @@ public class CompanionService {
         .orElseThrow(() -> new EntityNotFoundException("Companion not found with id: " + id));
   }
 
-  @Cacheable(value = "users", key = "#email", unless = "#result == null")
-  public Companion findCompanionByEmail(String email) {
-    return companionRepository
-        .findByEmail(email)
-        .orElseThrow(() -> new EntityNotFoundException("Companion not found with email: " + email));
-  }
-
   @Transactional
   public void addTgIdToCompanion(CompanionAdTgIdDto tgDto) {
     Companion companion =

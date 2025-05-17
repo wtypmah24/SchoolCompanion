@@ -2,8 +2,8 @@ package org.back.beobachtungapp.mapper;
 
 import java.util.List;
 import org.back.beobachtungapp.dto.request.task.TaskRequestDto;
-import org.back.beobachtungapp.dto.request.task.TaskUpdateDto;
 import org.back.beobachtungapp.dto.response.task.TaskResponseDto;
+import org.back.beobachtungapp.dto.update.task.TaskUpdateDto;
 import org.back.beobachtungapp.entity.task.Task;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
