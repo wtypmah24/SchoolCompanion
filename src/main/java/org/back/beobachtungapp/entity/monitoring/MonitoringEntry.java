@@ -4,7 +4,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
 import java.time.Instant;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.back.beobachtungapp.entity.child.Child;
 import org.springframework.data.annotation.CreatedDate;
@@ -16,7 +15,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "monitoring_entries")
 @Data
 @ToString(exclude = {"child"})
-@EqualsAndHashCode(exclude = {"child"})
 @EntityListeners(AuditingEntityListener.class)
 public class MonitoringEntry {
   @Id

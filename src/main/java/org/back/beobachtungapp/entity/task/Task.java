@@ -4,6 +4,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
 import java.time.Instant;
 import lombok.Data;
+import lombok.ToString;
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.springframework.data.annotation.CreatedDate;
@@ -26,6 +27,7 @@ public class Task {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "child_id")
+  @ToString.Exclude
   private Child child;
 
   @ManyToOne(fetch = FetchType.LAZY)

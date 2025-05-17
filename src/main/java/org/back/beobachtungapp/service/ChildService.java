@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.dto.request.child.ChildRequestDto;
 import org.back.beobachtungapp.dto.request.child.ChildUpdateDto;
 import org.back.beobachtungapp.dto.response.child.ChildResponseDto;
+import org.back.beobachtungapp.dto.response.child.ChildWithAttachments;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.companion.Companion;
@@ -108,5 +109,19 @@ public class ChildService {
 
     log.info("Found child with id: {}", id);
     return childMapper.childToChildResponseDto(child);
+  }
+
+  public ChildWithAttachments getChildWithAttachments(Long childId) {
+    Child child =
+        childRepository
+            .findByIdCustom(childId)
+            .orElseThrow(
+                () -> {
+                  log.error("Child not found with id: {}", childId);
+                  return new EntityNotFoundException("Child not found with id: " + childId);
+                });
+
+    log.info("Found child with id: {}", childId);
+    return childMapper.childToChildWithAttachments(child);
   }
 }

@@ -3,6 +3,7 @@ package org.back.beobachtungapp.entity.companion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.*;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Set;
 import lombok.Data;
 import lombok.ToString;
@@ -39,17 +40,22 @@ public class Companion {
   @Column(unique = true)
   private String tgId;
 
-  @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
-  @ToString.Exclude
-  private Set<Child> children;
+  @ElementCollection
+  @CollectionTable(name = "companion_thread_ids", joinColumns = @JoinColumn(name = "companion_id"))
+  @Column(name = "thread_id")
+  private Set<String> chatIds = new HashSet<>();
 
   @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
   @ToString.Exclude
-  private Set<Task> tasks;
+  private Set<Child> children = new HashSet<>();
 
   @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
   @ToString.Exclude
-  private Set<MonitoringParameter> params;
+  private Set<Task> tasks = new HashSet<>();
+
+  @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+  @ToString.Exclude
+  private Set<MonitoringParameter> params = new HashSet<>();
 
   @LastModifiedDate
   @Column(name = "updated_at")
