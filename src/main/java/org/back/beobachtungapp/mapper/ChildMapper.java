@@ -13,7 +13,14 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(
     componentModel = "spring",
-    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+    uses = {
+      SpecialNeedMapper.class,
+      GoalMapper.class,
+      NoteMapper.class,
+      EventMapper.class,
+      MonitoringEntryMapper.class
+    })
 public interface ChildMapper {
 
   Child childRequestDtoToChild(ChildRequestDto childRequestDto);
