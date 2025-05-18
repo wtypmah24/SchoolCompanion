@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.dto.response.monitoring.MonitoringEntryResponseDto;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -19,6 +20,7 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChartService {
@@ -64,7 +66,7 @@ public class ChartService {
         double value = Double.parseDouble(entry.value()); // Ожидается числовое значение
         series.addOrUpdate(new Millisecond(java.util.Date.from(entry.createdAt())), value);
       } catch (NumberFormatException ignored) {
-        // Пропускаем записи с некорректным значением
+        log.warn("{} is not a number", entry.value());
       }
     }
 
@@ -81,11 +83,11 @@ public class ChartService {
             false,
             false);
 
-    // Настройка оси времени
+    // Setting the time axis
     DateAxis axis = (DateAxis) chart.getXYPlot().getDomainAxis();
     axis.setDateFormatOverride(new SimpleDateFormat("dd-MM-yyyy HH:mm"));
 
-    // Настройка линий и точек
+    // Setting up lines and points
     XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true, false);
     chart.getXYPlot().setRenderer(renderer);
 

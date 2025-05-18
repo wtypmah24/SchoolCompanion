@@ -13,7 +13,6 @@ import org.back.beobachtungapp.dto.request.monitoring.MonitoringEntryRequestDto;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.response.monitoring.MonitoringEntryResponseDto;
 import org.back.beobachtungapp.dto.update.monitoring.MonitoringEntryUpdateDto;
-import org.back.beobachtungapp.service.ChartService;
 import org.back.beobachtungapp.service.MonitoringEntryService;
 import org.back.beobachtungapp.service.PdfGeneratorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,16 +32,12 @@ import org.springframework.web.bind.annotation.*;
 public class MonitoringEntryController {
   private final MonitoringEntryService entryService;
   private final PdfGeneratorService pdfGeneratorService;
-  private final ChartService chartService;
 
   @Autowired
   public MonitoringEntryController(
-      MonitoringEntryService entryService,
-      PdfGeneratorService pdfGeneratorService,
-      ChartService chartService) {
+      MonitoringEntryService entryService, PdfGeneratorService pdfGeneratorService) {
     this.entryService = entryService;
     this.pdfGeneratorService = pdfGeneratorService;
-    this.chartService = chartService;
   }
 
   @Operation(
@@ -140,6 +135,27 @@ public class MonitoringEntryController {
     return ResponseEntity.status(HttpStatus.OK).body(entryService.findAll());
   }
 
+  @Operation(
+      summary = "Generate and download PDF report for a child",
+      description =
+          "Generates a PDF report for the specified child and returns it as a downloadable file. Requires authenticated companion context.",
+      parameters = {
+        @Parameter(
+            name = "childId",
+            description = "ID of the child for whom the PDF report should be generated",
+            required = true,
+            example = "123")
+      },
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "PDF report generated and returned successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+        @ApiResponse(responseCode = "404", description = "Child not found"),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Internal server error while generating the PDF")
+      })
   @PostMapping("/download/child/{childId}")
   public ResponseEntity<byte[]> download(
       @PathVariable Long childId, @CurrentCompanion CompanionDto companionDto) throws IOException {

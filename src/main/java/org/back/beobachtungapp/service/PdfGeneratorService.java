@@ -19,6 +19,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.back.beobachtungapp.dto.response.child.ChildWithAttachments;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
+import org.back.beobachtungapp.dto.telegram.TelegramPdfJob;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -28,51 +29,78 @@ public class PdfGeneratorService {
 
   private final ChartService chartService;
   private final ChildService childService;
+  private final MessageQueueService messageService;
 
   public byte[] generatePdf(Long childId, CompanionDto companionDto) throws IOException {
     try (PDDocument document = new PDDocument()) {
       ChildWithAttachments child = childService.getChildWithAttachments(childId);
       List<BufferedImage> images = chartService.handleCharts(child.entries());
 
-      // 1. Титульная страница
+      // 1. Title page
       PDPage titlePage = new PDPage(PDRectangle.A4);
       document.addPage(titlePage);
 
       try (PDPageContentStream titleStream = new PDPageContentStream(document, titlePage)) {
-        titleStream.beginText();
-        titleStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 24);
-        titleStream.newLineAtOffset(70, 750);
-        titleStream.showText("Begleitbericht für das Kind");
-        titleStream.endText();
+        PDFont boldFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
+        PDFont regularFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+
+        // Params
+        float pageWidth = PDRectangle.A4.getWidth();
+        float titleFontSize = 32;
+        float subtitleFontSize = 18;
+        float lineSpacing = 30;
+
+        // Headings
+        String titleText = "Begleitbericht für das Kind";
+        float titleWidth = boldFont.getStringWidth(titleText) / 1000 * titleFontSize;
+        float titleX = (pageWidth - titleWidth) / 2;
+        float titleY = 600;
 
         titleStream.beginText();
-        titleStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 14);
-        titleStream.newLineAtOffset(70, 700);
-        titleStream.showText("Erstellt am: " + LocalDate.now());
+        titleStream.setFont(boldFont, titleFontSize);
+        titleStream.newLineAtOffset(titleX, titleY);
+        titleStream.showText(titleText);
         titleStream.endText();
 
-        titleStream.beginText();
-        titleStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 14);
-        titleStream.newLineAtOffset(70, 670);
-        titleStream.showText(
-            "Schulbegleiter: " + companionDto.name() + " " + companionDto.surname());
-        titleStream.endText();
+        // Subheadings
+        String[] lines = {
+          "Erstellt am: " + LocalDate.now(),
+          "Schulbegleiter: " + companionDto.name() + " " + companionDto.surname(),
+          "Kind: " + child.name() + " " + child.surname()
+        };
 
-        titleStream.beginText();
-        titleStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 14);
-        titleStream.newLineAtOffset(70, 640);
-        titleStream.showText("Kind: " + child.name() + " " + child.surname());
-        titleStream.endText();
+        float currentY = titleY - lineSpacing * 2;
+        for (String line : lines) {
+          float textWidth = regularFont.getStringWidth(line) / 1000 * subtitleFontSize;
+          float x = (pageWidth - textWidth) / 2;
+
+          titleStream.beginText();
+          titleStream.setFont(regularFont, subtitleFontSize);
+          titleStream.newLineAtOffset(x, currentY);
+          titleStream.showText(line);
+          titleStream.endText();
+
+          currentY -= lineSpacing;
+        }
       }
 
-      // 2. Информация о школьном компаньоне
-      addInfoPage(
-          document, "Informationen über den Schulbegleiter", formatCompanionInfo(companionDto));
+      // 2. School companion section
+      PDPage infoPage = new PDPage(PDRectangle.A4);
+      document.addPage(infoPage);
 
-      // 3. Информация о ребёнке
-      addInfoPage(document, "Informationen über das Kind", formatChildInfo(child));
+      // One page for two sections
+      String companionInfo = formatCompanionInfo(companionDto);
+      String childInfo = formatChildInfo(child);
 
-      // 4. Графики
+      String combinedInfo =
+          "Informationen über den Schulbegleiter\n\n"
+              + companionInfo
+              + "\n\nInformationen über das Kind\n\n"
+              + childInfo;
+
+      addInfoPage(document, infoPage, "Zusätzliche Informationen", combinedInfo);
+
+      // 4. Charts
       for (BufferedImage bufferedImage : images) {
         PDPage page = new PDPage(PDRectangle.A4);
         document.addPage(page);
@@ -94,24 +122,54 @@ public class PdfGeneratorService {
 
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
       document.save(outputStream);
+
+      messageService.enqueueTelegramPdfJob(
+          new TelegramPdfJob(
+              companionDto.tgId(), outputStream.toByteArray(), "begleitbericht.pdf"));
       return outputStream.toByteArray();
     }
   }
 
-  private void addInfoPage(PDDocument document, String title, String content) throws IOException {
-    PDPage infoPage = new PDPage(PDRectangle.A4);
-    document.addPage(infoPage);
-
-    try (PDPageContentStream stream = new PDPageContentStream(document, infoPage)) {
-      // Заголовок
+  private void addInfoPage(PDDocument document, PDPage page, String title, String content)
+      throws IOException {
+    try (PDPageContentStream stream = new PDPageContentStream(document, page)) {
+      // Main page title
       stream.beginText();
-      stream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 18);
-      stream.newLineAtOffset(70, 750);
+      stream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 20);
+      stream.newLineAtOffset(70, 770);
       stream.showText(title);
       stream.endText();
 
-      // Многострочный текст
-      addMultilineText(stream, content, 70, 720, 12);
+      // Handling content with subheadings
+      addFormattedMultilineText(stream, content, 70, 740);
+    }
+  }
+
+  private void addFormattedMultilineText(PDPageContentStream stream, String text, float x, float y)
+      throws IOException {
+
+    final float regularFontSize = 14;
+    final float boldFontSize = 16;
+    final float leading = regularFontSize + 6;
+    final PDFont regularFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+    final PDFont boldFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
+
+    String[] lines = text.split("\n");
+    float currentY = y;
+
+    for (String line : lines) {
+      boolean isSectionTitle =
+          line.trim().equals("Informationen über den Schulbegleiter")
+              || line.trim().equals("Informationen über das Kind");
+
+      stream.beginText();
+      stream.setFont(
+          isSectionTitle ? boldFont : regularFont, isSectionTitle ? boldFontSize : regularFontSize);
+      stream.newLineAtOffset(x, currentY);
+      stream.showText(line);
+      stream.endText();
+
+      currentY -= leading;
     }
   }
 
@@ -171,25 +229,5 @@ public class PdfGeneratorService {
     }
 
     return sb.toString();
-  }
-
-  // Многострочный вывод текста (простая реализация)
-  private void addMultilineText(
-      PDPageContentStream stream, String text, float x, float y, int fontSize) throws IOException {
-
-    final float leading = fontSize + 4;
-    final PDFont font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
-
-    String[] lines = text.split("\n");
-    float currentY = y;
-
-    for (String line : lines) {
-      stream.beginText();
-      stream.setFont(font, fontSize);
-      stream.newLineAtOffset(x, currentY);
-      stream.showText(line);
-      stream.endText();
-      currentY -= leading;
-    }
   }
 }

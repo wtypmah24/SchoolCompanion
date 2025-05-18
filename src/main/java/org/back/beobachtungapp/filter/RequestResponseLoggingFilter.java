@@ -27,27 +27,32 @@ public class RequestResponseLoggingFilter implements Filter {
 
     CachedBodyHttpServletRequest wrappedRequest =
         new CachedBodyHttpServletRequest((HttpServletRequest) request);
-
     CachedBodyHttpServletResponse wrappedResponse =
         new CachedBodyHttpServletResponse((HttpServletResponse) response);
 
-    // Log the request path
     String requestPath = wrappedRequest.getRequestURI();
 
-    // Continue filter chain
     chain.doFilter(wrappedRequest, wrappedResponse);
 
-    // Log request body (masked)
+    // Logging the request body with masking
     String requestBody = new String(wrappedRequest.getCachedBody(), StandardCharsets.UTF_8);
     logger.info(
         "Request path: {}, Request body: {}", requestPath, maskSensitiveFields(requestBody));
 
-    // Copy response back to real response
+    // Copy the response body back to the original response
     wrappedResponse.copyBodyToResponse();
 
-    // Log response body (masked/truncated)
-    String responseBody = new String(wrappedResponse.getCachedBody(), StandardCharsets.UTF_8);
-    logResponseBody(requestPath, responseBody);
+    // Getting the Content-Type of the response
+    String contentType = wrappedResponse.getContentType();
+
+    if (contentType != null && contentType.startsWith("application/pdf")) {
+      // Skip logging the response body, instead just log the fact that the file was sent
+      logger.info("Response body for {}: <PDF content, logging skipped>", requestPath);
+    } else {
+      // Logging the response body (with masking and truncation)
+      String responseBody = new String(wrappedResponse.getCachedBody(), StandardCharsets.UTF_8);
+      logResponseBody(requestPath, responseBody);
+    }
   }
 
   private void logResponseBody(String requestPath, String body) {
