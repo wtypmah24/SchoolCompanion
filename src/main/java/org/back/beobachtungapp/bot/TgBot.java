@@ -1,18 +1,23 @@
 package org.back.beobachtungapp.bot;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.ByteArrayInputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.config.properties.TelegramProperties;
 import org.back.beobachtungapp.dto.request.companion.CompanionAdTgIdDto;
 import org.back.beobachtungapp.service.CompanionService;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Slf4j
 @SuppressFBWarnings
@@ -78,6 +83,23 @@ public class TgBot extends TelegramWebhookBot {
 
     message.setText("Unknown command. Use /connect_tgid to link your Telegram.");
     return message;
+  }
+
+  @Async
+  public void sendPdfToUser(String chatId, byte[] pdfBytes, String fileName) {
+    try {
+      SendDocument sendDocumentRequest = new SendDocument();
+      sendDocumentRequest.setChatId(chatId);
+
+      InputFile inputFile = new InputFile();
+      inputFile.setMedia(new ByteArrayInputStream(pdfBytes), fileName);
+      sendDocumentRequest.setDocument(inputFile);
+      sendDocumentRequest.setCaption("Here's your report 📄");
+
+      this.execute(sendDocumentRequest);
+    } catch (TelegramApiException e) {
+      log.error("Telegram API Exception: {}", e.getMessage());
+    }
   }
 
   @Override

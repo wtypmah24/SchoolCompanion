@@ -9,5 +9,6 @@ public record CompanionDto(
     @Schema(description = "First name of the companion", example = "John") String name,
     @Schema(description = "Surname of the companion", example = "Doe") String surname,
     @Schema(description = "Email address of the companion", example = "john.doe@example.com")
-        String email)
+        String email,
+    @Schema(description = "Telegram id of the companion", example = "4354654464") String tgId)
     implements Serializable {}

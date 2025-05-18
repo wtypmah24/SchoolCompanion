@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 @SuppressFBWarnings
@@ -37,6 +38,16 @@ public class RequestLoggingAspect {
         "In class: {}, calling method: {} with params: {}", className, methodName, filteredParams);
 
     Object result = joinPoint.proceed();
+
+    if (result instanceof ResponseEntity<?> responseEntity) {
+      if (responseEntity.getBody() instanceof byte[]) {
+        log.info(
+            "In class: {}, method {} returned a file response (byte[]), logging skipped",
+            className,
+            methodName);
+        return result;
+      }
+    }
 
     String filteredResult = maskSensitiveObject(result);
     log.info("In class: {}, method {} returned: {}", className, methodName, filteredResult);
