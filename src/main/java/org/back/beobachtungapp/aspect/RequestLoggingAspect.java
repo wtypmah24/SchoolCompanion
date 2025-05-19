@@ -15,6 +15,17 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+/**
+ * Aspect for logging requests and responses in controller classes.
+ *
+ * <p>Intercepts all method executions within the package {@code org.back.beobachtungapp.controller}
+ * and logs method names, input parameters, and returned results.
+ *
+ * <p>Sensitive data such as passwords and JWT tokens are masked before logging to avoid leaking
+ * confidential information.
+ *
+ * <p>If the response is a file represented as a byte array, the response logging is skipped.
+ */
 @SuppressFBWarnings
 @Slf4j
 @Aspect
@@ -23,6 +34,14 @@ public class RequestLoggingAspect {
 
   private final ObjectMapper objectMapper = new ObjectMapper();
 
+  /**
+   * Around advice that logs the method name, class name, filtered input parameters, and filtered
+   * output result of controller methods.
+   *
+   * @param joinPoint the join point providing access to method execution details
+   * @return the original method's return value
+   * @throws Throwable if the intercepted method throws any exceptions
+   */
   @Around("execution(* org.back.beobachtungapp.controller..*(..))")
   public Object logRequest(ProceedingJoinPoint joinPoint) throws Throwable {
     String methodName = joinPoint.getSignature().getName();
@@ -55,6 +74,12 @@ public class RequestLoggingAspect {
     return result;
   }
 
+  /**
+   * Converts an object to JSON string and masks sensitive fields such as passwords and JWT tokens.
+   *
+   * @param obj the object to mask and serialize
+   * @return the masked JSON string representation or {@code obj.toString()} if serialization fails
+   */
   private String maskSensitiveObject(Object obj) {
     if (obj == null) return "null";
     try {
@@ -65,6 +90,13 @@ public class RequestLoggingAspect {
     }
   }
 
+  /**
+   * Masks sensitive fields in a JSON string. Specifically masks fields named "password" and JWT
+   * tokens anywhere in string values.
+   *
+   * @param jsonOrRaw JSON string or raw string to mask
+   * @return JSON string with masked sensitive fields, or original string if parsing fails
+   */
   private String maskSensitiveFields(String jsonOrRaw) {
     try {
       JsonNode root = objectMapper.readTree(jsonOrRaw);
@@ -98,10 +130,22 @@ public class RequestLoggingAspect {
     return maskJwtTokens(jsonOrRaw);
   }
 
+  /**
+   * Checks if a string matches the pattern of a JWT token.
+   *
+   * @param text the string to check
+   * @return {@code true} if the string looks like a JWT token, {@code false} otherwise
+   */
   private boolean isJwtToken(String text) {
     return text.matches("^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+$");
   }
 
+  /**
+   * Masks all JWT tokens in a string by replacing their parts with "***".
+   *
+   * @param input the input string potentially containing JWT tokens
+   * @return the string with JWT tokens masked
+   */
   private String maskJwtTokens(String input) {
     return input.replaceAll(
         "([A-Za-z0-9-_]+)\\.([A-Za-z0-9-_]+)\\.([A-Za-z0-9-_]+)", "***.***.***");

@@ -13,6 +13,13 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
+/**
+ * Service responsible for processing delayed messages including PDF jobs from Redis queues and
+ * sending them through the Telegram bot.
+ *
+ * <p>This service periodically polls Redis for scheduled Telegram messages and PDF sending jobs,
+ * then dispatches them accordingly.
+ */
 @SuppressFBWarnings
 @Slf4j
 @Service
@@ -37,12 +44,28 @@ public class MessageProcessor {
     this.objectMapper = objectMapper;
   }
 
+  /**
+   * Scheduled method that runs every 60 seconds to process pending jobs.
+   *
+   * <p>It triggers processing of:
+   *
+   * <ul>
+   *   <li>PDF sending jobs from the PDF Redis queue
+   *   <li>Delayed Telegram text messages from the Redis sorted set
+   * </ul>
+   */
   @Scheduled(fixedRate = 60000)
   public void processDelayedMessages() {
     processPdfJobs();
     processTgDelayedMessages();
   }
 
+  /**
+   * Processes a single PDF job from the Redis list queue.
+   *
+   * <p>Pops a job from the right of the queue, converts it to {@link TelegramPdfJob}, then uses
+   * {@link TgBot} to send the PDF to the user. If no jobs are found, simply logs and returns.
+   */
   private void processPdfJobs() {
     Object obj = redisPdfTemplate.opsForList().rightPop(TELEGRAM_PDF_QUEUE_KEY);
 
@@ -62,6 +85,21 @@ public class MessageProcessor {
     }
   }
 
+  /**
+   * Processes all delayed Telegram text messages from Redis sorted set whose scheduled time (score)
+   * is less than or equal to the current time.
+   *
+   * <p>For each message:
+   *
+   * <ul>
+   *   <li>Deserializes it to {@link DelayedTgMessage}
+   *   <li>Constructs a {@link SendMessage} with MarkdownV2 parse mode
+   *   <li>Sends the message through {@link TgBot}
+   *   <li>Removes the message from the Redis sorted set
+   * </ul>
+   *
+   * <p>If processing fails for any message, it is removed to avoid retries.
+   */
   private void processTgDelayedMessages() {
     long currentTime = System.currentTimeMillis();
 
