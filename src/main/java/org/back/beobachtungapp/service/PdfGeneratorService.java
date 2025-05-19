@@ -22,6 +22,14 @@ import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.telegram.TelegramPdfJob;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service for generating PDF reports for children, including title pages, companion information,
+ * child information, and charts. The generated PDF can also be enqueued for sending via Telegram.
+ *
+ * <p>This service depends on {@link ChartService} to generate chart images, {@link ChildService} to
+ * fetch child data with attachments, and {@link MessageQueueService} to enqueue Telegram PDF
+ * sending jobs.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -31,6 +39,16 @@ public class PdfGeneratorService {
   private final ChildService childService;
   private final MessageQueueService messageService;
 
+  /**
+   * Generates a PDF report for the given child ID and companion data. The PDF includes a title
+   * page, companion and child information page, and one or more pages with charts derived from the
+   * child's entries. The generated PDF is also enqueued for sending via Telegram.
+   *
+   * @param childId the ID of the child for whom the report is generated
+   * @param companionDto the data transfer object containing companion information
+   * @return a byte array representing the generated PDF document
+   * @throws IOException if there is an error while creating or saving the PDF
+   */
   public byte[] generatePdf(Long childId, CompanionDto companionDto) throws IOException {
     try (PDDocument document = new PDDocument()) {
       ChildWithAttachments child = childService.getChildWithAttachments(childId);
@@ -123,13 +141,23 @@ public class PdfGeneratorService {
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
       document.save(outputStream);
 
-      messageService.enqueueTelegramPdfJob(
+      messageService.enqueueTelegramPdfReportJob(
           new TelegramPdfJob(
               companionDto.tgId(), outputStream.toByteArray(), "begleitbericht.pdf"));
       return outputStream.toByteArray();
     }
   }
 
+  /**
+   * Adds an information page to the PDF document. This page includes a title and multi-line content
+   * text.
+   *
+   * @param document the PDF document to add the page to
+   * @param page the page to add information to
+   * @param title the title text displayed at the top of the page
+   * @param content the multi-line content text to display under the title
+   * @throws IOException if there is an error while writing to the PDF content stream
+   */
   private void addInfoPage(PDDocument document, PDPage page, String title, String content)
       throws IOException {
     try (PDPageContentStream stream = new PDPageContentStream(document, page)) {
@@ -145,6 +173,16 @@ public class PdfGeneratorService {
     }
   }
 
+  /**
+   * Writes formatted multiline text to a PDF content stream. Lines matching certain section titles
+   * are rendered in bold font; all other lines use the regular font.
+   *
+   * @param stream the PDF content stream to write to
+   * @param text the multi-line string to write (lines separated by '\n')
+   * @param x the x coordinate to start the text
+   * @param y the y coordinate to start the text
+   * @throws IOException if an error occurs writing to the content stream
+   */
   private void addFormattedMultilineText(PDPageContentStream stream, String text, float x, float y)
       throws IOException {
 
@@ -173,10 +211,23 @@ public class PdfGeneratorService {
     }
   }
 
+  /**
+   * Formats companion information into a string suitable for display in the PDF.
+   *
+   * @param dto the companion data transfer object
+   * @return a formatted string with the companion's name and email
+   */
   private String formatCompanionInfo(CompanionDto dto) {
     return "Name: " + dto.name() + " " + dto.surname() + "\n" + "E-Mail: " + dto.email();
   }
 
+  /**
+   * Formats child information including name, birth date, contact details, notes, special needs,
+   * and goals into a string for PDF display.
+   *
+   * @param child the child entity with attachments
+   * @return a formatted multi-line string containing child's detailed information
+   */
   private String formatChildInfo(ChildWithAttachments child) {
     StringBuilder sb = new StringBuilder();
     sb.append("Name: ")

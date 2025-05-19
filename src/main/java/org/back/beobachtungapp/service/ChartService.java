@@ -20,11 +20,25 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service responsible for generating charts based on monitoring entries. Supports different types
+ * of charts for binary, quantitative, and scale data.
+ *
+ * <p>Uses JFreeChart to generate line charts and bar charts as BufferedImage objects.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChartService {
 
+  /**
+   * Processes a set of monitoring entries and generates a list of charts (as BufferedImages)
+   * corresponding to the entry types: - Line chart for quantitative data - Bar chart for binary
+   * data - Bar chart for scale data
+   *
+   * @param entries the set of monitoring entries to process
+   * @return a list of BufferedImages representing the generated charts
+   */
   public List<BufferedImage> handleCharts(Set<MonitoringEntryResponseDto> entries) {
     List<MonitoringEntryResponseDto> binaryEntries = new ArrayList<>();
     List<MonitoringEntryResponseDto> quantitativeEntries = new ArrayList<>();
@@ -57,6 +71,13 @@ public class ChartService {
     return charts;
   }
 
+  /**
+   * Generates a time series line chart from quantitative monitoring entries. Each entry's timestamp
+   * and numeric value are plotted. Entries with non-numeric values are logged and skipped.
+   *
+   * @param entries list of quantitative monitoring entries
+   * @return a BufferedImage containing the line chart, or null if entries are empty
+   */
   public BufferedImage generateLineChart(List<MonitoringEntryResponseDto> entries) {
     if (entries.isEmpty()) return null;
     TimeSeries series = new TimeSeries(entries.get(0).parameterName());
@@ -94,6 +115,12 @@ public class ChartService {
     return chart.createBufferedImage(800, 600);
   }
 
+  /**
+   * Generates a bar chart representing the count of different states in binary entries.
+   *
+   * @param entries list of binary monitoring entries
+   * @return a BufferedImage containing the binary bar chart
+   */
   public BufferedImage generateBinaryChart(List<MonitoringEntryResponseDto> entries) {
     Map<String, Long> counts =
         entries.stream()
@@ -110,6 +137,12 @@ public class ChartService {
     return chart.createBufferedImage(800, 600);
   }
 
+  /**
+   * Generates a bar chart representing the count of different notes/values in scale entries.
+   *
+   * @param entries list of scale monitoring entries
+   * @return a BufferedImage containing the scale bar chart
+   */
   public BufferedImage generateScaleChart(List<MonitoringEntryResponseDto> entries) {
     Map<String, Long> counts =
         entries.stream()
