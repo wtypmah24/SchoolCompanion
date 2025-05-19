@@ -7,7 +7,6 @@ RUN mvn clean package -DskipTests
 
 FROM openjdk:latest AS app
 WORKDIR /app
-ENV SPRING_PROFILES_ACTIVE=prod
 
 COPY --from=maven /app/target/*.jar beobachtung_app.jar
 EXPOSE 8081
