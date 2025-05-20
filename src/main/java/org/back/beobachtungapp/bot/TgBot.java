@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.config.properties.TelegramProperties;
 import org.back.beobachtungapp.dto.request.companion.CompanionAdTgIdDto;
 import org.back.beobachtungapp.service.CompanionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
@@ -34,6 +35,7 @@ public class TgBot extends TelegramWebhookBot {
   private final boolean enabled;
   private final CompanionService companionService;
 
+  @Autowired
   public TgBot(TelegramProperties telegramProperties, CompanionService companionService) {
     super(new DefaultBotOptions(), telegramProperties.getToken());
     this.username = telegramProperties.getUsername();
@@ -44,45 +46,64 @@ public class TgBot extends TelegramWebhookBot {
 
   @Override
   public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
-    if (update.hasMessage() && update.getMessage().hasText() && enabled) {
-      return handleTgCommands(update);
+    if (!enabled || !update.hasMessage() || !update.getMessage().hasText()) {
+      return null;
     }
-    return null;
-  }
 
-  private SendMessage handleTgCommands(Update update) {
     String text = update.getMessage().getText().trim();
     Long chatId = update.getMessage().getChatId();
+
+    return userStates.containsKey(chatId)
+        ? handleStatefulMessage(chatId, text)
+        : handleCommand(chatId, text);
+  }
+
+  private SendMessage handleCommand(Long chatId, String text) {
+    return switch (text.toLowerCase()) {
+      case "/connect_tgid" -> {
+        userStates.put(chatId, BotState.AWAITING_EMAIL);
+        yield createMessage(chatId, "Enter your email in KinderCompass app");
+      }
+      default -> createMessage(chatId, "Unknown command. Use /connect_tgid to link your Telegram.");
+    };
+  }
+
+  private SendMessage handleStatefulMessage(Long chatId, String text) {
+    BotState state = userStates.get(chatId);
+    if (state == BotState.AWAITING_EMAIL) {
+      return processEmail(chatId, text);
+    }
+    return createMessage(chatId, "Unexpected state. Please try again.");
+  }
+
+  private SendMessage processEmail(Long chatId, String email) {
     SendMessage message = new SendMessage();
     message.setChatId(chatId.toString());
 
-    if (text.equalsIgnoreCase("/connect_tgid")) {
-      userStates.put(chatId, BotState.AWAITING_EMAIL);
-      message.setText("Enter your email in KinderCompass app");
-      return message;
+    try {
+      companionService.addTgIdToCompanion(new CompanionAdTgIdDto(chatId.toString(), email));
+      message.setText("✅ Telegram successfully linked to your account.");
+      log.info("Telegram ID linked: chatId={}, email={}", chatId, email);
+    } catch (Exception e) {
+      log.error(
+          "Failed to link Telegram ID for chat {} with email {}: {}",
+          chatId,
+          email,
+          e.getMessage(),
+          e);
+      message.setText("❌ Failed to link Telegram. Please check your email and try again.");
+    } finally {
+      userStates.remove(chatId);
     }
 
-    if (userStates.get(chatId) == BotState.AWAITING_EMAIL) {
-      try {
-        CompanionAdTgIdDto tgIdDto = new CompanionAdTgIdDto(chatId.toString(), text);
-        companionService.addTgIdToCompanion(tgIdDto);
-        message.setText("✅ Telegram successfully linked to your account.");
-      } catch (Exception e) {
-        log.error(
-            "Failed to link Telegram ID for chat {} with email {}: {}",
-            chatId,
-            text,
-            e.getMessage(),
-            e);
-        message.setText("❌ Failed to link Telegram. Please check your email and try again.");
-      } finally {
-        userStates.remove(chatId);
-      }
-      return message;
-    }
-
-    message.setText("Unknown command. Use /connect_tgid to link your Telegram.");
     return message;
+  }
+
+  private SendMessage createMessage(Long chatId, String text) {
+    SendMessage msg = new SendMessage();
+    msg.setChatId(chatId.toString());
+    msg.setText(text);
+    return msg;
   }
 
   @Async

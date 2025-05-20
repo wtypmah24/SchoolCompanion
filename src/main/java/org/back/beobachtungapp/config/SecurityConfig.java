@@ -74,6 +74,10 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers("/webhook/**")
                     .permitAll()
+                    .requestMatchers("/actuator/**")
+                    .permitAll()
+                    .requestMatchers("/swagger-ui/**")
+                    .permitAll()
                     .anyRequest()
                     .authenticated())
         .sessionManagement(
