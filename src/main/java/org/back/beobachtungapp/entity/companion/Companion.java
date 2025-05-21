@@ -40,6 +40,8 @@ public class Companion {
   @Column(unique = true)
   private String tgId;
 
+  @Column() private String organization;
+
   @ElementCollection
   @CollectionTable(name = "companion_thread_ids", joinColumns = @JoinColumn(name = "companion_id"))
   @Column(name = "thread_id")

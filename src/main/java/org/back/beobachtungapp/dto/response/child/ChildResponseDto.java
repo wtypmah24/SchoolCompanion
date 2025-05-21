@@ -20,4 +20,5 @@ public record ChildResponseDto(
     @JsonDeserialize(using = LocalDateDeserializer.class)
         @JsonSerialize(using = LocalDateSerializer.class)
         @Schema(description = "Date of birth of the child", example = "18-02-2012")
-        LocalDate dateOfBirth) {}
+        LocalDate dateOfBirth,
+    @Schema(description = "Child acc is active?", example = "true") boolean active) {}

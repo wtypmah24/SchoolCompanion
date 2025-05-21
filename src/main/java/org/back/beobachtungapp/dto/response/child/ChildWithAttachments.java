@@ -22,6 +22,7 @@ public record ChildWithAttachments(
         @JsonDeserialize(using = LocalDateDeserializer.class)
         @Schema(description = "Date of birth of the child", example = "18-02-2012")
         LocalDate dateOfBirth,
+    @Schema(description = "Child acc is active?", example = "true") boolean active,
     @Schema(description = "Notes associated with the child") Set<NoteResponseDto> notes,
     @Schema(description = "Special needs of the child") Set<SpecialNeedResponseDto> specialNeeds,
     @Schema(description = "Goals assigned to the child") Set<GoalResponseDto> goals,

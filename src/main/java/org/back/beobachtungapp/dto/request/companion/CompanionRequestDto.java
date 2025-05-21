@@ -15,6 +15,10 @@ public record CompanionRequestDto(
         @Size(min = 2, max = 50, message = "Surname must be between 2 and 50 characters")
         @Schema(description = "Surname of the companion", example = "Doe")
         String surname,
+    @NotBlank(message = "Organization cannot be blank")
+        @Size(min = 2, max = 50, message = "Organization must be between 2 and 50 characters")
+        @Schema(description = "Organization of the companion", example = "Good Company GmbH")
+        String organization,
     @Email(message = "Email should be valid")
         @NotBlank(message = "Email cannot be blank")
         @Schema(description = "Email address of the companion", example = "john.doe@example.com")

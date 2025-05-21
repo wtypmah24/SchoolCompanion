@@ -40,4 +40,10 @@ public record ChildUpdateDto(
             example = "2010-05-15",
             type = "string",
             format = "date")
-        LocalDate dateOfBirth) {}
+        LocalDate dateOfBirth,
+    @Schema(
+            description = "Is child acc active?",
+            example = "true",
+            type = "boolean",
+            format = "boolean")
+        boolean active) {}

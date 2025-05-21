@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.dto.request.companion.CompanionAdTgIdDto;
 import org.back.beobachtungapp.dto.request.companion.CompanionRequestDto;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
+import org.back.beobachtungapp.dto.update.companion.CompanionUpdateDto;
+import org.back.beobachtungapp.dto.update.companion.UpdatePasswordDto;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.mapper.CompanionMapper;
 import org.back.beobachtungapp.repository.CompanionRepository;
@@ -40,9 +42,44 @@ public class CompanionService {
 
     CompanionRequestDto newCompanion =
         new CompanionRequestDto(
-            companion.name(), companion.surname(), companion.email(), encodedPassword);
+            companion.name(),
+            companion.surname(),
+            companion.organization(),
+            companion.email(),
+            encodedPassword);
 
     return companionRepository.save(companionMapper.companionRequestDtoToCompanion(newCompanion));
+  }
+
+  @CacheEvict(value = "users")
+  @Transactional
+  public CompanionDto update(CompanionUpdateDto dto, CompanionDto companionDto) {
+    Companion companion =
+        companionRepository
+            .findById(companionDto.id())
+            .orElseThrow(
+                () ->
+                    new EntityNotFoundException(
+                        "Companion not found with id: " + companionDto.id()));
+    companionMapper.updateCompanionFromDto(dto, companion);
+    log.info("Companion with id: {} successfully updated", companionDto.id());
+    return companionMapper.companionToCompanionDto(companion);
+  }
+
+  public void updatePassword(UpdatePasswordDto dto, CompanionDto companionDto) {
+    Companion companion =
+        companionRepository
+            .findById(companionDto.id())
+            .orElseThrow(
+                () ->
+                    new EntityNotFoundException(
+                        "Companion not found with id: " + companionDto.id()));
+    String oldPassword = companion.getPassword();
+    if (dto.currentPassword().equals(oldPassword)) {
+      throw new IllegalArgumentException("Old password is incorrect");
+    }
+    companion.setPassword(passwordEncoder.encode(dto.newPassword()));
+    companionRepository.save(companion);
   }
 
   @Cacheable(value = "users", key = "#id", unless = "#result == null")

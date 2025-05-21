@@ -38,6 +38,9 @@ public class Child {
   @Column() private String phoneNumber;
   @Column() private LocalDate dateOfBirth;
 
+  @Column(nullable = false)
+  private boolean active = true;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "companion_id")
   private Companion schoolCompanion;

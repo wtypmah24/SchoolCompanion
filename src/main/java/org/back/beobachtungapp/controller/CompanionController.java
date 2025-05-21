@@ -1,12 +1,15 @@
 package org.back.beobachtungapp.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.back.beobachtungapp.annotation.CurrentCompanion;
 import org.back.beobachtungapp.dto.request.companion.CompanionRequestDto;
 import org.back.beobachtungapp.dto.request.companion.LoginRequest;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
+import org.back.beobachtungapp.dto.update.companion.CompanionUpdateDto;
+import org.back.beobachtungapp.dto.update.companion.UpdatePasswordDto;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.service.CompanionService;
 import org.back.beobachtungapp.service.TokenService;
@@ -73,5 +76,28 @@ public class CompanionController {
   @GetMapping("/me")
   public ResponseEntity<CompanionDto> me(@CurrentCompanion CompanionDto companionDto) {
     return ResponseEntity.status(HttpStatus.OK).body((companionDto));
+  }
+
+  @Operation(
+      summary = "Update companion",
+      description = "Update companion record.",
+      responses = {
+        @ApiResponse(responseCode = "200", description = "Companion updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized access")
+      })
+  @PatchMapping("profile")
+  public ResponseEntity<CompanionDto> update(
+      @Parameter(description = "Companion details to be updated") @RequestBody
+          CompanionUpdateDto updateDto,
+      @CurrentCompanion CompanionDto companion) {
+    return ResponseEntity.status(HttpStatus.OK).body(companionService.update(updateDto, companion));
+  }
+
+  @PostMapping("change-password")
+  public ResponseEntity<Void> updatePassword(
+      @RequestBody UpdatePasswordDto dto, @CurrentCompanion CompanionDto companionDto) {
+    companionService.updatePassword(dto, companionDto);
+    return ResponseEntity.ok().build();
   }
 }
