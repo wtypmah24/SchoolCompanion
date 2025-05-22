@@ -6,12 +6,6 @@
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="make-active-not-null" author="Admin">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="children" columnName="active"/>
-            </not>
-        </preConditions>
-
         <addColumn tableName="children">
             <column name="active" type="BOOLEAN" defaultValueBoolean="true"/>
         </addColumn>
