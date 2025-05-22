@@ -94,10 +94,31 @@ public class CompanionController {
     return ResponseEntity.status(HttpStatus.OK).body(companionService.update(updateDto, companion));
   }
 
+  @Operation(
+      summary = "Change password",
+      description = "Change the password of the currently authenticated companion.",
+      responses = {
+        @ApiResponse(responseCode = "200", description = "Password changed successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid password input"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized access")
+      })
   @PostMapping("change-password")
   public ResponseEntity<Void> updatePassword(
       @RequestBody UpdatePasswordDto dto, @CurrentCompanion CompanionDto companionDto) {
     companionService.updatePassword(dto, companionDto);
+    return ResponseEntity.ok().build();
+  }
+
+  @Operation(
+      summary = "Delete account",
+      description = "Permanently delete the authenticated companion's account.",
+      responses = {
+        @ApiResponse(responseCode = "200", description = "Account deleted successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized access")
+      })
+  @DeleteMapping("delete-account")
+  public ResponseEntity<Void> deleteAccount(@CurrentCompanion CompanionDto companionDto) {
+    companionService.deleteAccount(companionDto);
     return ResponseEntity.ok().build();
   }
 }

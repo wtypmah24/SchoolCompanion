@@ -47,7 +47,11 @@ public class Companion {
   @Column(name = "thread_id")
   private Set<String> chatIds = new HashSet<>();
 
-  @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+  @OneToMany(
+      mappedBy = "schoolCompanion",
+      cascade = CascadeType.REMOVE,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
   @ToString.Exclude
   private Set<Child> children = new HashSet<>();
 

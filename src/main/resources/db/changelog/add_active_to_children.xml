@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="make-active-not-null" author="Admin">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="children" columnName="active"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="children">
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true"/>
+        </addColumn>
+
+        <update tableName="children">
+            <column name="active" valueBoolean="true"/>
+            <where>active IS NULL</where>
+        </update>
+
+        <addNotNullConstraint tableName="children"
+                              columnName="active"
+                              columnDataType="BOOLEAN"/>
+    </changeSet>
+
+</databaseChangeLog>

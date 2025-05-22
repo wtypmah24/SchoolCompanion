@@ -66,6 +66,7 @@ public class CompanionService {
     return companionMapper.companionToCompanionDto(companion);
   }
 
+  @Transactional
   public void updatePassword(UpdatePasswordDto dto, CompanionDto companionDto) {
     Companion companion =
         companionRepository
@@ -80,6 +81,12 @@ public class CompanionService {
     }
     companion.setPassword(passwordEncoder.encode(dto.newPassword()));
     companionRepository.save(companion);
+  }
+
+  @Transactional
+  @CacheEvict(value = "users")
+  public void deleteAccount(CompanionDto companionDto) {
+    companionRepository.deleteById(companionDto.id());
   }
 
   @Cacheable(value = "users", key = "#id", unless = "#result == null")
