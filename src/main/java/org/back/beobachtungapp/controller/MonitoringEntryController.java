@@ -13,8 +13,8 @@ import org.back.beobachtungapp.dto.request.monitoring.MonitoringEntryRequestDto;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.response.monitoring.MonitoringEntryResponseDto;
 import org.back.beobachtungapp.dto.update.monitoring.MonitoringEntryUpdateDto;
+import org.back.beobachtungapp.reporting.PdfGenerator;
 import org.back.beobachtungapp.service.MonitoringEntryService;
-import org.back.beobachtungapp.service.PdfGeneratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,13 +31,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("entry")
 public class MonitoringEntryController {
   private final MonitoringEntryService entryService;
-  private final PdfGeneratorService pdfGeneratorService;
+  private final PdfGenerator pdfGenerator;
 
   @Autowired
-  public MonitoringEntryController(
-      MonitoringEntryService entryService, PdfGeneratorService pdfGeneratorService) {
+  public MonitoringEntryController(MonitoringEntryService entryService, PdfGenerator pdfGenerator) {
     this.entryService = entryService;
-    this.pdfGeneratorService = pdfGeneratorService;
+    this.pdfGenerator = pdfGenerator;
   }
 
   @Operation(
@@ -159,7 +158,7 @@ public class MonitoringEntryController {
   @PostMapping("/download/child/{childId}")
   public ResponseEntity<byte[]> download(
       @PathVariable Long childId, @CurrentCompanion CompanionDto companionDto) throws IOException {
-    byte[] pdfBytes = pdfGeneratorService.generatePdf(childId, companionDto);
+    byte[] pdfBytes = pdfGenerator.generatePdf(childId, companionDto);
 
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"document.pdf\"")

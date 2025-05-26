@@ -10,8 +10,8 @@ import org.back.beobachtungapp.annotation.CurrentCompanion;
 import org.back.beobachtungapp.dto.openai.ChatRequest;
 import org.back.beobachtungapp.dto.openai.ChatResponseDto;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
+import org.back.beobachtungapp.integration.openai.OpenAiService;
 import org.back.beobachtungapp.service.CompanionService;
-import org.back.beobachtungapp.service.OpenAiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

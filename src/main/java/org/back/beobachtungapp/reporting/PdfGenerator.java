@@ -1,4 +1,4 @@
-package org.back.beobachtungapp.service;
+package org.back.beobachtungapp.reporting;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -20,24 +20,26 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.back.beobachtungapp.dto.response.child.ChildWithAttachments;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.telegram.TelegramPdfJob;
+import org.back.beobachtungapp.messaging.MessagingQueueManager;
+import org.back.beobachtungapp.service.ChildService;
 import org.springframework.stereotype.Service;
 
 /**
  * Service for generating PDF reports for children, including title pages, companion information,
  * child information, and charts. The generated PDF can also be enqueued for sending via Telegram.
  *
- * <p>This service depends on {@link ChartService} to generate chart images, {@link ChildService} to
- * fetch child data with attachments, and {@link MessageQueueService} to enqueue Telegram PDF
+ * <p>This service depends on {@link ChartGenerator} to generate chart images, {@link ChildService}
+ * to fetch child data with attachments, and {@link MessagingQueueManager} to enqueue Telegram PDF
  * sending jobs.
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PdfGeneratorService {
+public class PdfGenerator {
 
-  private final ChartService chartService;
+  private final ChartGenerator chartGenerator;
   private final ChildService childService;
-  private final MessageQueueService messageService;
+  private final MessagingQueueManager messageService;
 
   /**
    * Generates a PDF report for the given child ID and companion data. The PDF includes a title
@@ -52,7 +54,7 @@ public class PdfGeneratorService {
   public byte[] generatePdf(Long childId, CompanionDto companionDto) throws IOException {
     try (PDDocument document = new PDDocument()) {
       ChildWithAttachments child = childService.getChildWithAttachments(childId);
-      List<BufferedImage> images = chartService.handleCharts(child.entries());
+      List<BufferedImage> images = chartGenerator.handleCharts(child.entries());
 
       // 1. Title page
       PDPage titlePage = new PDPage(PDRectangle.A4);

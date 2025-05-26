@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.ToString;
 import org.back.beobachtungapp.entity.child.Child;
 import org.back.beobachtungapp.entity.monitoring.MonitoringParameter;
+import org.back.beobachtungapp.entity.session.WorkSession;
 import org.back.beobachtungapp.entity.task.Task;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -62,6 +63,9 @@ public class Companion {
   @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
   @ToString.Exclude
   private Set<MonitoringParameter> params = new HashSet<>();
+
+  @OneToMany(mappedBy = "companion", cascade = CascadeType.REMOVE, orphanRemoval = true)
+  private Set<WorkSession> sessions = new HashSet<>();
 
   @LastModifiedDate
   @Column(name = "updated_at")

@@ -2,7 +2,7 @@ package org.back.beobachtungapp.config;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import org.back.beobachtungapp.service.CompanionJwtFilter;
+import org.back.beobachtungapp.auth.CompanionJwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

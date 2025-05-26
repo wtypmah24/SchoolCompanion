@@ -1,4 +1,4 @@
-package org.back.beobachtungapp.service;
+package org.back.beobachtungapp.auth;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;

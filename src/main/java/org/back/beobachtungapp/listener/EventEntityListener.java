@@ -13,7 +13,7 @@ import org.back.beobachtungapp.dto.brevo.BrevoEmailRequest;
 import org.back.beobachtungapp.dto.message.DelayedTgMessage;
 import org.back.beobachtungapp.dto.request.event.EventNotificationDto;
 import org.back.beobachtungapp.entity.event.Event;
-import org.back.beobachtungapp.service.MessageQueueService;
+import org.back.beobachtungapp.messaging.MessagingQueueManager;
 import org.back.beobachtungapp.utils.TgUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
  * <p>Handles scheduling and cancelling of delayed Telegram messages and email notifications when
  * {@link Event} entities are created, updated, or deleted.
  *
- * <p>Uses {@link MessageQueueService} to schedule/cancel messages and {@link MessageSource} to
+ * <p>Uses {@link MessagingQueueManager} to schedule/cancel messages and {@link MessageSource} to
  * obtain localized message templates.
  */
 @Slf4j
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class EventEntityListener {
-  private final MessageQueueService messageQueueService;
+  private final MessagingQueueManager messagingQueueManager;
   private final MessageSource messageSource;
 
   /** Delay before event notification, default 24 hours in milliseconds. */
@@ -76,7 +76,7 @@ public class EventEntityListener {
     String id = String.valueOf(event.getId());
 
     try {
-      messageQueueService.cancelScheduledEventTelegramMessage(id);
+      messagingQueueManager.cancelScheduledEventTelegramMessage(id);
     } catch (Exception e) {
       log.warn("Failed to remove TG message for event {}: {}", id, e.getMessage(), e);
     }
@@ -88,7 +88,7 @@ public class EventEntityListener {
     }
 
     try {
-      messageQueueService.cancelScheduledEventEmail(id);
+      messagingQueueManager.cancelScheduledEventEmail(id);
     } catch (Exception e) {
       log.warn("Failed to cancel email for event {}: {}", id, e.getMessage(), e);
     }
@@ -110,14 +110,14 @@ public class EventEntityListener {
   @PostRemove
   public void onPostRemove(Event event) {
     try {
-      messageQueueService.cancelScheduledEventTelegramMessage(String.valueOf(event.getId()));
+      messagingQueueManager.cancelScheduledEventTelegramMessage(String.valueOf(event.getId()));
     } catch (Exception e) {
       log.warn(
           "Failed to remove delayed TG message for event {}: {}", event.getId(), e.getMessage(), e);
     }
 
     try {
-      messageQueueService.cancelScheduledEventEmail(String.valueOf(event.getId()));
+      messagingQueueManager.cancelScheduledEventEmail(String.valueOf(event.getId()));
     } catch (Exception e) {
       log.warn(
           "Failed to cancel scheduled email for event {}: {}", event.getId(), e.getMessage(), e);
@@ -158,7 +158,7 @@ public class EventEntityListener {
     log.info("Telegram message: {}", message);
     long delayMillis = calculateDelay(event);
     log.info("Delayed Tg Message for {} ms", delayMillis);
-    messageQueueService.scheduleEventTelegramMessage(message, delayMillis);
+    messagingQueueManager.scheduleEventTelegramMessage(message, delayMillis);
   }
 
   /**
@@ -215,7 +215,7 @@ public class EventEntityListener {
             batchId);
 
     log.info("Scheduling email: {}", emailRequest);
-    messageQueueService.scheduleEventEmail(emailRequest);
+    messagingQueueManager.scheduleEventEmail(emailRequest);
   }
 
   /**

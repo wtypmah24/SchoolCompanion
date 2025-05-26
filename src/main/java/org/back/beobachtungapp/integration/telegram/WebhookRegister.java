@@ -1,4 +1,4 @@
-package org.back.beobachtungapp.bot;
+package org.back.beobachtungapp.integration.telegram;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.annotation.PostConstruct;

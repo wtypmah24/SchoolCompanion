@@ -1,4 +1,4 @@
-package org.back.beobachtungapp.service;
+package org.back.beobachtungapp.reporting;
 
 import java.awt.image.BufferedImage;
 import java.text.SimpleDateFormat;
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ChartService {
+public class ChartGenerator {
 
   /**
    * Processes a set of monitoring entries and generates a list of charts (as BufferedImages)

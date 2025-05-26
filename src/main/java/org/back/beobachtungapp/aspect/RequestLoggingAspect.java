@@ -35,8 +35,8 @@ public class RequestLoggingAspect {
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   /**
-   * Around advice that logs the method name, class name, filtered input parameters, and filtered
-   * output result of controller methods.
+   * Around advice that logs Controller the method name, class name, filtered input parameters, and
+   * filtered output result of controller methods.
    *
    * @param joinPoint the join point providing access to method execution details
    * @return the original method's return value
@@ -54,7 +54,10 @@ public class RequestLoggingAspect {
             .collect(Collectors.joining(", ", "[", "]"));
 
     log.info(
-        "In class: {}, calling method: {} with params: {}", className, methodName, filteredParams);
+        "📥 [CONTROLLER] >>> In class: {}, calling method: {} with params: {}",
+        className,
+        methodName,
+        filteredParams);
 
     Object result = joinPoint.proceed();
 
@@ -71,6 +74,65 @@ public class RequestLoggingAspect {
     String filteredResult = maskSensitiveObject(result);
     log.info("In class: {}, method {} returned: {}", className, methodName, filteredResult);
 
+    return result;
+  }
+
+  /**
+   * Around advice that logs the Service method name, class name, filtered input parameters, and
+   * filtered output result of controller methods.
+   *
+   * @param joinPoint the join point providing access to method execution details
+   * @return the original method's return value
+   * @throws Throwable if the intercepted method throws any exceptions
+   */
+  @Around("execution(public * org.back.beobachtungapp.service..*(..))")
+  public Object logServiceMethods(ProceedingJoinPoint joinPoint) throws Throwable {
+    String className = joinPoint.getSignature().getDeclaringType().getSimpleName();
+    String methodName = joinPoint.getSignature().getName();
+
+    Object[] methodArgs = joinPoint.getArgs();
+    String parameters =
+        Arrays.stream(methodArgs)
+            .map(
+                arg -> arg == null ? "null" : arg.getClass().getSimpleName() + "=" + arg.toString())
+            .collect(Collectors.joining(", ", "[", "]"));
+
+    log.info("➡️ Method {} in Class {}\n   Parameters: {}", methodName, className, parameters);
+
+    Object result;
+    try {
+      result = joinPoint.proceed();
+      log.info("⬅️ Returned from {} in Class {}\n   Return: {}", methodName, className, result);
+      return result;
+    } catch (Throwable throwable) {
+      log.error(
+          "❌ Exception in {} of Class {}\n   Parameters: {}\n   Message: {}",
+          methodName,
+          className,
+          parameters,
+          throwable.getMessage(),
+          throwable);
+      throw throwable;
+    }
+  }
+
+  /**
+   * Logs the execution time of all public methods within the specified service package.
+   *
+   * <p>This aspect intercepts any public method in the {@code org.back.beobachtungapp.service}
+   * package and its subpackages. It measures the time taken to execute the method and logs the
+   * duration along with the method signature.
+   *
+   * @param joinPoint the join point providing reflective access to the method being executed
+   * @return the result of the method execution
+   * @throws Throwable if the intercepted method throws any exception
+   */
+  @Around("execution(public * org.back.beobachtungapp.service..*(..))")
+  public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
+    long start = System.currentTimeMillis();
+    Object result = joinPoint.proceed();
+    long duration = System.currentTimeMillis() - start;
+    log.info("🔧 [PERF] >>> Method {} executed in {} ms <<<", joinPoint.getSignature(), duration);
     return result;
   }
 

@@ -57,10 +57,8 @@ public class ChildController {
   @PatchMapping("{childId}")
   public ResponseEntity<ChildResponseDto> update(
       @Parameter(description = "Child details to be updated") @RequestBody ChildUpdateDto child,
-      @PathVariable long childId,
-      @CurrentCompanion CompanionDto companion) {
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(childService.update(child, childId, companion));
+      @PathVariable long childId) {
+    return ResponseEntity.status(HttpStatus.OK).body(childService.update(child, childId));
   }
 
   @Operation(

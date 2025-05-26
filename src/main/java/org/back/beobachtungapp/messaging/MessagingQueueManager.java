@@ -1,4 +1,4 @@
-package org.back.beobachtungapp.service;
+package org.back.beobachtungapp.messaging;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MessageQueueService {
+public class MessagingQueueManager {
 
   private static final String DELAYED_MESSAGES_KEY = "delayedMessages";
   private static final String EVENT_KEY_PREFIX = "event:";
