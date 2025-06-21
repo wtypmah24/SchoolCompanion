@@ -1,14 +1,15 @@
 package org.back.beobachtungapp.service;
 
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
+import org.back.beobachtungapp.dto.response.session.WorkSessionResponseDto;
 import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.entity.session.WorkSession;
+import org.back.beobachtungapp.mapper.WorkSessionMapper;
 import org.back.beobachtungapp.repository.CompanionRepository;
 import org.back.beobachtungapp.repository.WorkSessionRepository;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class WorkSessionService {
 
   private final WorkSessionRepository workSessionRepository;
   private final CompanionRepository companionRepository;
+  private final WorkSessionMapper workSessionMapper;
 
   @Transactional
   public void startWorkSession(CompanionDto companionDto) {
@@ -44,10 +46,28 @@ public class WorkSessionService {
             .orElseThrow(
                 () ->
                     new IllegalStateException(
-                        "Work session doesn't exist for companion id: " + companionDto.id()));
+                        "There are no wok sessions for today for companion id: "
+                            + companionDto.id()));
+    log.info("Ending work session {}", existingSession);
 
     existingSession.setEndTime(currentInstant());
     workSessionRepository.save(existingSession);
+  }
+
+  public WorkSessionResponseDto isWorking(CompanionDto companionDto) {
+    return findTodayWorkSession(companionDto.id())
+        .map(workSessionMapper::sessionToResponseDto)
+        .orElse(null);
+  }
+
+  public List<WorkSessionResponseDto> getWorkSessionsByDates(
+      CompanionDto companionDto, LocalDate start, LocalDate end) {
+    ZoneId zone = ZoneId.of("Europe/Vilnius");
+    Instant startInst = start.atStartOfDay(zone).toInstant();
+    Instant endInst = end.atStartOfDay(zone).toInstant();
+    return workSessionMapper.sessionListToResponseDtoList(
+        workSessionRepository.findByCompanionIdAndCreatedAtBetween(
+            companionDto.id(), startInst, endInst));
   }
 
   private boolean hasWorkSessionToday(Long companionId) {

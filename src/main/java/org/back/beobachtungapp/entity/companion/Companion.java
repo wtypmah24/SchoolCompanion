@@ -65,6 +65,7 @@ public class Companion {
   private Set<MonitoringParameter> params = new HashSet<>();
 
   @OneToMany(mappedBy = "companion", cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @ToString.Exclude
   private Set<WorkSession> sessions = new HashSet<>();
 
   @LastModifiedDate

@@ -123,6 +123,19 @@ public class TgBot extends TelegramWebhookBot {
     }
   }
 
+  @Async
+  public void sendMessage(String chatId, String message) {
+    try {
+      SendMessage sendMessage = new SendMessage();
+      sendMessage.setChatId(chatId);
+      sendMessage.setText(message);
+
+      this.execute(sendMessage);
+    } catch (TelegramApiException e) {
+      log.error("Failed to send message to {}: {}", chatId, e.getMessage(), e);
+    }
+  }
+
   @Override
   public String getBotPath() {
     return path;

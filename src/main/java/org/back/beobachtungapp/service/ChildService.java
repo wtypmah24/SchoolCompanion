@@ -49,8 +49,7 @@ public class ChildService {
   @CacheEvict(value = "child", key = "#childId")
   @Transactional
   public void delete(Long childId) {
-    Child child = findChildOrThrow(childId);
-    childRepository.delete(child);
+    childRepository.delete(findChildOrThrow(childId));
   }
 
   public List<ChildResponseDto> findAll(CompanionDto companion) {
@@ -60,8 +59,7 @@ public class ChildService {
 
   @Cacheable(value = "child", key = "#id", unless = "#result == null")
   public ChildResponseDto findById(Long id) {
-    Child child = findChildOrThrow(id);
-    return childMapper.childToChildResponseDto(child);
+    return childMapper.childToChildResponseDto(findChildOrThrow(id));
   }
 
   public ChildWithAttachments getChildWithAttachments(Long childId) {

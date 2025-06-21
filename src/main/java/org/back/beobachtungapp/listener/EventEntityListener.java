@@ -10,7 +10,7 @@ import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.dto.brevo.BrevoEmailRequest;
-import org.back.beobachtungapp.dto.message.DelayedTgMessage;
+import org.back.beobachtungapp.dto.message.TelegramMessage;
 import org.back.beobachtungapp.dto.request.event.EventNotificationDto;
 import org.back.beobachtungapp.entity.event.Event;
 import org.back.beobachtungapp.messaging.MessagingQueueManager;
@@ -154,11 +154,11 @@ public class EventEntityListener {
             Locale.getDefault());
 
     String escapedMsg = TgUtils.escapeMarkdown(messageText);
-    DelayedTgMessage message = new DelayedTgMessage(dto.tgId(), escapedMsg, event.getId());
+    TelegramMessage message = new TelegramMessage(dto.tgId(), escapedMsg, event.getId());
     log.info("Telegram message: {}", message);
     long delayMillis = calculateDelay(event);
     log.info("Delayed Tg Message for {} ms", delayMillis);
-    messagingQueueManager.scheduleEventTelegramMessage(message, delayMillis);
+    messagingQueueManager.scheduleTelegramMessage(message, "event:", delayMillis);
   }
 
   /**
