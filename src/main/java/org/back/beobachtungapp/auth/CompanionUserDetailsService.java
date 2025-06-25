@@ -1,4 +1,4 @@
-package org.back.beobachtungapp.service;
+package org.back.beobachtungapp.auth;
 
 import java.util.List;
 import java.util.NoSuchElementException;

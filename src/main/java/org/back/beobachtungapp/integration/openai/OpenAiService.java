@@ -1,4 +1,4 @@
-package org.back.beobachtungapp.service;
+package org.back.beobachtungapp.integration.openai;
 
 import static org.back.beobachtungapp.utils.PersonUtils.calculateAge;
 import static org.back.beobachtungapp.utils.TexTemplatesUtil.loadTemplate;
@@ -7,13 +7,15 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.config.properties.OpenAiProperties;
 import org.back.beobachtungapp.dto.openai.*;
 import org.back.beobachtungapp.dto.response.child.ChildWithAttachments;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.feign.OpenAiClient;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.back.beobachtungapp.service.ChildService;
+import org.back.beobachtungapp.service.CompanionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,24 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class OpenAiService {
 
   private final OpenAiProperties openAiProperties;
   private final OpenAiClient openAiClient;
   private final CompanionService companionService;
   private final ChildService childService;
-
-  @Autowired
-  public OpenAiService(
-      OpenAiProperties openAiProperties,
-      OpenAiClient openAiClient,
-      CompanionService companionService,
-      ChildService childService) {
-    this.openAiProperties = openAiProperties;
-    this.openAiClient = openAiClient;
-    this.companionService = companionService;
-    this.childService = childService;
-  }
 
   /**
    * Handles a user prompt by either starting a new thread or continuing an existing one.

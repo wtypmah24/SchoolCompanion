@@ -1,4 +1,4 @@
-package org.back.beobachtungapp.service;
+package org.back.beobachtungapp.messaging;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,7 +7,7 @@ import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.dto.brevo.BrevoEmailRequest;
-import org.back.beobachtungapp.dto.message.DelayedTgMessage;
+import org.back.beobachtungapp.dto.message.TelegramMessage;
 import org.back.beobachtungapp.dto.telegram.TelegramPdfJob;
 import org.back.beobachtungapp.feign.BrevoClient;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -24,10 +24,12 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MessageQueueService {
+public class MessagingQueueManager {
 
   private static final String DELAYED_MESSAGES_KEY = "delayedMessages";
   private static final String EVENT_KEY_PREFIX = "event:";
+  private static final String SESSION_KEY_PREFIX = "session:";
+
   private static final String TELEGRAM_PDF_QUEUE_KEY = "telegram:pdf:queue";
 
   private final RedisTemplate<String, String> redisTemplate;
@@ -43,24 +45,25 @@ public class MessageQueueService {
    * @param msg the delayed Telegram message to schedule
    * @param delayMillis the delay in milliseconds before sending the message
    */
-  public void scheduleEventTelegramMessage(DelayedTgMessage msg, long delayMillis) {
+  public void scheduleTelegramMessage(TelegramMessage msg, String keyPrefix, long delayMillis) {
     if (msg == null) {
       log.warn("Attempted to schedule null Telegram message");
       return;
     }
 
+    log.info("TelegramMessage in scheduleTelegramMessage: {}", msg);
     long executionTime = Instant.now().toEpochMilli() + delayMillis;
 
     try {
       String json = serializeMessage(msg);
       redisTemplate.opsForZSet().add(DELAYED_MESSAGES_KEY, json, executionTime);
-      redisTemplate.opsForValue().set(EVENT_KEY_PREFIX + msg.eventId(), json);
+      redisTemplate.opsForValue().set(keyPrefix + msg.entityId(), json);
 
       log.info(
-          "Scheduled Telegram message with delay={} ms at time={} for eventId={}",
+          "Scheduled Telegram message with delay={} ms at time={} for entityId={}",
           delayMillis,
           executionTime,
-          msg.eventId());
+          msg.entityId());
     } catch (JsonProcessingException e) {
       log.error("Failed to serialize delayed Telegram message: {}", msg, e);
     }
@@ -74,7 +77,7 @@ public class MessageQueueService {
    */
   public void cancelScheduledEventTelegramMessage(String eventId) {
     if (eventId == null || eventId.isEmpty()) {
-      log.warn("Attempted to cancel Telegram message with null or empty eventId");
+      log.warn("Attempted to cancel Telegram message with null or empty entityId");
       return;
     }
 
@@ -84,9 +87,9 @@ public class MessageQueueService {
     if (json != null) {
       redisTemplate.opsForZSet().remove(DELAYED_MESSAGES_KEY, json);
       redisTemplate.delete(redisKey);
-      log.info("Cancelled scheduled Telegram message with eventId={}", eventId);
+      log.info("Cancelled scheduled Telegram message with entityId={}", eventId);
     } else {
-      log.warn("No scheduled Telegram message found in Redis for eventId={}", eventId);
+      log.warn("No scheduled Telegram message found in Redis for entityId={}", eventId);
     }
   }
 
@@ -148,7 +151,7 @@ public class MessageQueueService {
    * @return the JSON string representation of the message
    * @throws JsonProcessingException if serialization fails
    */
-  private String serializeMessage(DelayedTgMessage msg) throws JsonProcessingException {
+  private String serializeMessage(TelegramMessage msg) throws JsonProcessingException {
     return objectMapper.writeValueAsString(msg);
   }
 }

@@ -1,4 +1,4 @@
-package org.back.beobachtungapp.bot;
+package org.back.beobachtungapp.integration.telegram;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
@@ -120,6 +120,19 @@ public class TgBot extends TelegramWebhookBot {
       this.execute(sendDocumentRequest);
     } catch (TelegramApiException e) {
       log.error("Telegram API Exception: {}", e.getMessage());
+    }
+  }
+
+  @Async
+  public void sendMessage(String chatId, String message) {
+    try {
+      SendMessage sendMessage = new SendMessage();
+      sendMessage.setChatId(chatId);
+      sendMessage.setText(message);
+
+      this.execute(sendMessage);
+    } catch (TelegramApiException e) {
+      log.error("Failed to send message to {}: {}", chatId, e.getMessage(), e);
     }
   }
 

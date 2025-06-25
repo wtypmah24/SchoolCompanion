@@ -1,12 +1,12 @@
-package org.back.beobachtungapp.processor;
+package org.back.beobachtungapp.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.back.beobachtungapp.bot.TgBot;
-import org.back.beobachtungapp.dto.message.DelayedTgMessage;
+import org.back.beobachtungapp.dto.message.TelegramMessage;
 import org.back.beobachtungapp.dto.telegram.TelegramPdfJob;
+import org.back.beobachtungapp.integration.telegram.TgBot;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -92,7 +92,7 @@ public class MessageProcessor {
    * <p>For each message:
    *
    * <ul>
-   *   <li>Deserializes it to {@link DelayedTgMessage}
+   *   <li>Deserializes it to {@link TelegramMessage}
    *   <li>Constructs a {@link SendMessage} with MarkdownV2 parse mode
    *   <li>Sends the message through {@link TgBot}
    *   <li>Removes the message from the Redis sorted set
@@ -113,7 +113,7 @@ public class MessageProcessor {
 
     for (String messageJson : messages) {
       try {
-        DelayedTgMessage msg = objectMapper.readValue(messageJson, DelayedTgMessage.class);
+        TelegramMessage msg = objectMapper.readValue(messageJson, TelegramMessage.class);
 
         SendMessage telegramMsg = new SendMessage();
         telegramMsg.setParseMode(ParseMode.MARKDOWNV2);
