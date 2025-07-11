@@ -1,11 +1,11 @@
-FROM maven:latest AS maven
+FROM arm32v7/maven:3.8.7-openjdk-17 AS maven
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 RUN mvn dependency:go-offline
 RUN mvn clean package -DskipTests
 
-FROM openjdk:latest AS app
+FROM arm32v7/openjdk:17 AS app
 WORKDIR /app
 
 COPY --from=maven /app/target/*.jar beobachtung_app.jar
