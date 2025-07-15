@@ -55,7 +55,8 @@ public class SecurityConfig {
             "https://kinder-compass-companion-314503497094.europe-west3.run.app",
             "http://192.168.178.31:3000",
             "http://wtypmah.duckdns.org:3000",
-            "https://wtypmah.duckdns.org:3000"));
+            "https://wtypmah.duckdns.org:443",
+            "https://wtypmah.duckdns.org"));
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
     config.setAllowedHeaders(List.of("*"));
     config.setAllowCredentials(true);
