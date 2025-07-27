@@ -1,21 +1,15 @@
 package org.back.beobachtungapp.service;
 
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.ws.rs.BadRequestException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.back.beobachtungapp.dao.ChildDao;
 import org.back.beobachtungapp.dto.request.child.ChildRequestDto;
 import org.back.beobachtungapp.dto.response.child.ChildResponseDto;
-import org.back.beobachtungapp.dto.response.child.ChildWithAttachments;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.update.child.ChildUpdateDto;
-import org.back.beobachtungapp.entity.child.Child;
-import org.back.beobachtungapp.entity.companion.Companion;
-import org.back.beobachtungapp.mapper.ChildMapper;
-import org.back.beobachtungapp.repository.ChildRepository;
-import org.back.beobachtungapp.repository.CompanionRepository;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,60 +17,37 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class ChildService {
-  private final ChildMapper childMapper;
-  private final ChildRepository childRepository;
-  private final CompanionRepository companionRepository;
+  private final ChildDao childDao;
 
   @Transactional
-  public ChildResponseDto save(ChildRequestDto child, CompanionDto companionDto) {
-    Child newChild = childMapper.childRequestDtoToChild(child);
-    Companion companion = companionRepository.getReferenceById(companionDto.id());
-    newChild.setSchoolCompanion(companion);
-
-    Child savedChild = childRepository.save(newChild);
-
-    return childMapper.childToChildResponseDto(savedChild);
+  public void save(ChildRequestDto child, CompanionDto companionDto) {
+    childDao.save(child, companionDto.id());
   }
 
   @CacheEvict(value = "child", key = "#childId")
   @Transactional
-  public ChildResponseDto update(ChildUpdateDto childUpdateDto, Long childId) {
-    Child child = findChildOrThrow(childId);
-    childMapper.updateChildFromDto(childUpdateDto, child);
-    return childMapper.childToChildResponseDto(child);
+  public void update(ChildUpdateDto childUpdateDto, Long childId) {
+    childDao.update(childUpdateDto, childId);
   }
 
   @CacheEvict(value = "child", key = "#childId")
   @Transactional
   public void delete(Long childId) {
-    childRepository.delete(findChildOrThrow(childId));
+    childDao.delete(childId);
   }
 
   public List<ChildResponseDto> findAll(CompanionDto companion) {
-    return childMapper.childToChildResponseDtoList(
-        childRepository.findAllBySchoolCompanionId(companion.id()));
+    return childDao.findAllBySchoolCompanionId(companion.id());
   }
 
-  @Cacheable(value = "child", key = "#id", unless = "#result == null")
+  //  @Cacheable(value = "child", key = "#id", unless = "#result == null")
   public ChildResponseDto findById(Long id) {
-    return childMapper.childToChildResponseDto(findChildOrThrow(id));
-  }
-
-  public ChildWithAttachments getChildWithAttachments(Long childId) {
-    Child child =
-        childRepository
-            .findByIdCustom(childId)
-            .orElseThrow(() -> new EntityNotFoundException("Child not found with id: " + childId));
-    return childMapper.childToChildWithAttachments(child);
-  }
-
-  protected Child findChildOrThrow(Long childId) {
-    return childRepository
-        .findById(childId)
+    return childDao
+        .findById(id)
         .orElseThrow(
             () -> {
-              log.error("Child not found with id: {}", childId);
-              return new EntityNotFoundException("Child not found with id: " + childId);
+              log.error("Child not found with id: {}", id);
+              return new BadRequestException("Child not found with id: " + id);
             });
   }
 }

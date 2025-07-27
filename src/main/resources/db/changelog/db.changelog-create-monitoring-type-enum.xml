@@ -1,0 +1,26 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="0-create-scale-type-enum" author="wtypmah">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="monitoring_parameters"/>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM pg_type WHERE typname = 'scale_type';
+                </sqlCheck>
+            </and>
+        </preConditions>
+
+        <sql>
+            CREATE TYPE scale_type AS ENUM (
+            'QUANTITATIVE', 'QUALITATIVE', 'BINARY', 'SCALE'
+            );
+        </sql>
+    </changeSet>
+
+
+</databaseChangeLog>

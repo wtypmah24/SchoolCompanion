@@ -1,0 +1,93 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="set-updated-at-timestamps" author="wtypmah">
+        <sql>
+            <![CDATA[
+                CREATE OR REPLACE FUNCTION set_updated_at_timestamp()
+                RETURNS TRIGGER AS '
+                BEGIN
+                    NEW.updated_at = CURRENT_TIMESTAMP;
+                    RETURN NEW;
+                END;
+                ' LANGUAGE plpgsql;
+            ]]>
+        </sql>
+
+        <sql>
+            CREATE TRIGGER set_updated_at_child
+            BEFORE UPDATE ON children
+            FOR EACH ROW
+            WHEN (OLD.* IS DISTINCT FROM NEW.*)
+            EXECUTE FUNCTION set_updated_at_timestamp();
+        </sql>
+
+        <sql>
+            CREATE TRIGGER set_updated_at_special_need
+            BEFORE UPDATE ON special_needs
+            FOR EACH ROW
+            WHEN (OLD.* IS DISTINCT FROM NEW.*)
+            EXECUTE FUNCTION set_updated_at_timestamp();
+        </sql>
+
+        <sql>
+            CREATE TRIGGER set_updated_at_goal
+            BEFORE UPDATE ON goals
+            FOR EACH ROW
+            WHEN (OLD.* IS DISTINCT FROM NEW.*)
+            EXECUTE FUNCTION set_updated_at_timestamp();
+        </sql>
+
+        <sql>
+            CREATE TRIGGER set_updated_at_companion
+            BEFORE UPDATE ON companions
+            FOR EACH ROW
+            WHEN (OLD.* IS DISTINCT FROM NEW.*)
+            EXECUTE FUNCTION set_updated_at_timestamp();
+        </sql>
+
+        <sql>
+            CREATE TRIGGER set_updated_at_event
+            BEFORE UPDATE ON events
+            FOR EACH ROW
+            WHEN (OLD.* IS DISTINCT FROM NEW.*)
+            EXECUTE FUNCTION set_updated_at_timestamp();
+        </sql>
+
+        <sql>
+            CREATE TRIGGER set_updated_at_monitoring_parameter
+            BEFORE UPDATE ON monitoring_parameters
+            FOR EACH ROW
+            WHEN (OLD.* IS DISTINCT FROM NEW.*)
+            EXECUTE FUNCTION set_updated_at_timestamp();
+        </sql>
+
+        <sql>
+            CREATE TRIGGER set_updated_at_monitoring_entry
+            BEFORE UPDATE ON monitoring_entries
+            FOR EACH ROW
+            WHEN (OLD.* IS DISTINCT FROM NEW.*)
+            EXECUTE FUNCTION set_updated_at_timestamp();
+        </sql>
+
+        <sql>
+            CREATE TRIGGER set_updated_at_note
+            BEFORE UPDATE ON notes
+            FOR EACH ROW
+            WHEN (OLD.* IS DISTINCT FROM NEW.*)
+            EXECUTE FUNCTION set_updated_at_timestamp();
+        </sql>
+
+        <sql>
+            CREATE TRIGGER set_updated_at_task
+            BEFORE UPDATE ON tasks
+            FOR EACH ROW
+            WHEN (OLD.* IS DISTINCT FROM NEW.*)
+            EXECUTE FUNCTION set_updated_at_timestamp();
+        </sql>
+    </changeSet>
+</databaseChangeLog>

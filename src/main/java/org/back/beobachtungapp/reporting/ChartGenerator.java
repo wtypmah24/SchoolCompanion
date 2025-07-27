@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +38,7 @@ public class ChartGenerator {
    * @param entries the set of monitoring entries to process
    * @return a list of BufferedImages representing the generated charts
    */
-  public List<BufferedImage> handleCharts(Set<MonitoringEntryResponseDto> entries) {
+  public List<BufferedImage> handleCharts(List<MonitoringEntryResponseDto> entries) {
     List<MonitoringEntryResponseDto> binaryEntries = new ArrayList<>();
     List<MonitoringEntryResponseDto> quantitativeEntries = new ArrayList<>();
     List<MonitoringEntryResponseDto> scaleEntries = new ArrayList<>();

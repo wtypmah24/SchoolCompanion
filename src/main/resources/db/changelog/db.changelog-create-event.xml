@@ -1,0 +1,49 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="5-create-event-table" author="wtypmah">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="events"/>
+            </not>
+        </preConditions>
+        <createTable tableName="events">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="description" type="TEXT"/>
+            <column name="companion_id" type="BIGINT"/>
+            <column name="child_id" type="BIGINT"/>
+            <column name="start_date_time" type="TIMESTAMP"/>
+            <column name="end_date_time" type="TIMESTAMP"/>
+            <column name="location" type="VARCHAR(255)"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="events"
+                baseColumnNames="companion_id"
+                constraintName="fk_event_companion"
+                referencedTableName="companions"
+                referencedColumnNames="id"
+                deferrable="false"
+                initiallyDeferred="false"
+                onDelete="SET NULL"/>
+
+        <addForeignKeyConstraint
+                baseTableName="events"
+                baseColumnNames="child_id"
+                constraintName="fk_event_child"
+                referencedTableName="children"
+                referencedColumnNames="id"
+                deferrable="false"
+                initiallyDeferred="false"
+                onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>

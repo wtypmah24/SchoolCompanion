@@ -1,0 +1,42 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="2-create-monitoring-entry-table" author="wtypmah">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="monitoring_entries"/>
+            </not>
+        </preConditions>
+        <createTable tableName="monitoring_entries">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="value" type="VARCHAR(255)"/>
+            <column name="notes" type="TEXT"/>
+            <column name="monitoring_parameter_id" type="BIGINT"/>
+            <column name="child_id" type="BIGINT"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="monitoring_entries"
+                baseColumnNames="monitoring_parameter_id"
+                constraintName="fk_monitoring_entry_parameter"
+                referencedTableName="monitoring_parameters"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+                baseTableName="monitoring_entries"
+                baseColumnNames="child_id"
+                constraintName="fk_monitoring_entry_child"
+                referencedTableName="children"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>

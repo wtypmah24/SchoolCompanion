@@ -17,11 +17,12 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.back.beobachtungapp.dto.response.child.ChildResponseDto;
 import org.back.beobachtungapp.dto.response.child.ChildWithAttachments;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.telegram.TelegramPdfJob;
 import org.back.beobachtungapp.messaging.MessagingQueueManager;
-import org.back.beobachtungapp.service.ChildService;
+import org.back.beobachtungapp.service.*;
 import org.springframework.stereotype.Service;
 
 /**
@@ -39,6 +40,11 @@ public class PdfGenerator {
 
   private final ChartGenerator chartGenerator;
   private final ChildService childService;
+  private final MonitoringEntryService monitoringEntryService;
+  private final NoteService noteService;
+  private final SpecialNeedService specialNeedService;
+  private final GoalService goalService;
+  private final EventService eventService;
   private final MessagingQueueManager messageService;
 
   /**
@@ -53,8 +59,28 @@ public class PdfGenerator {
    */
   public byte[] generatePdf(Long childId, CompanionDto companionDto) throws IOException {
     try (PDDocument document = new PDDocument()) {
-      ChildWithAttachments child = childService.getChildWithAttachments(childId);
-      List<BufferedImage> images = chartGenerator.handleCharts(child.entries());
+      ChildResponseDto child = childService.findById(childId);
+      var entries = monitoringEntryService.findAllByChildId(childId);
+      var notes = noteService.findByChild(childId);
+      var specialNeeds = specialNeedService.findByChild(childId);
+      var goals = goalService.findByChild(childId);
+      var events = eventService.findByChild(childId);
+
+      var childWithAttachments =
+          new ChildWithAttachments(
+              childId,
+              child.name(),
+              child.surname(),
+              child.email(),
+              child.phoneNumber(),
+              child.dateOfBirth(),
+              child.active(),
+              notes,
+              specialNeeds,
+              goals,
+              events,
+              entries);
+      List<BufferedImage> images = chartGenerator.handleCharts(entries);
 
       // 1. Title page
       PDPage titlePage = new PDPage(PDRectangle.A4);
@@ -110,7 +136,7 @@ public class PdfGenerator {
 
       // One page for two sections
       String companionInfo = formatCompanionInfo(companionDto);
-      String childInfo = formatChildInfo(child);
+      String childInfo = formatChildInfo(childWithAttachments);
 
       String combinedInfo =
           "Informationen über den Schulbegleiter\n\n"

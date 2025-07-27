@@ -1,17 +1,14 @@
 package org.back.beobachtungapp.service;
 
-import jakarta.persistence.EntityNotFoundException;
-import java.util.Set;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.back.beobachtungapp.dao.CompanionDao;
 import org.back.beobachtungapp.dto.request.companion.CompanionAdTgIdDto;
 import org.back.beobachtungapp.dto.request.companion.CompanionRequestDto;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.update.companion.CompanionUpdateDto;
 import org.back.beobachtungapp.dto.update.companion.UpdatePasswordDto;
-import org.back.beobachtungapp.entity.companion.Companion;
-import org.back.beobachtungapp.mapper.CompanionMapper;
-import org.back.beobachtungapp.repository.CompanionRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,13 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class CompanionService {
-  private final CompanionRepository companionRepository;
+  private final CompanionDao companionDao;
   private final PasswordEncoder passwordEncoder;
-  private final CompanionMapper companionMapper;
 
   @CacheEvict(value = "users")
   @Transactional
-  public Companion save(CompanionRequestDto companion) {
+  public void save(CompanionRequestDto companion) {
     String encodedPassword = passwordEncoder.encode(companion.password());
 
     CompanionRequestDto newCompanion =
@@ -38,68 +34,45 @@ public class CompanionService {
             companion.email(),
             encodedPassword);
 
-    return companionRepository.save(companionMapper.companionRequestDtoToCompanion(newCompanion));
+    companionDao.save(newCompanion);
   }
 
   @CacheEvict(value = "users")
   @Transactional
-  public CompanionDto update(CompanionUpdateDto dto, CompanionDto companionDto) {
-    Companion companion = findCompanionOrThrow(companionDto.id());
-    companionMapper.updateCompanionFromDto(dto, companion);
-    return companionMapper.companionToCompanionDto(companion);
+  public void update(CompanionUpdateDto dto, CompanionDto companionDto) {
+    companionDao.update(dto, companionDto.id());
   }
 
   @Transactional
   public void updatePassword(UpdatePasswordDto dto, CompanionDto companionDto) {
-    Companion companion = findCompanionOrThrow(companionDto.id());
-    String oldPassword = companion.getPassword();
-    if (!dto.currentPassword().equals(oldPassword)) {
-      throw new IllegalArgumentException("Old password is incorrect");
-    }
-    companion.setPassword(passwordEncoder.encode(dto.newPassword()));
-    companionRepository.save(companion);
+    companionDao.updatePassword(
+        companionDto.id(),
+        passwordEncoder.encode(dto.newPassword()),
+        passwordEncoder.encode(dto.currentPassword()));
   }
 
   @Transactional
   @CacheEvict(value = "users")
   public void delete(CompanionDto companionDto) {
-    companionRepository.deleteById(companionDto.id());
+    companionDao.delete(companionDto.id());
   }
 
   @Transactional
   public void addTgIdToCompanion(CompanionAdTgIdDto tgDto) {
-    Companion companion =
-        companionRepository
-            .findByEmail(tgDto.email())
-            .orElseThrow(
-                () ->
-                    new EntityNotFoundException(
-                        "Companion not found with email: " + tgDto.email()));
-
-    companion.setTgId(tgDto.tgId());
-    companionRepository.save(companion);
+    companionDao.addTgId(tgDto);
   }
 
   @Transactional
   public void addChatIdToCompanion(Long companionId, String newChatId) {
-    Companion companion = findCompanionOrThrow(companionId);
-    companion.getChatIds().add(newChatId);
-    companionRepository.save(companion);
+    companionDao.addThreadToCompanion(companionId, newChatId);
   }
 
-  public Set<String> getThreadIds(Long companionId) {
-    Companion companion = findCompanionOrThrow(companionId);
-    return companion.getChatIds();
+  public List<String> getThreadIds(Long companionId) {
+    return companionDao.getChatIds(companionId);
   }
 
   @Transactional
   public void deleteThreadIds(CompanionDto dto, String threadId) {
-    companionRepository.removeThread(dto.id(), threadId);
-  }
-
-  private Companion findCompanionOrThrow(Long id) {
-    return companionRepository
-        .findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("Companion not found with id: " + id));
+    companionDao.removeThread(dto.id(), threadId);
   }
 }

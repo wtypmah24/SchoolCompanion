@@ -1,0 +1,118 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="notify-event-insert-function" author="wtypmah">
+        <sql>
+            <![CDATA[
+        CREATE OR REPLACE FUNCTION notify_event_insert()
+        RETURNS trigger AS '
+        DECLARE
+            companion_name TEXT;
+            companion_email TEXT;
+            companion_tg_id TEXT;
+            child_name TEXT;
+            child_email TEXT;
+        BEGIN
+            SELECT name, email, tg_id
+            INTO companion_name, companion_email, companion_tg_id
+            FROM companions
+            WHERE id = NEW.companion_id;
+
+            SELECT name, email
+            INTO child_name, child_email
+            FROM children
+            WHERE id = NEW.child_id;
+
+            PERFORM pg_notify(''event_channel'', json_build_object(
+                ''type'', ''event_created'',
+                ''id'', NEW.id,
+                ''title'', NEW.title,
+                ''description'', NEW.description,
+                ''start'', to_char(NEW.start_date_time AT TIME ZONE ''UTC'', ''YYYY-MM-DD"T"HH24:MI:SS"Z"''),
+                ''end'', to_char(NEW.end_date_time AT TIME ZONE ''UTC'', ''YYYY-MM-DD"T"HH24:MI:SS"Z"''),
+                ''location'', NEW.location,
+                ''companionName'', companion_name,
+                ''companionEmail'', companion_email,
+                ''tgId'', companion_tg_id,
+                ''childName'', child_name,
+                ''childEmail'', child_email
+            )::text);
+
+            RETURN NEW;
+        END;
+        ' LANGUAGE plpgsql;
+        ]]>
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="notify-event-update-function" author="wtypmah">
+        <sql>
+            <![CDATA[
+        CREATE OR REPLACE FUNCTION notify_event_update()
+        RETURNS trigger AS '
+        BEGIN
+            PERFORM pg_notify(''event_channel'', json_build_object(
+                ''type'', ''event_updated'',
+                ''id'', NEW.id,
+                ''updated_at'', now()
+            )::text);
+            RETURN NEW;
+        END;
+        ' LANGUAGE plpgsql;
+        ]]>
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="notify-event-delete-function" author="wtypmah">
+        <sql>
+            <![CDATA[
+        CREATE OR REPLACE FUNCTION notify_event_delete()
+        RETURNS trigger AS '
+        BEGIN
+            PERFORM pg_notify(''event_channel'', json_build_object(
+                ''type'', ''event_deleted'',
+                ''id'', OLD.id
+            )::text);
+            RETURN OLD;
+        END;
+        ' LANGUAGE plpgsql;
+        ]]>
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="trigger-insert" author="wtypmah">
+        <sql>
+            CREATE TRIGGER event_insert_trigger
+            AFTER INSERT ON events
+            FOR EACH ROW
+            EXECUTE FUNCTION notify_event_insert();
+        </sql>
+    </changeSet>
+
+    <changeSet id="trigger-update" author="wtypmah">
+        <sql>
+            CREATE TRIGGER event_update_trigger
+            AFTER UPDATE ON events
+            FOR EACH ROW
+            EXECUTE FUNCTION notify_event_update();
+        </sql>
+    </changeSet>
+
+    <changeSet id="trigger-delete" author="wtypmah">
+        <sql>
+            CREATE TRIGGER event_delete_trigger
+            AFTER DELETE ON events
+            FOR EACH ROW
+            EXECUTE FUNCTION notify_event_delete();
+        </sql>
+    </changeSet>
+
+
+</databaseChangeLog>

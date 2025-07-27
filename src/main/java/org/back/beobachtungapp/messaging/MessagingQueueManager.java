@@ -2,7 +2,6 @@ package org.back.beobachtungapp.messaging;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
  *
  * <p>Uses Redis to store delayed messages and message queues.
  */
-@SuppressFBWarnings
 @Slf4j
 @Service
 @RequiredArgsConstructor

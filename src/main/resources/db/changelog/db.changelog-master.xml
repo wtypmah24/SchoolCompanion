@@ -4,5 +4,19 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
-<!--    <include file="./db.changelog-create-work-sessions.xml" relativeToChangelogFile="true"/>-->
+    <include file="./db.changelog-create-companion.xml" relativeToChangelogFile="true"/>
+    <include file="./db.changelog-create-children.xml" relativeToChangelogFile="true"/>
+    <include file="./db.changelog-create-event.xml" relativeToChangelogFile="true"/>
+    <include file="./db.changelog-create-goal.xml" relativeToChangelogFile="true"/>
+    <include file="./db.changelog-create-note.xml" relativeToChangelogFile="true"/>
+    <include file="./db.changelog-create-task.xml" relativeToChangelogFile="true"/>
+    <include file="./db.changelog-create-special-need.xml" relativeToChangelogFile="true"/>
+    <include file="./db.changelog-create-monitoring-type-enum.xml" relativeToChangelogFile="true"/>
+    <include file="./db.changelog-create-monitoring-param.xml" relativeToChangelogFile="true"/>
+    <include file="./db.changelog-create-monitoring-entry.xml" relativeToChangelogFile="true"/>
+    <include file="./db.changelog-create-work-sessions.xml" relativeToChangelogFile="true"/>
+    <include file="./db.changelog-create-companion-thread-ids.xml" relativeToChangelogFile="true"/>
+    <include file="./db.changelog-trigger-updated-at.xml" relativeToChangelogFile="true"/>
+    <include file="./db.changelog-trigger-event-notification.xml" relativeToChangelogFile="true"/>
+    <include file="./db.changelog-trigger-session-notification.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

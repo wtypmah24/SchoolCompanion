@@ -1,6 +1,5 @@
 package org.back.beobachtungapp.exception;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import org.springframework.http.HttpStatus;
@@ -26,10 +25,5 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
   public ResponseEntity<?> handleOtherErrors(Exception ex) {
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body(Map.of("error", "Internal error", "message", ex.getMessage()));
-  }
-
-  @ExceptionHandler(EntityNotFoundException.class)
-  public ResponseEntity<?> handleEntityNotFound(EntityNotFoundException ex) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
   }
 }

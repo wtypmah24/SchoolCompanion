@@ -1,0 +1,54 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="notify-session-update-function" author="wtypmah">
+        <sql>
+            <![CDATA[
+        CREATE OR REPLACE FUNCTION notify_session_update()
+        RETURNS trigger AS '
+        DECLARE
+            tgId TEXT;
+            email TEXT;
+        BEGIN
+            IF NEW.companion_id IS NOT NULL THEN
+                SELECT c.email, c.tg_id INTO email, tgId
+                FROM companions c
+                WHERE c.id = NEW.companion_id;
+            END IF;
+
+            PERFORM pg_notify(''event_channel'', json_build_object(
+                ''type'', ''session_updated'',
+                ''id'', NEW.id,
+                ''workSessionResponseDto'', json_build_object(
+                    ''id'', NEW.id,
+                    ''startTime'', to_char(NEW.start_time AT TIME ZONE ''UTC'', ''YYYY-MM-DD"T"HH24:MI:SS.MS"Z"''),
+                    ''endTime'', to_char(NEW.end_time AT TIME ZONE ''UTC'', ''YYYY-MM-DD"T"HH24:MI:SS.MS"Z"''),
+                    ''note'', NEW.note
+                ),
+                ''email'', email,
+                ''tgId'', tgId
+            )::text);
+
+            RETURN NEW;
+        END;
+        ' LANGUAGE plpgsql;
+        ]]>
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="trigger-update" author="wtypmah">
+        <sql>
+            CREATE TRIGGER session_update_trigger
+            AFTER UPDATE ON work_sessions
+            FOR EACH ROW
+            WHEN (NEW.end_time IS NOT NULL AND OLD.end_time IS DISTINCT FROM NEW.end_time)
+            EXECUTE FUNCTION notify_session_update();
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

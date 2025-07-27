@@ -3,7 +3,6 @@ package org.back.beobachtungapp.filter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +26,6 @@ import org.slf4j.LoggerFactory;
  * <p>If the response content type is PDF, the response body logging is skipped, and only an info
  * message about the PDF content is logged.
  */
-@SuppressFBWarnings
 @WebFilter("/*")
 public class RequestResponseLoggingFilter implements Filter {
 

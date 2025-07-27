@@ -5,7 +5,12 @@
         http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <changeSet id="20240528-create-work-sessions" author="yourname">
+    <changeSet id="1-create-work-sessions" author="wtypmah">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="work_sessions"/>
+            </not>
+        </preConditions>
         <createTable tableName="work_sessions">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -15,7 +20,7 @@
             <column name="note" type="VARCHAR(255)"/>
             <column name="companion_id" type="BIGINT"/>
             <column name="updated_at" type="TIMESTAMP"/>
-            <column name="created_at" type="TIMESTAMP"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
         </createTable>
 
         <addForeignKeyConstraint

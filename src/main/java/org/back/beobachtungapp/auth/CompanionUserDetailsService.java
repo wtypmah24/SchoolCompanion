@@ -2,10 +2,10 @@ package org.back.beobachtungapp.auth;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.back.beobachtungapp.dao.CompanionDao;
 import org.back.beobachtungapp.entity.companion.Companion;
-import org.back.beobachtungapp.repository.CompanionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,19 +15,15 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 class CompanionUserDetailsService implements UserDetailsService {
-  private final CompanionRepository companionRepository;
-
-  @Autowired
-  public CompanionUserDetailsService(CompanionRepository companionRepository) {
-    this.companionRepository = companionRepository;
-  }
+  private final CompanionDao companionDao;
 
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
     Companion companion =
-        companionRepository
-            .findByEmail(email)
+        companionDao
+            .findCompanionByEmail(email)
             .orElseThrow(
                 () -> new NoSuchElementException("Companion not found with email: " + email));
     return new User(

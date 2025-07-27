@@ -11,11 +11,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.config.properties.OpenAiProperties;
 import org.back.beobachtungapp.dto.openai.*;
-import org.back.beobachtungapp.dto.response.child.ChildWithAttachments;
+import org.back.beobachtungapp.dto.response.child.ChildResponseDto;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.feign.OpenAiClient;
-import org.back.beobachtungapp.service.ChildService;
-import org.back.beobachtungapp.service.CompanionService;
+import org.back.beobachtungapp.service.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +31,9 @@ public class OpenAiService {
   private final OpenAiClient openAiClient;
   private final CompanionService companionService;
   private final ChildService childService;
+  private final MonitoringEntryService monitoringEntryService;
+  private final SpecialNeedService specialNeedService;
+  private final GoalService goalService;
 
   /**
    * Handles a user prompt by either starting a new thread or continuing an existing one.
@@ -112,12 +114,15 @@ public class OpenAiService {
    * @return formatted context string
    */
   private String buildContextForCompanion(Long childId) {
-    ChildWithAttachments child = childService.getChildWithAttachments(childId);
+    ChildResponseDto child = childService.findById(childId);
+    var entries = monitoringEntryService.findAllByChildId(childId);
+    var specialNeeds = specialNeedService.findByChild(childId);
+    var goals = goalService.findByChild(childId);
+
     int age = calculateAge(child.dateOfBirth());
 
     String template = loadTemplate("templates/context-template.txt");
-    return String.format(
-        template, child.name(), age, child.specialNeeds(), child.goals(), child.entries());
+    return String.format(template, child.name(), age, specialNeeds, goals, entries);
   }
 
   /**

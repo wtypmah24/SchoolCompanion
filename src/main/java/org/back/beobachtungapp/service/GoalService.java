@@ -1,15 +1,12 @@
 package org.back.beobachtungapp.service;
 
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.ws.rs.BadRequestException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.back.beobachtungapp.dao.GoalDao;
 import org.back.beobachtungapp.dto.request.child.GoalRequestDto;
 import org.back.beobachtungapp.dto.response.child.GoalResponseDto;
-import org.back.beobachtungapp.entity.child.Child;
-import org.back.beobachtungapp.entity.child.Goal;
-import org.back.beobachtungapp.mapper.GoalMapper;
-import org.back.beobachtungapp.repository.GoalRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -19,52 +16,37 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class GoalService {
-  private final GoalRepository goalRepository;
-  private final GoalMapper goalMapper;
-  private final ChildService childService;
+  private final GoalDao goalDao;
 
   @Transactional
-  public GoalResponseDto save(GoalRequestDto goalDto, Long childId) {
-    Goal goal = goalMapper.goalRequestDtoToGoal(goalDto);
-    Child child = childService.findChildOrThrow(childId);
-    child.addGoal(goal);
-    Goal savedGoal = goalRepository.save(goal);
-    return goalMapper.goalToGoalResponseDto(savedGoal);
+  public void save(GoalRequestDto goalDto, Long childId) {
+    goalDao.save(goalDto, childId);
   }
 
   @Transactional
   @CacheEvict(value = "goals")
-  public GoalResponseDto update(GoalRequestDto goalDto, Long goalId) {
-    Goal goal = findGoalOrThrow(goalId);
-    goalMapper.updateGoalFromDto(goalDto, goal);
-    return goalMapper.goalToGoalResponseDto(goal);
+  public void update(GoalRequestDto goalDto, Long goalId) {
+    goalDao.update(goalDto, goalId);
   }
 
   @CacheEvict(value = "goal")
   @Transactional
   public void delete(Long goalId) {
-    Goal goal = findGoalOrThrow(goalId);
-    goalRepository.delete(goal);
+    goalDao.delete(goalId);
   }
 
-  @Transactional(readOnly = true)
-  public List<GoalResponseDto> findAll(Long childId) {
-    return goalMapper.goalToGoalResponseDtoList(goalRepository.findByChildId(childId));
+  public List<GoalResponseDto> findByChild(Long childId) {
+    return goalDao.findByChildId(childId);
   }
 
   @Cacheable(value = "goal", key = "goalId")
   public GoalResponseDto findById(Long goalId) {
-    Goal goal = findGoalOrThrow(goalId);
-    return goalMapper.goalToGoalResponseDto(goal);
-  }
-
-  private Goal findGoalOrThrow(Long goalId) {
-    return goalRepository
+    return goalDao
         .findById(goalId)
         .orElseThrow(
             () -> {
               log.error("Goal not found with id: {}", goalId);
-              return new EntityNotFoundException("Goal not found with id: " + goalId);
+              return new BadRequestException("Goal not found with id: " + goalId);
             });
   }
 }

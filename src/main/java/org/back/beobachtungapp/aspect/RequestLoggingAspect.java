@@ -3,7 +3,6 @@ package org.back.beobachtungapp.aspect;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
@@ -12,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -26,10 +26,10 @@ import org.springframework.stereotype.Component;
  *
  * <p>If the response is a file represented as a byte array, the response logging is skipped.
  */
-@SuppressFBWarnings
 @Slf4j
 @Aspect
 @Component
+@Profile("local")
 public class RequestLoggingAspect {
 
   private final ObjectMapper objectMapper = new ObjectMapper();

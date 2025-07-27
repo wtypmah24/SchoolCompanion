@@ -1,13 +1,11 @@
 package org.back.beobachtungapp.filter;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.WriteListener;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;
 import java.io.*;
 
-@SuppressFBWarnings
 public class CachedBodyHttpServletResponse extends HttpServletResponseWrapper {
 
   private final ByteArrayOutputStream cachedContent = new ByteArrayOutputStream();

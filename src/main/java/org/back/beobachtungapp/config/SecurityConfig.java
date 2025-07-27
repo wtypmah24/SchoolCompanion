@@ -1,6 +1,5 @@
 package org.back.beobachtungapp.config;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.back.beobachtungapp.auth.CompanionJwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +22,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 public class SecurityConfig {
-  @SuppressFBWarnings(
-      value = "EI_EXPOSE_REP2",
-      justification = "CompanionJwtFilter is immutable and safe to inject")
+
   private final CompanionJwtFilter companionJwtFilter;
 
   @Autowired

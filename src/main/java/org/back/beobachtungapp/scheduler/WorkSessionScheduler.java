@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
-import org.back.beobachtungapp.repository.WorkSessionRepository;
+import org.back.beobachtungapp.dao.SessionDao;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @RequiredArgsConstructor
 public class WorkSessionScheduler {
-  private final WorkSessionRepository workSessionRepository;
+  private final SessionDao sessionDao;
 
   @Scheduled(cron = "@daily")
   @Transactional
@@ -23,8 +23,7 @@ public class WorkSessionScheduler {
 
     LocalDate yesterday = LocalDate.now(zone).minusDays(1);
     Instant startOfDay = yesterday.atStartOfDay(zone).toInstant();
-    Instant endOfDay = yesterday.plusDays(1).atStartOfDay(zone).toInstant();
 
-    workSessionRepository.endAllSessionsStartedToday(startOfDay, endOfDay, now);
+    sessionDao.endAllSessionsStartedToday(startOfDay, now);
   }
 }

@@ -7,13 +7,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.back.beobachtungapp.dao.CompanionDao;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
-import org.back.beobachtungapp.entity.companion.Companion;
 import org.back.beobachtungapp.entity.companion.CompanionAuthentication;
-import org.back.beobachtungapp.mapper.CompanionMapper;
-import org.back.beobachtungapp.repository.CompanionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,21 +24,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CompanionJwtFilter extends OncePerRequestFilter {
 
   private final JwtDecoder jwtDecoder;
-  private final CompanionRepository companionRepository;
-  private final CompanionMapper companionMapper;
-
-  @Autowired
-  public CompanionJwtFilter(
-      JwtDecoder jwtDecoder,
-      CompanionRepository companionRepository,
-      CompanionMapper companionMapper) {
-    this.jwtDecoder = jwtDecoder;
-    this.companionRepository = companionRepository;
-    this.companionMapper = companionMapper;
-  }
+  private final CompanionDao companionDao;
 
   @Override
   protected void doFilterInternal(
@@ -55,15 +43,14 @@ public class CompanionJwtFilter extends OncePerRequestFilter {
       try {
         Jwt jwt = jwtDecoder.decode(token);
         String email = jwt.getSubject();
-        Companion companion =
-            companionRepository
+        CompanionDto companion =
+            companionDao
                 .findByEmail(email)
                 .orElseThrow(
                     () -> new NoSuchElementException("Companion not found with email: " + email));
-        CompanionDto companionDto = companionMapper.companionToCompanionDto(companion);
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
         CompanionAuthentication authentication =
-            new CompanionAuthentication(companionDto, authorities);
+            new CompanionAuthentication(companion, authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
       } catch (JwtException e) {

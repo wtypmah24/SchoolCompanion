@@ -1,7 +1,6 @@
 package org.back.beobachtungapp.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.dto.message.TelegramMessage;
@@ -20,7 +19,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
  * <p>This service periodically polls Redis for scheduled Telegram messages and PDF sending jobs,
  * then dispatches them accordingly.
  */
-@SuppressFBWarnings
 @Slf4j
 @Service
 public class MessageProcessor {

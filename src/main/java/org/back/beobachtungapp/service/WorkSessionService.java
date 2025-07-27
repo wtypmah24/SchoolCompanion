@@ -2,16 +2,11 @@ package org.back.beobachtungapp.service;
 
 import java.time.*;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.back.beobachtungapp.dao.SessionDao;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.response.session.WorkSessionResponseDto;
-import org.back.beobachtungapp.entity.companion.Companion;
-import org.back.beobachtungapp.entity.session.WorkSession;
-import org.back.beobachtungapp.mapper.WorkSessionMapper;
-import org.back.beobachtungapp.repository.CompanionRepository;
-import org.back.beobachtungapp.repository.WorkSessionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,9 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class WorkSessionService {
 
-  private final WorkSessionRepository workSessionRepository;
-  private final CompanionRepository companionRepository;
-  private final WorkSessionMapper workSessionMapper;
+  private final SessionDao sessionDao;
 
   @Transactional
   public void startWorkSession(CompanionDto companionDto) {
@@ -30,55 +23,25 @@ public class WorkSessionService {
       throw new IllegalStateException(
           "Work session already exists for companion id " + companionDto.id() + " today.");
     }
-
-    Companion companion = companionRepository.getReferenceById(companionDto.id());
-    WorkSession newWorkSession = new WorkSession();
-    newWorkSession.setStartTime(currentInstant());
-    newWorkSession.setCompanion(companion);
-
-    workSessionRepository.save(newWorkSession);
+    sessionDao.start(Instant.now(), companionDto.id());
   }
 
   @Transactional
   public void endWorkSession(CompanionDto companionDto) {
-    WorkSession existingSession =
-        findTodayWorkSession(companionDto.id())
-            .orElseThrow(
-                () ->
-                    new IllegalStateException(
-                        "There are no wok sessions for today for companion id: "
-                            + companionDto.id()));
-    log.info("Ending work session {}", existingSession);
-
-    existingSession.setEndTime(currentInstant());
-    workSessionRepository.save(existingSession);
+    sessionDao.end(companionDto.id(), Instant.now(), startOfUtcDay());
   }
 
   public WorkSessionResponseDto isWorking(CompanionDto companionDto) {
-    return findTodayWorkSession(companionDto.id())
-        .map(workSessionMapper::sessionToResponseDto)
-        .orElse(null);
+    return sessionDao.findTodayWorkSession(companionDto.id(), startOfUtcDay()).orElse(null);
   }
 
   public List<WorkSessionResponseDto> getWorkSessionsByDates(
       CompanionDto companionDto, LocalDate start, LocalDate end) {
-    ZoneId zone = ZoneId.of("Europe/Vilnius");
-    Instant startInst = start.atStartOfDay(zone).toInstant();
-    Instant endInst = end.atStartOfDay(zone).toInstant();
-    return workSessionMapper.sessionListToResponseDtoList(
-        workSessionRepository.findByCompanionIdAndCreatedAtBetween(
-            companionDto.id(), startInst, endInst));
+    return sessionDao.findSessionsByDateRange(companionDto.id(), startOfUtcDay(), endOfUtcDay());
   }
 
   private boolean hasWorkSessionToday(Long companionId) {
-    return findTodayWorkSession(companionId).isPresent();
-  }
-
-  private Optional<WorkSession> findTodayWorkSession(Long companionId) {
-    Instant startOfDay = startOfUtcDay();
-    Instant endOfDay = endOfUtcDay();
-    return workSessionRepository.findByCompanionIdAndStartTimeBetween(
-        companionId, startOfDay, endOfDay);
+    return sessionDao.findTodayWorkSession(companionId, startOfUtcDay()).isPresent();
   }
 
   private Instant startOfUtcDay() {
@@ -92,9 +55,5 @@ public class WorkSessionService {
         .atStartOfDay(ZoneOffset.UTC)
         .minusNanos(1)
         .toInstant();
-  }
-
-  private Instant currentInstant() {
-    return Instant.now();
   }
 }

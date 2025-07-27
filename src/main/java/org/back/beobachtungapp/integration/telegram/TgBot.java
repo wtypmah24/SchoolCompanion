@@ -1,6 +1,5 @@
 package org.back.beobachtungapp.integration.telegram;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,7 +20,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Slf4j
-@SuppressFBWarnings
 @Component
 public class TgBot extends TelegramWebhookBot {
   private final Map<Long, BotState> userStates = new ConcurrentHashMap<>();
