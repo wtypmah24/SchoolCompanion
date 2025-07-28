@@ -10,6 +10,8 @@ import org.back.beobachtungapp.dto.response.child.ChildResponseDto;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.update.child.ChildUpdateDto;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,27 +22,37 @@ public class ChildService {
   private final ChildDao childDao;
 
   @Transactional
-  public void save(ChildRequestDto child, CompanionDto companionDto) {
-    childDao.save(child, companionDto.id());
+  @CacheEvict(value = "children", key = "#companionDto.id()")
+  public ChildResponseDto save(ChildRequestDto child, CompanionDto companionDto) {
+    return childDao.save(child, companionDto.id());
   }
 
-  @CacheEvict(value = "child", key = "#childId")
+  @Caching(
+      evict = {
+        @CacheEvict(value = "child", key = "#childId"),
+        @CacheEvict(value = "children", key = "#companionDto.id()")
+      })
   @Transactional
-  public void update(ChildUpdateDto childUpdateDto, Long childId) {
+  public void update(ChildUpdateDto childUpdateDto, Long childId, CompanionDto companionDto) {
     childDao.update(childUpdateDto, childId);
   }
 
-  @CacheEvict(value = "child", key = "#childId")
+  @Caching(
+      evict = {
+        @CacheEvict(value = "child", key = "#childId"),
+        @CacheEvict(value = "children", key = "#companionDto.id()")
+      })
   @Transactional
-  public void delete(Long childId) {
+  public void delete(Long childId, CompanionDto companionDto) {
     childDao.delete(childId);
   }
 
+  @Cacheable(value = "children", key = "#companion.id()", unless = "#result == null")
   public List<ChildResponseDto> findAll(CompanionDto companion) {
     return childDao.findAllBySchoolCompanionId(companion.id());
   }
 
-  //  @Cacheable(value = "child", key = "#id", unless = "#result == null")
+  @Cacheable(value = "child", key = "#id", unless = "#result == null")
   public ChildResponseDto findById(Long id) {
     return childDao
         .findById(id)

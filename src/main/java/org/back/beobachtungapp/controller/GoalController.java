@@ -22,16 +22,18 @@ public class GoalController {
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
-  @PatchMapping("{goalId}")
+  @PatchMapping("{goalId}/child/{childId}")
   public ResponseEntity<GoalResponseDto> update(
-      @RequestBody GoalRequestDto goalRequestDto, @PathVariable long goalId) {
-    goalService.update(goalRequestDto, goalId);
+      @RequestBody GoalRequestDto goalRequestDto,
+      @PathVariable long goalId,
+      @PathVariable Long childId) {
+    goalService.update(goalRequestDto, goalId, childId);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
-  @DeleteMapping("{goalId}")
-  public ResponseEntity<Void> delete(@PathVariable long goalId) {
-    goalService.delete(goalId);
+  @DeleteMapping("{goalId}/child/{childId}")
+  public ResponseEntity<Void> delete(@PathVariable long goalId, @PathVariable Long childId) {
+    goalService.delete(goalId, childId);
     return ResponseEntity.ok().build();
   }
 

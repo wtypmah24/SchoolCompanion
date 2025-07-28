@@ -9,6 +9,7 @@ import org.back.beobachtungapp.dto.request.note.NoteRequestDto;
 import org.back.beobachtungapp.dto.response.note.NoteResponseDto;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,22 +20,32 @@ public class NoteService {
   private final NoteDao noteDao;
 
   @Transactional
+  @CacheEvict(value = "notes", key = "#childId")
   public void save(NoteRequestDto noteRequestDto, Long childId) {
     noteDao.save(noteRequestDto, childId);
   }
 
-  @CacheEvict(value = "note", key = "#noteId")
+  @Caching(
+      evict = {
+        @CacheEvict(value = "note", key = "#noteId"),
+        @CacheEvict(value = "notes", key = "#childId")
+      })
   @Transactional
-  public void update(NoteRequestDto noteRequestDto, Long noteId) {
+  public void update(NoteRequestDto noteRequestDto, Long noteId, Long childId) {
     noteDao.update(noteRequestDto, noteId);
   }
 
-  @CacheEvict(value = "note", key = "#noteId")
+  @Caching(
+      evict = {
+        @CacheEvict(value = "note", key = "#noteId"),
+        @CacheEvict(value = "notes", key = "#childId")
+      })
   @Transactional
-  public void delete(Long noteId) {
+  public void delete(Long noteId, Long childId) {
     noteDao.delete(noteId);
   }
 
+  @Cacheable(value = "notes", key = "#childId", unless = "#result == null")
   public List<NoteResponseDto> findByChild(Long childId) {
     return noteDao.findByChildId(childId);
   }

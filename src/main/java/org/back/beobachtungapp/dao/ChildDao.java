@@ -18,23 +18,22 @@ public class ChildDao {
 
   private final JdbcTemplate jdbcTemplate;
 
-  public void save(ChildRequestDto childDto, Long companionId) {
+  public ChildResponseDto save(ChildRequestDto childDto, Long companionId) {
     String sql =
         """
-        INSERT INTO children (name, surname, email, phone_number, date_of_birth, companion_id)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """;
+                    INSERT INTO children (name, surname, email, phone_number, date_of_birth, companion_id)
+                    VALUES (?, ?, ?, ?, ?, ?) RETURNING *
+                """;
 
-    jdbcTemplate.update(
+    return jdbcTemplate.queryForObject(
         sql,
-        ps -> {
-          ps.setString(1, childDto.name());
-          ps.setString(2, childDto.surname());
-          ps.setString(3, childDto.email());
-          ps.setString(4, childDto.phoneNumber());
-          ps.setDate(5, Date.valueOf(childDto.dateOfBirth()));
-          ps.setLong(6, companionId);
-        });
+        this::mapRowToChild,
+        childDto.name(),
+        childDto.surname(),
+        childDto.email(),
+        childDto.phoneNumber(),
+        Date.valueOf(childDto.dateOfBirth()),
+        companionId);
   }
 
   public void update(ChildUpdateDto dto, Long childId) {

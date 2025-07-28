@@ -26,8 +26,8 @@ public class GoalDao {
     jdbcTemplate.update(
         sql,
         ps -> {
-          ps.setString(2, dto.description());
-          ps.setLong(6, childId);
+          ps.setString(1, dto.description());
+          ps.setLong(2, childId);
         });
   }
 

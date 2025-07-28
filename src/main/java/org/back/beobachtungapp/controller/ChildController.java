@@ -19,22 +19,24 @@ public class ChildController {
   private final ChildService childService;
 
   @PostMapping()
-  public ResponseEntity<Void> add(
+  public ResponseEntity<ChildResponseDto> add(
       @RequestBody ChildRequestDto child, @CurrentCompanion CompanionDto companion) {
-    childService.save(child, companion);
-    return ResponseEntity.status(HttpStatus.CREATED).build();
+    return ResponseEntity.status(HttpStatus.CREATED).body(childService.save(child, companion));
   }
 
   @PatchMapping("{childId}")
   public ResponseEntity<Void> update(
-      @RequestBody ChildUpdateDto child, @PathVariable long childId) {
-    childService.update(child, childId);
+      @RequestBody ChildUpdateDto child,
+      @PathVariable long childId,
+      @CurrentCompanion CompanionDto companion) {
+    childService.update(child, childId, companion);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
   @DeleteMapping("{childId}")
-  public ResponseEntity<Void> delete(@PathVariable long childId) {
-    childService.delete(childId);
+  public ResponseEntity<Void> delete(
+      @PathVariable long childId, @CurrentCompanion CompanionDto companion) {
+    childService.delete(childId, companion);
     return ResponseEntity.ok().build();
   }
 

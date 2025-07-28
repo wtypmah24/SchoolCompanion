@@ -27,16 +27,18 @@ public class TaskController {
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
-  @PatchMapping("{taskId}")
+  @PatchMapping("{taskId}/child/{childId}")
   public ResponseEntity<TaskResponseDto> update(
-      @RequestBody TaskUpdateDto taskUpdateDto, @PathVariable long taskId) {
-    taskService.update(taskUpdateDto, taskId);
+      @RequestBody TaskUpdateDto taskUpdateDto,
+      @PathVariable long taskId,
+      @PathVariable long childId) {
+    taskService.update(taskUpdateDto, taskId, childId);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
-  @DeleteMapping("{taskId}")
-  public ResponseEntity<Void> delete(@PathVariable long taskId) {
-    taskService.delete(taskId);
+  @DeleteMapping("{taskId}/ child/{childId}")
+  public ResponseEntity<Void> delete(@PathVariable long taskId, @PathVariable long childId) {
+    taskService.delete(taskId, childId);
     return ResponseEntity.ok().build();
   }
 

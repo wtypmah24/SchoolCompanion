@@ -22,7 +22,7 @@ public class ParamDao {
         """
             INSERT INTO monitoring_parameters
             (title, type, description, min_value, max_value, companion_id)
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (?, ?::scale_type, ?, ?, ?, ?)
         """;
 
     jdbcTemplate.update(
@@ -33,7 +33,7 @@ public class ParamDao {
           ps.setString(3, dto.description());
           ps.setInt(4, dto.minValue());
           ps.setInt(5, dto.maxValue());
-          ps.setLong(5, companionId);
+          ps.setLong(6, companionId);
         });
   }
 

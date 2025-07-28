@@ -23,16 +23,18 @@ public class SpecialNeedController {
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
-  @PatchMapping("{needId}")
+  @PatchMapping("{needId}/child/{childId}")
   public ResponseEntity<SpecialNeedResponseDto> update(
-      @RequestBody SpecialNeedUpdateDto needUpdateDto, @PathVariable long needId) {
-    specialNeedService.update(needUpdateDto, needId);
+      @RequestBody SpecialNeedUpdateDto needUpdateDto,
+      @PathVariable long needId,
+      @PathVariable long childId) {
+    specialNeedService.update(needUpdateDto, needId, childId);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
-  @DeleteMapping("{needId}")
-  public ResponseEntity<Void> delete(@PathVariable long needId) {
-    specialNeedService.delete(needId);
+  @DeleteMapping("{needId}/child/{childId}")
+  public ResponseEntity<Void> delete(@PathVariable long needId, @PathVariable long childId) {
+    specialNeedService.delete(needId, childId);
     return ResponseEntity.ok().build();
   }
 

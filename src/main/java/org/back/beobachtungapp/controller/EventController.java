@@ -27,16 +27,22 @@ public class EventController {
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
-  @PatchMapping("{eventId}")
+  @PatchMapping("{eventId}/child/{childId}")
   public ResponseEntity<EventResponseDto> update(
-      @RequestBody EventUpdateDto eventUpdateDto, @PathVariable long eventId) {
-    eventService.update(eventUpdateDto, eventId);
+      @RequestBody EventUpdateDto eventUpdateDto,
+      @PathVariable long eventId,
+      @PathVariable Long childId,
+      @CurrentCompanion CompanionDto companion) {
+    eventService.update(eventUpdateDto, eventId, companion, childId);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
-  @DeleteMapping("{eventId}")
-  public ResponseEntity<Void> delete(@PathVariable long eventId) {
-    eventService.delete(eventId);
+  @DeleteMapping("{eventId}/child/{childId}")
+  public ResponseEntity<Void> delete(
+      @PathVariable long eventId,
+      @PathVariable long childId,
+      @CurrentCompanion CompanionDto companion) {
+    eventService.delete(eventId, companion, childId);
     return ResponseEntity.ok().build();
   }
 

@@ -11,6 +11,7 @@ import org.back.beobachtungapp.dto.response.task.TaskResponseDto;
 import org.back.beobachtungapp.dto.update.task.TaskUpdateDto;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,19 +21,29 @@ import org.springframework.transaction.annotation.Transactional;
 public class TaskService {
   private final TaskDao taskDao;
 
+  @Transactional
+  @CacheEvict(value = "tasks", key = "#childId")
   public void save(TaskRequestDto dto, CompanionDto companionDto, Long childId) {
     taskDao.save(dto, childId, companionDto.id());
   }
 
-  @CacheEvict(value = "task", key = "#taskId")
+  @Caching(
+      evict = {
+        @CacheEvict(value = "task", key = "#taskId"),
+        @CacheEvict(value = "tasks", key = "#childId")
+      })
   @Transactional
-  public void update(TaskUpdateDto taskUpdateDto, Long taskId) {
+  public void update(TaskUpdateDto taskUpdateDto, Long taskId, Long childId) {
     taskDao.update(taskUpdateDto, taskId);
   }
 
-  @CacheEvict(value = "task", key = "#taskId")
+  @Caching(
+      evict = {
+        @CacheEvict(value = "task", key = "#taskId"),
+        @CacheEvict(value = "tasks", key = "#childId")
+      })
   @Transactional
-  public void delete(Long taskId) {
+  public void delete(Long taskId, Long childId) {
     taskDao.delete(taskId);
   }
 
@@ -40,6 +51,7 @@ public class TaskService {
     return taskDao.findByCompanionId(companionDto.id());
   }
 
+  @Cacheable(value = "tasks", key = "#childId", unless = "#result == null")
   public List<TaskResponseDto> findByChildId(Long childId) {
     return taskDao.findByChildId(childId);
   }

@@ -11,6 +11,7 @@ import org.back.beobachtungapp.dto.response.monitoring.MonitoringParamResponseDt
 import org.back.beobachtungapp.dto.update.monitoring.MonitoringParamUpdateDto;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,22 +22,32 @@ public class MonitoringParamService {
   private final ParamDao paramDao;
 
   @Transactional
+  @CacheEvict(value = "params", key = "#companionDto.id()")
   public void save(MonitoringParamRequestDto requestDto, CompanionDto companionDto) {
     paramDao.save(requestDto, companionDto.id());
   }
 
-  @CacheEvict(value = "param", key = "#paramId")
+  @Caching(
+      evict = {
+        @CacheEvict(value = "param", key = "#paramId"),
+        @CacheEvict(value = "params", key = "#companionDto.id()")
+      })
   @Transactional
-  public void update(MonitoringParamUpdateDto updateDto, Long paramId) {
+  public void update(MonitoringParamUpdateDto updateDto, Long paramId, CompanionDto companionDto) {
     paramDao.update(updateDto, paramId);
   }
 
-  @CacheEvict(value = "param", key = "#paramId")
+  @Caching(
+      evict = {
+        @CacheEvict(value = "param", key = "#paramId"),
+        @CacheEvict(value = "params", key = "#companionDto.id()")
+      })
   @Transactional
-  public void delete(Long paramId) {
+  public void delete(Long paramId, CompanionDto companionDto) {
     paramDao.delete(paramId);
   }
 
+  @Cacheable(value = "params", key = "#companionDto.id()", unless = "#result == null")
   public List<MonitoringParamResponseDto> findAll(CompanionDto companionDto) {
     return paramDao.findByCompanionId(companionDto.id());
   }

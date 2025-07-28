@@ -27,10 +27,10 @@ public class EntryDao {
     jdbcTemplate.update(
         sql,
         ps -> {
-          ps.setString(2, dto.value());
+          ps.setString(1, dto.value());
           ps.setString(2, dto.notes());
-          ps.setLong(2, monitoringParameterId);
-          ps.setLong(6, childId);
+          ps.setLong(3, monitoringParameterId);
+          ps.setLong(4, childId);
         });
   }
 

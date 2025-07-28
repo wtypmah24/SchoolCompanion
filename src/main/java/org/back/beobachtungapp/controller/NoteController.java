@@ -22,16 +22,18 @@ public class NoteController {
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
-  @PatchMapping("{noteId}")
+  @PatchMapping("{noteId}/child/{childId}")
   public ResponseEntity<NoteResponseDto> update(
-      @RequestBody NoteRequestDto noteRequestDto, @PathVariable long noteId) {
-    noteService.update(noteRequestDto, noteId);
+      @RequestBody NoteRequestDto noteRequestDto,
+      @PathVariable long noteId,
+      @PathVariable long childId) {
+    noteService.update(noteRequestDto, noteId, childId);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
-  @DeleteMapping("{noteId}")
-  public ResponseEntity<Void> delete(@PathVariable long noteId) {
-    noteService.delete(noteId);
+  @DeleteMapping("{noteId}/child/{childId}")
+  public ResponseEntity<Void> delete(@PathVariable long noteId, @PathVariable long childId) {
+    noteService.delete(noteId, childId);
     return ResponseEntity.ok().build();
   }
 

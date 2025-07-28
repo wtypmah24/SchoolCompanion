@@ -28,14 +28,17 @@ public class MonitoringParamController {
 
   @PatchMapping("{paramId}")
   public ResponseEntity<MonitoringParamResponseDto> update(
-      @RequestBody MonitoringParamUpdateDto updateDto, @PathVariable long paramId) {
-    paramService.update(updateDto, paramId);
+      @RequestBody MonitoringParamUpdateDto updateDto,
+      @PathVariable long paramId,
+      @CurrentCompanion CompanionDto companionDto) {
+    paramService.update(updateDto, paramId, companionDto);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
   @DeleteMapping("{paramId}")
-  public ResponseEntity<Void> delete(@PathVariable long paramId) {
-    paramService.delete(paramId);
+  public ResponseEntity<Void> delete(
+      @PathVariable long paramId, @CurrentCompanion CompanionDto companionDto) {
+    paramService.delete(paramId, companionDto);
     return ResponseEntity.ok().build();
   }
 

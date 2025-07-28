@@ -9,7 +9,6 @@ import org.back.beobachtungapp.dto.request.companion.CompanionRequestDto;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.update.companion.CompanionUpdateDto;
 import org.back.beobachtungapp.dto.update.companion.UpdatePasswordDto;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +20,6 @@ public class CompanionService {
   private final CompanionDao companionDao;
   private final PasswordEncoder passwordEncoder;
 
-  @CacheEvict(value = "users")
   @Transactional
   public void save(CompanionRequestDto companion) {
     String encodedPassword = passwordEncoder.encode(companion.password());
@@ -37,7 +35,6 @@ public class CompanionService {
     companionDao.save(newCompanion);
   }
 
-  @CacheEvict(value = "users")
   @Transactional
   public void update(CompanionUpdateDto dto, CompanionDto companionDto) {
     companionDao.update(dto, companionDto.id());
@@ -52,7 +49,6 @@ public class CompanionService {
   }
 
   @Transactional
-  @CacheEvict(value = "users")
   public void delete(CompanionDto companionDto) {
     companionDao.delete(companionDto.id());
   }
