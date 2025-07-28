@@ -27,21 +27,28 @@ public class MonitoringEntryController {
   public ResponseEntity<MonitoringEntryResponseDto> add(
       @RequestBody MonitoringEntryRequestDto requestDto,
       @PathVariable("childId") Long childId,
-      @PathVariable("paramId") Long paramId) {
-    entryService.save(requestDto, childId, paramId);
+      @PathVariable("paramId") Long paramId,
+      @CurrentCompanion CompanionDto companionDto) {
+    entryService.save(requestDto, childId, paramId, companionDto);
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
-  @PatchMapping("{entryId}")
+  @PatchMapping("{entryId}/child/{childId}")
   public ResponseEntity<MonitoringEntryResponseDto> update(
-      @RequestBody MonitoringEntryUpdateDto updateDto, @PathVariable long entryId) {
-    entryService.update(updateDto, entryId);
+      @RequestBody MonitoringEntryUpdateDto updateDto,
+      @PathVariable long entryId,
+      @CurrentCompanion CompanionDto companionDto,
+      @PathVariable Long childId) {
+    entryService.update(updateDto, entryId, companionDto, childId);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
-  @DeleteMapping("{entryId}")
-  public ResponseEntity<Void> delete(@PathVariable long entryId) {
-    entryService.delete(entryId);
+  @DeleteMapping("{entryId}/child/{childId}")
+  public ResponseEntity<Void> delete(
+      @PathVariable long entryId,
+      @CurrentCompanion CompanionDto companionDto,
+      @PathVariable long childId) {
+    entryService.delete(entryId, companionDto, childId);
     return ResponseEntity.ok().build();
   }
 
@@ -57,8 +64,9 @@ public class MonitoringEntryController {
   }
 
   @GetMapping()
-  public ResponseEntity<List<MonitoringEntryResponseDto>> getAll() {
-    return ResponseEntity.status(HttpStatus.OK).body(entryService.findAll());
+  public ResponseEntity<List<MonitoringEntryResponseDto>> getAll(
+      @CurrentCompanion CompanionDto companionDto) {
+    return ResponseEntity.status(HttpStatus.OK).body(entryService.findAll(companionDto));
   }
 
   @PostMapping("/download/child/{childId}")

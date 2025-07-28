@@ -6,10 +6,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.dao.EntryDao;
 import org.back.beobachtungapp.dto.request.monitoring.MonitoringEntryRequestDto;
+import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.response.monitoring.MonitoringEntryResponseDto;
 import org.back.beobachtungapp.dto.update.monitoring.MonitoringEntryUpdateDto;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,22 +22,40 @@ public class MonitoringEntryService {
   private final EntryDao entryDao;
 
   @Transactional
-  public void save(MonitoringEntryRequestDto requestDto, Long childId, Long paramId) {
+  @Caching(
+      evict = {
+        @CacheEvict(value = "entries", key = "#companionDto.id()"),
+        @CacheEvict(value = "entries_by_child", key = "#childId")
+      })
+  public void save(
+      MonitoringEntryRequestDto requestDto, Long childId, Long paramId, CompanionDto companionDto) {
     entryDao.save(requestDto, childId, paramId);
   }
 
-  @CacheEvict(value = "entry", key = "#entryId")
+  @Caching(
+      evict = {
+        @CacheEvict(value = "entry", key = "#entryId"),
+        @CacheEvict(value = "entries", key = "#companionDto.id()"),
+        @CacheEvict(value = "entries_by_child", key = "#childId")
+      })
   @Transactional
-  public void update(MonitoringEntryUpdateDto updateDto, Long entryId) {
+  public void update(
+      MonitoringEntryUpdateDto updateDto, Long entryId, CompanionDto companionDto, long childId) {
     entryDao.update(updateDto, entryId);
   }
 
-  @CacheEvict(value = "entry", key = "#entryId")
+  @Caching(
+      evict = {
+        @CacheEvict(value = "entry", key = "#entryId"),
+        @CacheEvict(value = "entries", key = "#companionDto.id()"),
+        @CacheEvict(value = "entries_by_child", key = "#childId")
+      })
   @Transactional
-  public void delete(Long entryId) {
+  public void delete(Long entryId, CompanionDto companionDto, long childId) {
     entryDao.delete(entryId);
   }
 
+  @Cacheable(value = "entries_by_child", key = "#childId", unless = "#result == null")
   public List<MonitoringEntryResponseDto> findAllByChildId(Long childId) {
     return entryDao.findByChildId(childId);
   }
@@ -51,7 +71,8 @@ public class MonitoringEntryService {
             });
   }
 
-  public List<MonitoringEntryResponseDto> findAll() {
-    return entryDao.findAll();
+  @Cacheable(value = "entries", key = "#dto.id()", unless = "#result == null")
+  public List<MonitoringEntryResponseDto> findAll(CompanionDto dto) {
+    return entryDao.findAll(dto.id());
   }
 }

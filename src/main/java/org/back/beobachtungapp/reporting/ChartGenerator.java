@@ -2,6 +2,7 @@ package org.back.beobachtungapp.reporting;
 
 import java.awt.image.BufferedImage;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -83,8 +84,9 @@ public class ChartGenerator {
 
     for (MonitoringEntryResponseDto entry : entries) {
       try {
-        double value = Double.parseDouble(entry.value()); // Ожидается числовое значение
-        series.addOrUpdate(new Millisecond(java.util.Date.from(entry.createdAt())), value);
+        double value = Double.parseDouble(entry.value());
+        series.addOrUpdate(
+            new Millisecond(java.util.Date.from(Instant.parse(entry.createdAt()))), value);
       } catch (NumberFormatException ignored) {
         log.warn("{} is not a number", entry.value());
       }

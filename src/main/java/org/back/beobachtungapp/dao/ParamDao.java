@@ -81,6 +81,6 @@ public class ParamDao {
         rs.getString("description"),
         rs.getInt("min_value"),
         rs.getInt("max_value"),
-        rs.getTimestamp("created_at").toInstant());
+        rs.getString("created_at"));
   }
 }

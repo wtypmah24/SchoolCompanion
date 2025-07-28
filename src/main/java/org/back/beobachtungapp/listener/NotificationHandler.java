@@ -21,7 +21,6 @@ public class NotificationHandler {
   private final EmailMessagePlanner emailMessagePlanner;
 
   public void handleNotification(String payload) {
-    log.debug("Received raw notification payload: {}", payload);
     try {
       JsonNode root = objectMapper.readTree(payload);
       String type = root.path("type").asText();

@@ -78,16 +78,17 @@ public class EntryDao {
     return jdbcTemplate.query(sql, ps -> ps.setLong(1, childId), this::mapRowToEntry);
   }
 
-  public List<MonitoringEntryResponseDto> findAll() {
+  public List<MonitoringEntryResponseDto> findAll(long companionId) {
     String sql =
         """
-            SELECT me.id, me.value, me.notes, me.monitoring_parameter_id, me.child_id, me.created_at,
-                   mp.title, mp.type
-            FROM monitoring_entries me
-            JOIN monitoring_parameters mp ON me.monitoring_parameter_id = mp.id
-        """;
+                    SELECT me.id, me.value, me.notes, me.monitoring_parameter_id, me.child_id, me.created_at,
+                           mp.title, mp.type
+                    FROM monitoring_entries me
+                    JOIN monitoring_parameters mp ON me.monitoring_parameter_id = mp.id
+                    WHERE mp.companion_id = ?
+                """;
 
-    return jdbcTemplate.query(sql, this::mapRowToEntry);
+    return jdbcTemplate.query(sql, ps -> ps.setLong(1, companionId), this::mapRowToEntry);
   }
 
   private MonitoringEntryResponseDto mapRowToEntry(ResultSet rs, int rowNum) throws SQLException {
@@ -100,6 +101,6 @@ public class EntryDao {
         rs.getString("title"),
         rs.getString("type"),
         rs.getLong("child_id"),
-        rs.getTimestamp("created_at").toInstant());
+        rs.getString("created_at"));
   }
 }

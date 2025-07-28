@@ -1,6 +1,5 @@
 package org.back.beobachtungapp.dto.response.monitoring;
 
-import java.time.Instant;
 import org.back.beobachtungapp.entity.monitoring.ScaleType;
 
 public record MonitoringParamResponseDto(
@@ -10,4 +9,4 @@ public record MonitoringParamResponseDto(
     String description,
     int minValue,
     int maxValue,
-    Instant createdAt) {}
+    String createdAt) {}

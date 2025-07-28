@@ -11,9 +11,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.back.beobachtungapp.config.properties.DbProperties;
 import org.postgresql.PGConnection;
 import org.postgresql.PGNotification;
 import org.springframework.stereotype.Component;
@@ -24,16 +24,16 @@ import org.springframework.stereotype.Component;
 public class PgListener {
   private Connection conn;
   private ScheduledExecutorService scheduler;
-  private final DataSource dataSource;
   private final NotificationHandler notificationHandler;
+  private final DbProperties dbProperties;
 
   @PostConstruct
   public void startListener() {
     try {
-      log.info("▶️ Starting PostgreSQL LISTEN listener...");
       conn =
-          DriverManager.getConnection("jdbc:postgresql://localhost:5433/postgres", "cat", "secret");
-      conn.setAutoCommit(true); // Обязательно!
+          DriverManager.getConnection(
+              dbProperties.getUrl(), dbProperties.getUsername(), dbProperties.getPassword());
+      conn.setAutoCommit(true);
 
       Statement stmt = conn.createStatement();
       PGConnection pgConnection = conn.unwrap(PGConnection.class);

@@ -1,9 +1,6 @@
 package org.back.beobachtungapp.config;
 
-import org.back.beobachtungapp.config.properties.BrevoProperties;
-import org.back.beobachtungapp.config.properties.JwtProperties;
-import org.back.beobachtungapp.config.properties.OpenAiProperties;
-import org.back.beobachtungapp.config.properties.TelegramProperties;
+import org.back.beobachtungapp.config.properties.*;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
   JwtProperties.class,
   OpenAiProperties.class,
   TelegramProperties.class,
-  BrevoProperties.class
+  BrevoProperties.class,
+  DbProperties.class,
 })
 public class PropertiesConfig {}

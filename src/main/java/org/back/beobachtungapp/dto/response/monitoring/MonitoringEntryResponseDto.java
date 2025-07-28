@@ -1,7 +1,5 @@
 package org.back.beobachtungapp.dto.response.monitoring;
 
-import java.time.Instant;
-
 public record MonitoringEntryResponseDto(
     Long id,
     String value,
@@ -10,4 +8,4 @@ public record MonitoringEntryResponseDto(
     String parameterName,
     String type,
     Long childId,
-    Instant createdAt) {}
+    String createdAt) {}
