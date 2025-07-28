@@ -1,4 +1,4 @@
-package org.back.beobachtungapp.entity.companion;
+package org.back.beobachtungapp.auth;
 
 import java.util.List;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
