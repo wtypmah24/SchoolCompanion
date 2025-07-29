@@ -28,31 +28,39 @@ public class WorkSessionService {
 
   @Transactional
   public void endWorkSession(CompanionDto companionDto) {
-    sessionDao.end(companionDto.id(), Instant.now(), startOfUtcDay());
+    sessionDao.end(companionDto.id(), Instant.now(), startOfDay());
   }
 
   public WorkSessionResponseDto isWorking(CompanionDto companionDto) {
-    return sessionDao.findTodayWorkSession(companionDto.id(), startOfUtcDay()).orElse(null);
+    return sessionDao.findTodayWorkSession(companionDto.id(), startOfDay()).orElse(null);
   }
 
   public List<WorkSessionResponseDto> getWorkSessionsByDates(
       CompanionDto companionDto, LocalDate start, LocalDate end) {
-    return sessionDao.findSessionsByDateRange(companionDto.id(), startOfUtcDay(), endOfUtcDay());
+    ZoneId zone = ZoneId.of("Europe/Berlin");
+
+    Instant startInstant = start.atStartOfDay(zone).toInstant();
+    Instant endInstant = end.plusDays(1).atStartOfDay(zone).minusNanos(1).toInstant();
+
+    return sessionDao.findSessionsByDateRange(companionDto.id(), startInstant, endInstant);
   }
 
   private boolean hasWorkSessionToday(Long companionId) {
-    return sessionDao.findTodayWorkSession(companionId, startOfUtcDay()).isPresent();
+    return sessionDao.findTodayWorkSession(companionId, startOfDay()).isPresent();
   }
 
-  private Instant startOfUtcDay() {
-    return ZonedDateTime.now(ZoneOffset.UTC).toLocalDate().atStartOfDay(ZoneOffset.UTC).toInstant();
+  private Instant startOfDay() {
+    return ZonedDateTime.now(ZoneId.of("Europe/Berlin"))
+        .toLocalDate()
+        .atStartOfDay(ZoneId.of("Europe/Berlin"))
+        .toInstant();
   }
 
-  private Instant endOfUtcDay() {
-    return ZonedDateTime.now(ZoneOffset.UTC)
+  private Instant endOfDay() {
+    return ZonedDateTime.now(ZoneId.of("Europe/Berlin"))
         .toLocalDate()
         .plusDays(1)
-        .atStartOfDay(ZoneOffset.UTC)
+        .atStartOfDay(ZoneId.of("Europe/Berlin"))
         .minusNanos(1)
         .toInstant();
   }

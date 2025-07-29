@@ -18,6 +18,7 @@
             <column name="name" type="VARCHAR(255)"/>
             <column name="surname" type="VARCHAR(255)"/>
             <column name="email" type="VARCHAR(255)"/>
+            <column name="avatar_id" type="VARCHAR(255)"/>
             <column name="password" type="VARCHAR(255)"/>
             <column name="tg_id" type="VARCHAR(255)"/>
             <column name="organization" type="VARCHAR(255)"/>

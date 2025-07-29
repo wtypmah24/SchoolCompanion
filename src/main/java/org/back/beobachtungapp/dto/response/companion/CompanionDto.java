@@ -9,4 +9,5 @@ public record CompanionDto(
     String organization,
     String email,
     String tgId,
+    String avatarId,
     Instant createdAt) {}

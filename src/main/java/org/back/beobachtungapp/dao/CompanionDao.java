@@ -109,6 +109,11 @@ public class CompanionDao {
         sql, ps -> ps.setLong(1, companionId), (rs, rowNum) -> rs.getString("thread_id"));
   }
 
+  public void addAvatar(Long companionId, String avatarId) {
+    String sql = "UPDATE companions SET avatar_id = ? WHERE id = ?";
+    jdbcTemplate.update(sql, avatarId, companionId);
+  }
+
   private CompanionDto mapRowToCompanionDto(ResultSet rs, int rowNum) throws SQLException {
     return new CompanionDto(
         rs.getLong("id"),
@@ -117,6 +122,7 @@ public class CompanionDao {
         rs.getString("organization"),
         rs.getString("email"),
         rs.getString("tg_id"),
+        rs.getString("avatar_id"),
         rs.getTimestamp("created_at").toInstant());
   }
 
