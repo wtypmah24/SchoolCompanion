@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.dao.SessionDao;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.response.session.WorkSessionResponseDto;
+import org.back.beobachtungapp.dto.update.session.SessionUpdateDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +44,16 @@ public class WorkSessionService {
     Instant endInstant = end.plusDays(1).atStartOfDay(zone).minusNanos(1).toInstant();
 
     return sessionDao.findSessionsByDateRange(companionDto.id(), startInstant, endInstant);
+  }
+
+  @Transactional
+  public void update(Long id, SessionUpdateDto dto) {
+    sessionDao.update(id, dto);
+  }
+
+  @Transactional
+  public void delete(Long id) {
+    sessionDao.delete(id);
   }
 
   private boolean hasWorkSessionToday(Long companionId) {

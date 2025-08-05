@@ -1,6 +1,5 @@
 package org.back.beobachtungapp.resolver;
 
-import lombok.extern.slf4j.Slf4j;
 import org.back.beobachtungapp.annotation.CurrentCompanion;
 import org.back.beobachtungapp.auth.CompanionAuthentication;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
@@ -14,7 +13,6 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-@Slf4j
 @Component
 public class CurrentCompanionArgumentResolver implements HandlerMethodArgumentResolver {
 

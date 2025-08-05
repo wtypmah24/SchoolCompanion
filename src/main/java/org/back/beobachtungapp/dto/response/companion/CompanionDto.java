@@ -10,4 +10,6 @@ public record CompanionDto(
     String email,
     String tgId,
     String avatarId,
+    String startWorkingTime,
+    String endWorkingTime,
     Instant createdAt) {}

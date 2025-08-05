@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.back.beobachtungapp.dto.request.child.ChildRequestDto;
+import org.back.beobachtungapp.dto.response.child.ChildPhotoResponseDto;
 import org.back.beobachtungapp.dto.response.child.ChildResponseDto;
 import org.back.beobachtungapp.dto.update.child.ChildUpdateDto;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -69,6 +70,37 @@ public class ChildDao {
         jdbcTemplate.query(sql, ps -> ps.setLong(1, id), this::mapRowToChild);
 
     return results.stream().findFirst();
+  }
+
+  public void savePhoto(Long childId, String photoId, String description) {
+    String sql =
+        """
+                        INSERT INTO child_photo_ids (photo_id, child_id, description)
+                        VALUES (?, ?, ?)
+                    """;
+    jdbcTemplate.update(
+        sql,
+        ps -> {
+          ps.setString(1, photoId);
+          ps.setLong(2, childId);
+          ps.setString(3, description);
+        });
+  }
+
+  public List<ChildPhotoResponseDto> getPhotosByChildId(Long childId) {
+    String sql = "SELECT photo_id, description, created_at FROM child_photo_ids WHERE child_id = ?";
+    return jdbcTemplate.query(sql, ps -> ps.setLong(1, childId), this::mapRowToPhotoResponseDto);
+  }
+
+  public void removePhoto(String childPhotoId) {
+    String sql = "DELETE FROM child_photo_ids WHERE photo_id = ?";
+    jdbcTemplate.update(sql, childPhotoId);
+  }
+
+  private ChildPhotoResponseDto mapRowToPhotoResponseDto(ResultSet rs, int rowNum)
+      throws SQLException {
+    return new ChildPhotoResponseDto(
+        rs.getString("photo_id"), rs.getString("description"), rs.getString("created_at"));
   }
 
   private ChildResponseDto mapRowToChild(ResultSet rs, int rowNum) throws SQLException {

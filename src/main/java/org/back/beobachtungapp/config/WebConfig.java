@@ -3,7 +3,7 @@ package org.back.beobachtungapp.config;
 import java.nio.file.Paths;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.back.beobachtungapp.config.properties.AvatarProperties;
+import org.back.beobachtungapp.config.properties.PhotoProperties;
 import org.back.beobachtungapp.filter.RequestResponseLoggingFilter;
 import org.back.beobachtungapp.resolver.CurrentCompanionArgumentResolver;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -18,7 +18,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
   private final CurrentCompanionArgumentResolver resolver;
-  private final AvatarProperties avatarProperties;
+  private final PhotoProperties photoProperties;
 
   @Override
   public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
@@ -38,8 +38,9 @@ public class WebConfig implements WebMvcConfigurer {
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
     registry
-        .addResourceHandler("/avatar/**")
+        .addResourceHandler("upload/**")
         .addResourceLocations(
-            "file:" + Paths.get(avatarProperties.getUpload_dir()).toAbsolutePath() + "/");
+            "file:" + Paths.get(photoProperties.getAvatar_dir()).toAbsolutePath() + "/")
+        .addResourceLocations("file:" + photoProperties.getChild_photo() + "/");
   }
 }

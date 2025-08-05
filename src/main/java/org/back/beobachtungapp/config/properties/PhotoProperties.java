@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 @Setter
 @Validated
 @ConfigurationProperties(prefix = "avatar")
-public class AvatarProperties {
-  @NotBlank private String upload_dir;
+public class PhotoProperties {
+  @NotBlank private String avatar_dir;
+  @NotBlank private String child_photo;
 }

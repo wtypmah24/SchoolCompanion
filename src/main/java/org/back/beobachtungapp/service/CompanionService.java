@@ -36,8 +36,8 @@ public class CompanionService {
   }
 
   @Transactional
-  public void update(CompanionUpdateDto dto, CompanionDto companionDto) {
-    companionDao.update(dto, companionDto.id());
+  public CompanionDto update(CompanionUpdateDto dto, CompanionDto companionDto) {
+    return companionDao.update(dto, companionDto.id());
   }
 
   @Transactional
@@ -61,6 +61,15 @@ public class CompanionService {
   @Transactional
   public void addChatIdToCompanion(Long companionId, String newChatId) {
     companionDao.addThreadToCompanion(companionId, newChatId);
+  }
+
+  public boolean getNotificationStatus(CompanionDto companionDto) {
+    return companionDao.getNotificationStatus(companionDto.id());
+  }
+
+  @Transactional
+  public void setNotificationStatus(CompanionDto companionDto, boolean status) {
+    companionDao.updateNotificationStatus(companionDto.id(), status);
   }
 
   public List<String> getThreadIds(Long companionId) {

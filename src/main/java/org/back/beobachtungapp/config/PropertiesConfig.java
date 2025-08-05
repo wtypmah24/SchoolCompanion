@@ -11,6 +11,6 @@ import org.springframework.context.annotation.Configuration;
   TelegramProperties.class,
   BrevoProperties.class,
   DbProperties.class,
-  AvatarProperties.class
+  PhotoProperties.class
 })
 public class PropertiesConfig {}

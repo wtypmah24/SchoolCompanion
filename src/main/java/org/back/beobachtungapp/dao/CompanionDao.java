@@ -2,6 +2,7 @@ package org.back.beobachtungapp.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -36,19 +37,30 @@ public class CompanionDao {
         });
   }
 
-  public void update(CompanionUpdateDto dto, Long companionId) {
+  public CompanionDto update(CompanionUpdateDto dto, Long companionId) {
     String sql =
         """
-                          UPDATE companions SET
-                              name = COALESCE(?, name),
-                              surname = COALESCE(?, surname),
-                              email = COALESCE(?, email),
-                              organization = COALESCE(?, organization)
-                          WHERE id = ?
-                      """;
+          UPDATE companions SET
+            name = COALESCE(?, name),
+            surname = COALESCE(?, surname),
+            email = COALESCE(?, email),
+            organization = COALESCE(?, organization),
+            workday_start = COALESCE(?, workday_start),
+            workday_end = COALESCE(?, workday_end)
+          WHERE id = ?
+          RETURNING *
+      """;
 
-    jdbcTemplate.update(
-        sql, dto.name(), dto.surname(), dto.email(), dto.organization(), companionId);
+    return jdbcTemplate.queryForObject(
+        sql,
+        this::mapRowToCompanionDto,
+        dto.name(),
+        dto.surname(),
+        dto.email(),
+        dto.organization(),
+        dto.startWorkingTime(),
+        dto.endWorkingTime(),
+        companionId);
   }
 
   public void delete(Long companionId) {
@@ -109,9 +121,44 @@ public class CompanionDao {
         sql, ps -> ps.setLong(1, companionId), (rs, rowNum) -> rs.getString("thread_id"));
   }
 
-  public void addAvatar(Long companionId, String avatarId) {
+  public void addAvatarRefToCompanion(Long companionId, String avatarId) {
     String sql = "UPDATE companions SET avatar_id = ? WHERE id = ?";
     jdbcTemplate.update(sql, avatarId, companionId);
+  }
+
+  public void removeAvatarRefFromCompanion(Long companionId) {
+    String sql = "UPDATE companions SET avatar_id = NULL WHERE id = ?";
+    jdbcTemplate.update(sql, companionId);
+  }
+
+  public boolean getNotificationStatus(Long companionId) {
+    String sql = "SELECT notification FROM companions WHERE id = ?";
+    return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, companionId));
+  }
+
+  public void updateNotificationStatus(Long companionId, boolean status) {
+    String sql = "UPDATE companions SET notification = ? WHERE id = ?";
+    jdbcTemplate.update(sql, status, companionId);
+  }
+
+  public List<CompanionDto> getCompanionsByStartWorkingHors() {
+    String sql =
+        """
+            SELECT * FROM companions
+            WHERE workday_start >= ? AND workday_start < ?
+              AND notification = true AND tg_id IS NOT NULL
+        """;
+
+    LocalTime currentTime = LocalTime.now();
+    LocalTime oneMinuteLater = currentTime.plusMinutes(1);
+
+    return jdbcTemplate.query(
+        sql,
+        ps -> {
+          ps.setTime(1, java.sql.Time.valueOf(currentTime));
+          ps.setTime(2, java.sql.Time.valueOf(oneMinuteLater));
+        },
+        this::mapRowToCompanionDto);
   }
 
   private CompanionDto mapRowToCompanionDto(ResultSet rs, int rowNum) throws SQLException {
@@ -123,6 +170,8 @@ public class CompanionDao {
         rs.getString("email"),
         rs.getString("tg_id"),
         rs.getString("avatar_id"),
+        rs.getString("workday_start"),
+        rs.getString("workday_end"),
         rs.getTimestamp("created_at").toInstant());
   }
 

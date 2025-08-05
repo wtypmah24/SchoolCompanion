@@ -18,13 +18,26 @@ public class CompanionController {
   @PatchMapping()
   public ResponseEntity<CompanionDto> update(
       @RequestBody CompanionUpdateDto updateDto, @CurrentCompanion CompanionDto companion) {
-    companionService.update(updateDto, companion);
-    return ResponseEntity.status(HttpStatus.OK).build();
+    return ResponseEntity.status(HttpStatus.OK).body(companionService.update(updateDto, companion));
   }
 
   @DeleteMapping()
   public ResponseEntity<Void> deleteAccount(@CurrentCompanion CompanionDto companionDto) {
     companionService.delete(companionDto);
+    return ResponseEntity.ok().build();
+  }
+
+  @GetMapping("notifications")
+  public ResponseEntity<Boolean> getNotificationStatus(
+      @CurrentCompanion CompanionDto companionDto) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(companionService.getNotificationStatus(companionDto));
+  }
+
+  @PatchMapping("notifications")
+  public ResponseEntity<Void> updateNotificationStatus(
+      @CurrentCompanion CompanionDto companionDto, @RequestBody Boolean enabled) {
+    companionService.setNotificationStatus(companionDto, enabled);
     return ResponseEntity.ok().build();
   }
 }

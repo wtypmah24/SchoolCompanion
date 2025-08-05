@@ -88,6 +88,10 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers("/swagger-ui.html")
                     .permitAll()
+                    .requestMatchers("/upload/**")
+                    .permitAll()
+                    .requestMatchers("/photos/**")
+                    .permitAll()
                     .anyRequest()
                     .authenticated())
         .sessionManagement(

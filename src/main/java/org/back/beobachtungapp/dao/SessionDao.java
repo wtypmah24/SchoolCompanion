@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.back.beobachtungapp.dto.response.session.WorkSessionResponseDto;
+import org.back.beobachtungapp.dto.update.session.SessionUpdateDto;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -30,6 +31,23 @@ public class SessionDao {
           ps.setTimestamp(1, Timestamp.from(start));
           ps.setLong(2, companionId);
         });
+  }
+
+  public void update(Long id, SessionUpdateDto dto) {
+    String sql =
+        """
+                UPDATE work_sessions SET
+                    start_time = COALESCE(?, start_time),
+                    end_time = COALESCE(?, end_time),
+                    note = COALESCE(?, note)
+                WHERE id = ?;
+                """;
+    jdbcTemplate.update(sql, dto.startTime(), dto.endTime(), dto.note(), id);
+  }
+
+  public void delete(Long id) {
+    String sql = "DELETE FROM work_sessions WHERE id = ?";
+    jdbcTemplate.update(sql, id);
   }
 
   public void end(Long companionId, Instant now, Instant todayStart) {

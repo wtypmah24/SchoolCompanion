@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.back.beobachtungapp.annotation.CurrentCompanion;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.response.session.WorkSessionResponseDto;
+import org.back.beobachtungapp.dto.update.session.SessionUpdateDto;
 import org.back.beobachtungapp.service.WorkSessionService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -42,5 +43,18 @@ public class WorkSessionController {
       @CurrentCompanion CompanionDto companion) {
     return ResponseEntity.status(HttpStatus.OK)
         .body(sessionService.getWorkSessionsByDates(companion, startDate, endDate));
+  }
+
+  @PatchMapping("{sessionId}")
+  public ResponseEntity<Void> updateWorkSession(
+      @PathVariable Long sessionId, @RequestBody SessionUpdateDto dto) {
+    sessionService.update(sessionId, dto);
+    return ResponseEntity.ok().build();
+  }
+
+  @DeleteMapping("{sessionId}")
+  public ResponseEntity<Void> deleteWorkSession(@PathVariable Long sessionId) {
+    sessionService.delete(sessionId);
+    return ResponseEntity.ok().build();
   }
 }

@@ -19,4 +19,5 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
     <include file="./db.changelog-trigger-updated-at.xml" relativeToChangelogFile="true"/>
     <include file="./db.changelog-trigger-event-notification.xml" relativeToChangelogFile="true"/>
     <include file="./db.changelog-trigger-session-notification.xml" relativeToChangelogFile="true"/>
+    <include file="./db.changelog-create-child-photo-ids.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

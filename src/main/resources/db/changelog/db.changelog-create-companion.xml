@@ -19,9 +19,12 @@
             <column name="surname" type="VARCHAR(255)"/>
             <column name="email" type="VARCHAR(255)"/>
             <column name="avatar_id" type="VARCHAR(255)"/>
+            <column name="notification" type="BOOLEAN" defaultValue="true"/>
             <column name="password" type="VARCHAR(255)"/>
             <column name="tg_id" type="VARCHAR(255)"/>
             <column name="organization" type="VARCHAR(255)"/>
+            <column name="workday_start" type="TIME" defaultValue="08:00:00"/>
+            <column name="workday_end" type="TIME" defaultValue="15:00:00"/>
             <column name="updated_at" type="TIMESTAMP"/>
             <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
         </createTable>

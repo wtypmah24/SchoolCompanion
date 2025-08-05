@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("photo")
+@RequestMapping("avatar")
 @RequiredArgsConstructor
-public class PhotoController {
+public class AvatarController {
   private final PhotoService photoService;
 
   @PostMapping("/upload")
   public ResponseEntity<String> uploadPhoto(
       @CurrentCompanion CompanionDto companion, @RequestParam("file") MultipartFile file) {
-    photoService.uploadAvatar(companion, file);
+    photoService.uploadCompanionAvatar(companion, file);
     return ResponseEntity.ok("Photo uploaded successfully.");
   }
 }
