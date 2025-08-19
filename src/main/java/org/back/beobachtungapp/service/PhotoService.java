@@ -41,7 +41,9 @@ public class PhotoService {
   @Transactional
   public void uploadCompanionAvatar(CompanionDto companionDto, MultipartFile file) {
     String filename = savePhoto(file, photoProperties.getAvatar_dir(), companionDto.id());
-    removeCompanionAvatarFromUploads(companionDto.avatarId(), photoProperties.getAvatar_dir());
+    if (companionDto.avatarId() != null && !companionDto.avatarId().isEmpty()) {
+      removeCompanionAvatarFromUploads(companionDto.avatarId(), photoProperties.getAvatar_dir());
+    }
     companionDao.addAvatarRefToCompanion(companionDto.id(), filename);
   }
 
