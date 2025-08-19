@@ -1,5 +1,7 @@
 package org.back.beobachtungapp.controller;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.back.beobachtungapp.annotation.CurrentCompanion;
 import org.back.beobachtungapp.auth.TokenService;
@@ -37,6 +39,20 @@ public class AuthController {
 
     String token = tokenService.generateToken(authentication);
     return ResponseEntity.ok(token);
+  }
+
+  @PostMapping("/login-app")
+  public ResponseEntity<Map<String, CompanionDto>> loginApp(
+      @RequestBody LoginRequest loginRequest) {
+    Authentication authentication =
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password()));
+
+    String token = tokenService.generateToken(authentication);
+    CompanionDto companion = companionService.getCompanionByEmail(loginRequest.email());
+    Map<String, CompanionDto> response = new HashMap<>();
+    response.put(token, companion);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/me")

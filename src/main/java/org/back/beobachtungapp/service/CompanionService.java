@@ -67,6 +67,10 @@ public class CompanionService {
     return companionDao.getNotificationStatus(companionDto.id());
   }
 
+  public CompanionDto getCompanionByEmail(String email) {
+    return companionDao.findByEmail(email).orElse(null);
+  }
+
   @Transactional
   public void setNotificationStatus(CompanionDto companionDto, boolean status) {
     companionDao.updateNotificationStatus(companionDto.id(), status);

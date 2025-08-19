@@ -54,8 +54,8 @@ public class EventDao {
         sql,
         dto.title(),
         dto.description(),
-        dto.startDateTime(),
-        dto.endDateTime(),
+        dto.startDateTime() != null ? Timestamp.from(dto.startDateTime()) : null,
+        dto.endDateTime() != null ? Timestamp.from(dto.endDateTime()) : null,
         dto.location(),
         eventId);
   }

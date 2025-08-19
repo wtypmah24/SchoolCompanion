@@ -9,9 +9,6 @@ import org.back.beobachtungapp.dto.request.event.EventRequestDto;
 import org.back.beobachtungapp.dto.response.companion.CompanionDto;
 import org.back.beobachtungapp.dto.response.event.EventResponseDto;
 import org.back.beobachtungapp.dto.update.event.EventUpdateDto;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,49 +19,49 @@ public class EventService {
   private final EventDao eventDao;
 
   @Transactional
-  @Caching(
-      evict = {
-        @CacheEvict(value = "events", key = "#companionDto.id()"),
-        @CacheEvict(value = "events_by_child", key = "#childId")
-      })
+  //  @Caching(
+  //      evict = {
+  //        @CacheEvict(value = "events", key = "#companionDto.id()"),
+  //        @CacheEvict(value = "events_by_child", key = "#childId")
+  //      })
   public void save(EventRequestDto eventRequestDto, CompanionDto companionDto, Long childId) {
     eventDao.save(eventRequestDto, childId, companionDto.id());
   }
 
-  @Caching(
-      evict = {
-        @CacheEvict(value = "event", key = "#eventId"),
-        @CacheEvict(value = "events", key = "#companionDto.id()"),
-        @CacheEvict(value = "events_by_child", key = "#childId")
-      })
+  //  @Caching(
+  //      evict = {
+  //        @CacheEvict(value = "event", key = "#eventId"),
+  //        @CacheEvict(value = "events", key = "#companionDto.id()"),
+  //        @CacheEvict(value = "events_by_child", key = "#childId")
+  //      })
   @Transactional
   public void update(
       EventUpdateDto eventUpdateDto, Long eventId, CompanionDto companionDto, Long childId) {
     eventDao.update(eventUpdateDto, eventId);
   }
 
-  @Caching(
-      evict = {
-        @CacheEvict(value = "event", key = "#eventId"),
-        @CacheEvict(value = "events", key = "#companionDto.id()"),
-        @CacheEvict(value = "events_by_child", key = "#childId")
-      })
+  //  @Caching(
+  //      evict = {
+  //        @CacheEvict(value = "event", key = "#eventId"),
+  //        @CacheEvict(value = "events", key = "#companionDto.id()"),
+  //        @CacheEvict(value = "events_by_child", key = "#childId")
+  //      })
   @Transactional
   public void delete(Long eventId, CompanionDto companionDto, Long childId) {
     eventDao.delete(eventId);
   }
 
-  @Cacheable(value = "events", key = "#companionDto.id()", unless = "#result == null")
+  //  @Cacheable(value = "events", key = "#companionDto.id()", unless = "#result == null")
   public List<EventResponseDto> findAll(CompanionDto companionDto) {
     return eventDao.findByCompanionId(companionDto.id());
   }
 
-  @Cacheable(value = "events_by_child", key = "#childId", unless = "#result == null")
+  //  @Cacheable(value = "events_by_child", key = "#childId", unless = "#result == null")
   public List<EventResponseDto> findByChild(Long childId) {
     return eventDao.findByChildId(childId);
   }
 
-  @Cacheable(value = "event", key = "#eventId", unless = "#result == null")
+  //  @Cacheable(value = "event", key = "#eventId", unless = "#result == null")
   public EventResponseDto findById(Long eventId) {
     return eventDao
         .findById(eventId)
